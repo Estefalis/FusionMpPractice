@@ -983,12 +983,15 @@ MonoBehaviour:
   m_playerController: {fileID: 1040389692}
   m_characterController: {fileID: 1040389689}
   m_cursorLockMode: 0
-  m_playerWalkSpeed: 5
-  m_playerRunSpeed: 10
-  m_playerCrouchSpeed: 2.5
+  m_walkSpeed: 5
+  m_runSpeed: 10
+  m_crouchSpeed: 2.5
   m_jumpForce: 11.5
   m_kneelTime: 0.1
   m_moveSpeedLerpTime: 0.5
+  m_durationToMaxSpeed: 2.5
+  m_durationToZero: 6
+  m_breakToZero: 1
   m_groundCheckLayerMask:
     serializedVersion: 2
     m_Bits: 833

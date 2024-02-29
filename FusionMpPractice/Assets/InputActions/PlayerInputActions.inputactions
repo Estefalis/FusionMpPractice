@@ -51,6 +51,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "ActiveBreaking",
+                    "type": "Button",
+                    "id": "c39db1d9-01bc-4296-897b-e8b8123ce96a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "SwitchMoveModi",
                     "type": "Button",
                     "id": "f4a5be9a-fbc3-40b3-957a-94f752f18671",
@@ -96,7 +105,7 @@
                     "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -107,7 +116,7 @@
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -118,7 +127,7 @@
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -129,7 +138,7 @@
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -217,7 +226,7 @@
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -261,7 +270,7 @@
                     "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Acceleration",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -305,7 +314,7 @@
                     "path": "<Keyboard>/ctrl",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Duck",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -349,7 +358,7 @@
                     "path": "<Keyboard>/m",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "Menu",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -437,7 +446,7 @@
                     "path": "<Keyboard>/c",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardAndMouse;UniversalController;PlaystationController;XBoxController",
+                    "groups": "KeyboardAndMouse",
                     "action": "CursorLockMode",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -472,6 +481,50 @@
                     "processors": "",
                     "groups": "XBoxController",
                     "action": "CursorLockMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "75749436-dece-423b-af8e-2e483c215b6d",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardAndMouse",
+                    "action": "ActiveBreaking",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "630b7130-ce6a-479b-bfd3-30c7408a1bbe",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "UniversalController",
+                    "action": "ActiveBreaking",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7e40a34b-c6f7-4300-b162-14e4ac3b0d56",
+                    "path": "<DualShockGamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlaystationController",
+                    "action": "ActiveBreaking",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "380bf17b-6a07-498b-8d8f-ec0804778ed3",
+                    "path": "<XInputController>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "XBoxController",
+                    "action": "ActiveBreaking",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

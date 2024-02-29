@@ -1,7 +1,6 @@
 using UnityEngine;
+using PlayerInputManagement;
 
-public class PlayerController : MonoBehaviour
-{
     internal enum EMoveModi
     {
         Idle,
@@ -9,8 +8,6 @@ public class PlayerController : MonoBehaviour
         Running,
         Crouching
     }
-
-    [SerializeField] internal EMoveModi m_eCurrentMoveMode;
 
     internal enum MoveInputDevice
     {
@@ -20,6 +17,10 @@ public class PlayerController : MonoBehaviour
         PlaystationController,
         XBoxController
     }
+
+public class PlayerController : MonoBehaviour
+{
+    [SerializeField] internal EMoveModi m_eCurrentMoveMode;
     
     internal MoveInputDevice m_moveInputDevice;
 

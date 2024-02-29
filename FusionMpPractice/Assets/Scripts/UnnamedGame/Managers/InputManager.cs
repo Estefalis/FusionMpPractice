@@ -5,66 +5,69 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public class InputManager : MonoBehaviour
+namespace PlayerInputManagement
 {
-    internal static PlayerInputActions m_InputManagerActions;
-    internal static event Action<InputActionMap> m_changeActiveActionMap;
-
-    public static bool InputManagerIsSet { get => m_inputManagerIsSet; }
-    internal static bool m_inputManagerIsSet = false;
-
-    private void Awake()
+    public class InputManager : MonoBehaviour
     {
-        if (m_InputManagerActions == null)
-            m_InputManagerActions = new PlayerInputActions();
+        internal static PlayerInputActions m_InputManagerActions;
+        internal static event Action<InputActionMap> m_changeActiveActionMap;
 
-        SceneManager.sceneLoaded += OnSceneFinishedLoading;
-        m_inputManagerIsSet = true;
-    }
+        public static bool InputManagerIsSet { get => m_inputManagerIsSet; }
+        internal static bool m_inputManagerIsSet = false;
 
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneFinishedLoading;
-        m_inputManagerIsSet = false;
-    }
-
-    private void Start()
-    {
-        ToggleActionMaps(m_InputManagerActions.PlayerControl);
-    }
-
-    private void OnSceneFinishedLoading(Scene _scene, LoadSceneMode _mode)
-    {
-        switch (_scene.buildIndex)
+        private void Awake()
         {
-            case 0:
+            if (m_InputManagerActions == null)
+                m_InputManagerActions = new PlayerInputActions();
+
+            SceneManager.sceneLoaded += OnSceneFinishedLoading;
+            m_inputManagerIsSet = true;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneFinishedLoading;
+            m_inputManagerIsSet = false;
+        }
+
+        private void Start()
+        {
+            ToggleActionMaps(m_InputManagerActions.PlayerControl);
+        }
+
+        private void OnSceneFinishedLoading(Scene _scene, LoadSceneMode _mode)
+        {
+            switch (_scene.buildIndex)
             {
-                ToggleActionMaps(m_InputManagerActions.DefaultUI);
-                break;
-            }
-            case 1:
-            case 2:
-            {
-                ToggleActionMaps(m_InputManagerActions.PlayerControl);
-                break;
-            }
-            default:
-            {
+                case 0:
+                {
+                    ToggleActionMaps(m_InputManagerActions.DefaultUI);
+                    break;
+                }
+                case 1:
+                case 2:
+                {
+                    ToggleActionMaps(m_InputManagerActions.PlayerControl);
+                    break;
+                }
+                default:
+                {
 #if UNITY_EDITOR
-                Debug.LogWarning("Please define an InputAction to set at start of this Scene!");
+                    Debug.LogWarning("Please define an InputAction to set at start of this Scene!");
 #endif
-                break;
+                    break;
+                }
             }
         }
-    }
 
-    public static void ToggleActionMaps(InputActionMap _actionMap)
-    {
-        if (_actionMap.enabled)
-            return;
+        public static void ToggleActionMaps(InputActionMap _actionMap)
+        {
+            if (_actionMap.enabled)
+                return;
 
-        m_InputManagerActions.Disable();
-        m_changeActiveActionMap?.Invoke(_actionMap);
-        _actionMap.Enable();
+            m_InputManagerActions.Disable();
+            m_changeActiveActionMap?.Invoke(_actionMap);
+            _actionMap.Enable();
+        }
     }
 }

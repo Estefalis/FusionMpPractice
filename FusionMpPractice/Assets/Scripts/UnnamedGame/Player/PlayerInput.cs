@@ -26,9 +26,9 @@ public class PlayerInput : MonoBehaviour
 
     #region Movement-Variables
     //[Header("Movement")]
-    //[SerializeField] private float m_playerWalkSpeed = 5f;
-    //[SerializeField] private float m_playerRunSpeed = 10f;
-    //[SerializeField] private float m_playerCrouchSpeed = 2.5f;
+    //[SerializeField] private float m_walkSpeed = 5f;
+    //[SerializeField] private float m_runSpeed = 10f;
+    //[SerializeField] private float m_crouchSpeed = 2.5f;
     //[SerializeField] private float m_jumpForce = 11.5f;
     //[SerializeField] private float m_kneelTime = 0.1f;
 
@@ -110,9 +110,9 @@ public class PlayerInput : MonoBehaviour
     {
         //m_playerInputActions.PlayerControl.Disable();
         //m_playerInputActions.PlayerControl.Movement.performed -= MoveCharacter;
-        //m_playerInputActions.PlayerControl.Movement.canceled -= StopCharacterMovement;
+        //m_playerInputActions.PlayerControl.Movement.canceled -= StopMovement;
         //m_playerInputActions.PlayerControl.Rotation.performed -= RotateCharacter;
-        //m_playerInputActions.PlayerControl.Rotation.canceled -= StopCharacterRotation;
+        //m_playerInputActions.PlayerControl.Rotation.canceled -= StopRotation;
         //m_playerInputActions.PlayerControl.Jump.performed -= CharacterJump;
         //m_playerInputActions.PlayerControl.Jump.canceled -= StopJumping;
         //m_playerInputActions.PlayerControl.Duck.performed -= CharacterDuck;
@@ -132,9 +132,9 @@ public class PlayerInput : MonoBehaviour
         //m_playerInputActions = InputManager.m_InputManagerActions;
         //m_playerInputActions.PlayerControl.Enable();
         //m_playerInputActions.PlayerControl.Movement.performed += MoveCharacter;
-        //m_playerInputActions.PlayerControl.Movement.canceled += StopCharacterMovement;
+        //m_playerInputActions.PlayerControl.Movement.canceled += StopMovement;
         //m_playerInputActions.PlayerControl.Rotation.performed += RotateCharacter;
-        //m_playerInputActions.PlayerControl.Rotation.canceled += StopCharacterRotation;
+        //m_playerInputActions.PlayerControl.Rotation.canceled += StopRotation;
         //m_playerInputActions.PlayerControl.Jump.performed += CharacterJump;
         //m_playerInputActions.PlayerControl.Jump.canceled += StopJumping;
         //m_playerInputActions.PlayerControl.Duck.performed += CharacterDuck;
@@ -196,17 +196,17 @@ public class PlayerInput : MonoBehaviour
         //        break;
         //    case EMoveModi.Walking:
         //    {
-        //        m_characterController.Move(m_playerWalkSpeed * Time.fixedDeltaTime * horizontalMovement);
+        //        m_characterController.Move(m_walkSpeed * Time.fixedDeltaTime * horizontalMovement);
         //        break;
         //    }
         //    case EMoveModi.Running:
         //    {
-        //        m_characterController.Move(m_playerRunSpeed * Time.fixedDeltaTime * horizontalMovement);
+        //        m_characterController.Move(m_runSpeed * Time.fixedDeltaTime * horizontalMovement);
         //        break;
         //    }
         //    case EMoveModi.Crouching:
         //    {
-        //        m_characterController.Move(m_playerCrouchSpeed * Time.fixedDeltaTime * horizontalMovement);
+        //        m_characterController.Move(m_crouchSpeed * Time.fixedDeltaTime * horizontalMovement);
         //        break;
         //    }
         //    default:
@@ -327,7 +327,7 @@ public class PlayerInput : MonoBehaviour
     //    //m_inputVector = _callbackContext.ReadValue<Vector2>();
     //}
 
-    //private void StopCharacterMovement(InputAction.CallbackContext _callbackContext)
+    //private void StopMovement(InputAction.CallbackContext _callbackContext)
     //{
     //    //m_inputVector = Vector2.zero;
     //}
@@ -338,7 +338,7 @@ public class PlayerInput : MonoBehaviour
     //    //_callbackContext.ReadValue<Vector2>();
     //}
 
-    //private void StopCharacterRotation(InputAction.CallbackContext _callbackContext)
+    //private void StopRotation(InputAction.CallbackContext _callbackContext)
     //{
 
     //}

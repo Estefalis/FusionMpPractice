@@ -73,6 +73,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""ActiveBreaking"",
+                    ""type"": ""Button"",
+                    ""id"": ""c39db1d9-01bc-4296-897b-e8b8123ce96a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""SwitchMoveModi"",
                     ""type"": ""Button"",
                     ""id"": ""f4a5be9a-fbc3-40b3-957a-94f752f18671"",
@@ -118,7 +127,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -129,7 +138,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -140,7 +149,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -151,7 +160,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -239,7 +248,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -283,7 +292,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Acceleration"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -327,7 +336,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Duck"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -371,7 +380,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/m"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""Menu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -459,7 +468,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/c"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse;UniversalController;PlaystationController;XBoxController"",
+                    ""groups"": ""KeyboardAndMouse"",
                     ""action"": ""CursorLockMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -494,6 +503,50 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""XBoxController"",
                     ""action"": ""CursorLockMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""75749436-dece-423b-af8e-2e483c215b6d"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardAndMouse"",
+                    ""action"": ""ActiveBreaking"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""630b7130-ce6a-479b-bfd3-30c7408a1bbe"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""UniversalController"",
+                    ""action"": ""ActiveBreaking"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7e40a34b-c6f7-4300-b162-14e4ac3b0d56"",
+                    ""path"": ""<DualShockGamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""PlaystationController"",
+                    ""action"": ""ActiveBreaking"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""380bf17b-6a07-498b-8d8f-ec0804778ed3"",
+                    ""path"": ""<XInputController>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XBoxController"",
+                    ""action"": ""ActiveBreaking"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1090,6 +1143,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_PlayerControl_Jump = m_PlayerControl.FindAction("Jump", throwIfNotFound: true);
         m_PlayerControl_Duck = m_PlayerControl.FindAction("Duck", throwIfNotFound: true);
         m_PlayerControl_Acceleration = m_PlayerControl.FindAction("Acceleration", throwIfNotFound: true);
+        m_PlayerControl_ActiveBreaking = m_PlayerControl.FindAction("ActiveBreaking", throwIfNotFound: true);
         m_PlayerControl_SwitchMoveModi = m_PlayerControl.FindAction("SwitchMoveModi", throwIfNotFound: true);
         m_PlayerControl_Menu = m_PlayerControl.FindAction("Menu", throwIfNotFound: true);
         m_PlayerControl_CursorLockMode = m_PlayerControl.FindAction("CursorLockMode", throwIfNotFound: true);
@@ -1171,6 +1225,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerControl_Jump;
     private readonly InputAction m_PlayerControl_Duck;
     private readonly InputAction m_PlayerControl_Acceleration;
+    private readonly InputAction m_PlayerControl_ActiveBreaking;
     private readonly InputAction m_PlayerControl_SwitchMoveModi;
     private readonly InputAction m_PlayerControl_Menu;
     private readonly InputAction m_PlayerControl_CursorLockMode;
@@ -1183,6 +1238,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_PlayerControl_Jump;
         public InputAction @Duck => m_Wrapper.m_PlayerControl_Duck;
         public InputAction @Acceleration => m_Wrapper.m_PlayerControl_Acceleration;
+        public InputAction @ActiveBreaking => m_Wrapper.m_PlayerControl_ActiveBreaking;
         public InputAction @SwitchMoveModi => m_Wrapper.m_PlayerControl_SwitchMoveModi;
         public InputAction @Menu => m_Wrapper.m_PlayerControl_Menu;
         public InputAction @CursorLockMode => m_Wrapper.m_PlayerControl_CursorLockMode;
@@ -1210,6 +1266,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Acceleration.started += instance.OnAcceleration;
             @Acceleration.performed += instance.OnAcceleration;
             @Acceleration.canceled += instance.OnAcceleration;
+            @ActiveBreaking.started += instance.OnActiveBreaking;
+            @ActiveBreaking.performed += instance.OnActiveBreaking;
+            @ActiveBreaking.canceled += instance.OnActiveBreaking;
             @SwitchMoveModi.started += instance.OnSwitchMoveModi;
             @SwitchMoveModi.performed += instance.OnSwitchMoveModi;
             @SwitchMoveModi.canceled += instance.OnSwitchMoveModi;
@@ -1238,6 +1297,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Acceleration.started -= instance.OnAcceleration;
             @Acceleration.performed -= instance.OnAcceleration;
             @Acceleration.canceled -= instance.OnAcceleration;
+            @ActiveBreaking.started -= instance.OnActiveBreaking;
+            @ActiveBreaking.performed -= instance.OnActiveBreaking;
+            @ActiveBreaking.canceled -= instance.OnActiveBreaking;
             @SwitchMoveModi.started -= instance.OnSwitchMoveModi;
             @SwitchMoveModi.performed -= instance.OnSwitchMoveModi;
             @SwitchMoveModi.canceled -= instance.OnSwitchMoveModi;
@@ -1425,6 +1487,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnDuck(InputAction.CallbackContext context);
         void OnAcceleration(InputAction.CallbackContext context);
+        void OnActiveBreaking(InputAction.CallbackContext context);
         void OnSwitchMoveModi(InputAction.CallbackContext context);
         void OnMenu(InputAction.CallbackContext context);
         void OnCursorLockMode(InputAction.CallbackContext context);
