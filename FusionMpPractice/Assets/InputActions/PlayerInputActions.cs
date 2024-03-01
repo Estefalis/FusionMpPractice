@@ -24,7 +24,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     ""name"": ""PlayerInputActions"",
     ""maps"": [
         {
-            ""name"": ""PlayerControl"",
+            ""name"": ""PlayerOnFoot"",
             ""id"": ""87a4940e-19dd-4b33-af22-4770d81f8cf4"",
             ""actions"": [
                 {
@@ -76,15 +76,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""ActiveBreaking"",
                     ""type"": ""Button"",
                     ""id"": ""c39db1d9-01bc-4296-897b-e8b8123ce96a"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""SwitchMoveModi"",
-                    ""type"": ""Button"",
-                    ""id"": ""f4a5be9a-fbc3-40b3-957a-94f752f18671"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -170,7 +161,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""id"": ""247dee5d-afb3-474c-85ff-d452fb31eac7"",
                     ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone,ScaleVector2(x=30,y=20)"",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": ""UniversalController"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
@@ -178,22 +169,22 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e0bc1ae0-0030-45eb-ba06-b6943d372ee8"",
+                    ""id"": ""f10a55c0-6e68-4260-b74f-307c5ecad8ee"",
                     ""path"": ""<DualShockGamepad>/leftStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone,ScaleVector2(x=30,y=20)"",
-                    ""groups"": ""PlaystationController"",
+                    ""processors"": """",
+                    ""groups"": """",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""94d6e2dc-cc5e-4c4a-b8d0-b3649245ff51"",
+                    ""id"": ""9b2189e4-5c57-4f0d-999e-c390787d7977"",
                     ""path"": ""<XInputController>/leftStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone,ScaleVector2(x=30,y=20)"",
-                    ""groups"": ""XBoxController"",
+                    ""processors"": """",
+                    ""groups"": """",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -214,7 +205,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""id"": ""ee6fa2a8-2605-4112-9d7f-360251d63348"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone,ScaleVector2(x=30,y=20)"",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": ""UniversalController"",
                     ""action"": ""Rotation"",
                     ""isComposite"": false,
@@ -225,7 +216,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""id"": ""301c624e-7664-4d22-a3f7-075de986e950"",
                     ""path"": ""<DualShockGamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone,ScaleVector2(x=30,y=20)"",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": ""PlaystationController"",
                     ""action"": ""Rotation"",
                     ""isComposite"": false,
@@ -236,7 +227,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""id"": ""f4879f2d-1acb-402c-a7d3-aa5258660f71"",
                     ""path"": ""<XInputController>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone,ScaleVector2(x=30,y=20)"",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": ""XBoxController"",
                     ""action"": ""Rotation"",
                     ""isComposite"": false,
@@ -344,7 +335,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""eb8f30b4-5f6d-4f33-97f4-fa263b83b03a"",
-                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""UniversalController"",
@@ -355,7 +346,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""c58f2c63-e5fe-4609-9e03-4fcd4709934b"",
-                    ""path"": ""<DualShockGamepad>/dpad/down"",
+                    ""path"": ""<DualShockGamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""PlaystationController"",
@@ -366,7 +357,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""71332ec0-3614-47c1-88ed-24c6769689d8"",
-                    ""path"": ""<XInputController>/dpad/down"",
+                    ""path"": ""<XInputController>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XBoxController"",
@@ -415,50 +406,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""XBoxController"",
                     ""action"": ""Menu"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b4c5a4a7-7784-4a5c-9279-ee717612ad5c"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""KeyboardAndMouse"",
-                    ""action"": ""SwitchMoveModi"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ada00e9e-3609-4d9d-ab38-e5b575cfe6d7"",
-                    ""path"": ""<Gamepad>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""UniversalController"",
-                    ""action"": ""SwitchMoveModi"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""acc63f83-1f8e-45cd-b5cf-87bc81f7b6bb"",
-                    ""path"": ""<DualShockGamepad>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""PlaystationController"",
-                    ""action"": ""SwitchMoveModi"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""259f4199-5f04-4dc3-b19c-4dfbfaf6f6ee"",
-                    ""path"": ""<XInputController>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XBoxController"",
-                    ""action"": ""SwitchMoveModi"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1136,17 +1083,16 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     ]
 }");
-        // PlayerControl
-        m_PlayerControl = asset.FindActionMap("PlayerControl", throwIfNotFound: true);
-        m_PlayerControl_Movement = m_PlayerControl.FindAction("Movement", throwIfNotFound: true);
-        m_PlayerControl_Rotation = m_PlayerControl.FindAction("Rotation", throwIfNotFound: true);
-        m_PlayerControl_Jump = m_PlayerControl.FindAction("Jump", throwIfNotFound: true);
-        m_PlayerControl_Duck = m_PlayerControl.FindAction("Duck", throwIfNotFound: true);
-        m_PlayerControl_Acceleration = m_PlayerControl.FindAction("Acceleration", throwIfNotFound: true);
-        m_PlayerControl_ActiveBreaking = m_PlayerControl.FindAction("ActiveBreaking", throwIfNotFound: true);
-        m_PlayerControl_SwitchMoveModi = m_PlayerControl.FindAction("SwitchMoveModi", throwIfNotFound: true);
-        m_PlayerControl_Menu = m_PlayerControl.FindAction("Menu", throwIfNotFound: true);
-        m_PlayerControl_CursorLockMode = m_PlayerControl.FindAction("CursorLockMode", throwIfNotFound: true);
+        // PlayerOnFoot
+        m_PlayerOnFoot = asset.FindActionMap("PlayerOnFoot", throwIfNotFound: true);
+        m_PlayerOnFoot_Movement = m_PlayerOnFoot.FindAction("Movement", throwIfNotFound: true);
+        m_PlayerOnFoot_Rotation = m_PlayerOnFoot.FindAction("Rotation", throwIfNotFound: true);
+        m_PlayerOnFoot_Jump = m_PlayerOnFoot.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerOnFoot_Duck = m_PlayerOnFoot.FindAction("Duck", throwIfNotFound: true);
+        m_PlayerOnFoot_Acceleration = m_PlayerOnFoot.FindAction("Acceleration", throwIfNotFound: true);
+        m_PlayerOnFoot_ActiveBreaking = m_PlayerOnFoot.FindAction("ActiveBreaking", throwIfNotFound: true);
+        m_PlayerOnFoot_Menu = m_PlayerOnFoot.FindAction("Menu", throwIfNotFound: true);
+        m_PlayerOnFoot_CursorLockMode = m_PlayerOnFoot.FindAction("CursorLockMode", throwIfNotFound: true);
         // DefaultUI
         m_DefaultUI = asset.FindActionMap("DefaultUI", throwIfNotFound: true);
         m_DefaultUI_Navigate = m_DefaultUI.FindAction("Navigate", throwIfNotFound: true);
@@ -1217,40 +1163,38 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // PlayerControl
-    private readonly InputActionMap m_PlayerControl;
-    private List<IPlayerControlActions> m_PlayerControlActionsCallbackInterfaces = new List<IPlayerControlActions>();
-    private readonly InputAction m_PlayerControl_Movement;
-    private readonly InputAction m_PlayerControl_Rotation;
-    private readonly InputAction m_PlayerControl_Jump;
-    private readonly InputAction m_PlayerControl_Duck;
-    private readonly InputAction m_PlayerControl_Acceleration;
-    private readonly InputAction m_PlayerControl_ActiveBreaking;
-    private readonly InputAction m_PlayerControl_SwitchMoveModi;
-    private readonly InputAction m_PlayerControl_Menu;
-    private readonly InputAction m_PlayerControl_CursorLockMode;
-    public struct PlayerControlActions
+    // PlayerOnFoot
+    private readonly InputActionMap m_PlayerOnFoot;
+    private List<IPlayerOnFootActions> m_PlayerOnFootActionsCallbackInterfaces = new List<IPlayerOnFootActions>();
+    private readonly InputAction m_PlayerOnFoot_Movement;
+    private readonly InputAction m_PlayerOnFoot_Rotation;
+    private readonly InputAction m_PlayerOnFoot_Jump;
+    private readonly InputAction m_PlayerOnFoot_Duck;
+    private readonly InputAction m_PlayerOnFoot_Acceleration;
+    private readonly InputAction m_PlayerOnFoot_ActiveBreaking;
+    private readonly InputAction m_PlayerOnFoot_Menu;
+    private readonly InputAction m_PlayerOnFoot_CursorLockMode;
+    public struct PlayerOnFootActions
     {
         private @PlayerInputActions m_Wrapper;
-        public PlayerControlActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Movement => m_Wrapper.m_PlayerControl_Movement;
-        public InputAction @Rotation => m_Wrapper.m_PlayerControl_Rotation;
-        public InputAction @Jump => m_Wrapper.m_PlayerControl_Jump;
-        public InputAction @Duck => m_Wrapper.m_PlayerControl_Duck;
-        public InputAction @Acceleration => m_Wrapper.m_PlayerControl_Acceleration;
-        public InputAction @ActiveBreaking => m_Wrapper.m_PlayerControl_ActiveBreaking;
-        public InputAction @SwitchMoveModi => m_Wrapper.m_PlayerControl_SwitchMoveModi;
-        public InputAction @Menu => m_Wrapper.m_PlayerControl_Menu;
-        public InputAction @CursorLockMode => m_Wrapper.m_PlayerControl_CursorLockMode;
-        public InputActionMap Get() { return m_Wrapper.m_PlayerControl; }
+        public PlayerOnFootActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Movement => m_Wrapper.m_PlayerOnFoot_Movement;
+        public InputAction @Rotation => m_Wrapper.m_PlayerOnFoot_Rotation;
+        public InputAction @Jump => m_Wrapper.m_PlayerOnFoot_Jump;
+        public InputAction @Duck => m_Wrapper.m_PlayerOnFoot_Duck;
+        public InputAction @Acceleration => m_Wrapper.m_PlayerOnFoot_Acceleration;
+        public InputAction @ActiveBreaking => m_Wrapper.m_PlayerOnFoot_ActiveBreaking;
+        public InputAction @Menu => m_Wrapper.m_PlayerOnFoot_Menu;
+        public InputAction @CursorLockMode => m_Wrapper.m_PlayerOnFoot_CursorLockMode;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerOnFoot; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PlayerControlActions set) { return set.Get(); }
-        public void AddCallbacks(IPlayerControlActions instance)
+        public static implicit operator InputActionMap(PlayerOnFootActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerOnFootActions instance)
         {
-            if (instance == null || m_Wrapper.m_PlayerControlActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_PlayerControlActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Add(instance);
             @Movement.started += instance.OnMovement;
             @Movement.performed += instance.OnMovement;
             @Movement.canceled += instance.OnMovement;
@@ -1269,9 +1213,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ActiveBreaking.started += instance.OnActiveBreaking;
             @ActiveBreaking.performed += instance.OnActiveBreaking;
             @ActiveBreaking.canceled += instance.OnActiveBreaking;
-            @SwitchMoveModi.started += instance.OnSwitchMoveModi;
-            @SwitchMoveModi.performed += instance.OnSwitchMoveModi;
-            @SwitchMoveModi.canceled += instance.OnSwitchMoveModi;
             @Menu.started += instance.OnMenu;
             @Menu.performed += instance.OnMenu;
             @Menu.canceled += instance.OnMenu;
@@ -1280,7 +1221,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @CursorLockMode.canceled += instance.OnCursorLockMode;
         }
 
-        private void UnregisterCallbacks(IPlayerControlActions instance)
+        private void UnregisterCallbacks(IPlayerOnFootActions instance)
         {
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
@@ -1300,9 +1241,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ActiveBreaking.started -= instance.OnActiveBreaking;
             @ActiveBreaking.performed -= instance.OnActiveBreaking;
             @ActiveBreaking.canceled -= instance.OnActiveBreaking;
-            @SwitchMoveModi.started -= instance.OnSwitchMoveModi;
-            @SwitchMoveModi.performed -= instance.OnSwitchMoveModi;
-            @SwitchMoveModi.canceled -= instance.OnSwitchMoveModi;
             @Menu.started -= instance.OnMenu;
             @Menu.performed -= instance.OnMenu;
             @Menu.canceled -= instance.OnMenu;
@@ -1311,21 +1249,21 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @CursorLockMode.canceled -= instance.OnCursorLockMode;
         }
 
-        public void RemoveCallbacks(IPlayerControlActions instance)
+        public void RemoveCallbacks(IPlayerOnFootActions instance)
         {
-            if (m_Wrapper.m_PlayerControlActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IPlayerControlActions instance)
+        public void SetCallbacks(IPlayerOnFootActions instance)
         {
-            foreach (var item in m_Wrapper.m_PlayerControlActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_PlayerControlActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public PlayerControlActions @PlayerControl => new PlayerControlActions(this);
+    public PlayerOnFootActions @PlayerOnFoot => new PlayerOnFootActions(this);
 
     // DefaultUI
     private readonly InputActionMap m_DefaultUI;
@@ -1480,7 +1418,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_XBoxControllerSchemeIndex];
         }
     }
-    public interface IPlayerControlActions
+    public interface IPlayerOnFootActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnRotation(InputAction.CallbackContext context);
@@ -1488,7 +1426,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnDuck(InputAction.CallbackContext context);
         void OnAcceleration(InputAction.CallbackContext context);
         void OnActiveBreaking(InputAction.CallbackContext context);
-        void OnSwitchMoveModi(InputAction.CallbackContext context);
         void OnMenu(InputAction.CallbackContext context);
         void OnCursorLockMode(InputAction.CallbackContext context);
     }

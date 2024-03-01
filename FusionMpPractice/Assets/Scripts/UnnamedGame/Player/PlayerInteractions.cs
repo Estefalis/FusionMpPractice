@@ -1,28 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInteractions : MonoBehaviour
+namespace PlayerInputManagement
 {
-    [SerializeField] private PlayerController m_playerController;
-
-    private void OnCollisionEnter(Collision _collision)
+    public class PlayerInteractions : MonoBehaviour
     {
-        
-    }
+        [SerializeField] private PlayerController m_playerController;
 
-    private void OnCollisionExit(Collision _collision)
-    {
-        
-    }
+        private void OnCollisionEnter(Collision _collision)
+        {
 
-    private void OnTriggerEnter(Collider _other)
-    {
-        
-    }
+        }
 
-    private void OnTriggerExit(Collider _other)
-    {
-        
+        private void OnCollisionStay(Collision collision)
+        {
+            
+        }
+
+        private void OnCollisionExit(Collision _collision)
+        {
+
+        }
+
+        private void OnTriggerEnter(Collider _other)
+        {
+
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            
+        }
+
+        private void OnTriggerExit(Collider _other)
+        {
+
+        }
     }
 }

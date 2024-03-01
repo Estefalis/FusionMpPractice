@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -32,7 +30,7 @@ namespace PlayerInputManagement
 
         private void Start()
         {
-            ToggleActionMaps(m_InputManagerActions.PlayerControl);
+            ToggleActionMaps(m_InputManagerActions.PlayerOnFoot);
         }
 
         private void OnSceneFinishedLoading(Scene _scene, LoadSceneMode _mode)
@@ -47,7 +45,7 @@ namespace PlayerInputManagement
                 case 1:
                 case 2:
                 {
-                    ToggleActionMaps(m_InputManagerActions.PlayerControl);
+                    ToggleActionMaps(m_InputManagerActions.PlayerOnFoot);
                     break;
                 }
                 default:

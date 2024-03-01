@@ -1,32 +1,66 @@
 using UnityEngine;
-using PlayerInputManagement;
 
-    internal enum EMoveModi
-    {
-        Idle,
-        Walking,
-        Running,
-        Crouching
-    }
-
-    internal enum MoveInputDevice
-    {
-        KeyboardDominant,
-        KeyboardAndMouse,
-        CommonController,
-        PlaystationController,
-        XBoxController
-    }
-
-public class PlayerController : MonoBehaviour
+internal enum EMoveModi
 {
-    [SerializeField] internal EMoveModi m_eCurrentMoveMode;
-    
-    internal MoveInputDevice m_moveInputDevice;
+    Idle,
+    Walking,
+    Running,
+    Crouching
+}
 
-    [SerializeField] internal PlayerMovement m_playerMovement;
-    [SerializeField] internal PlayerInteractions m_playerInteractions;
-    [SerializeField] internal PlayerHealth m_playerHealth;
-    
-    internal bool m_isDead = false;
+internal enum MoveInputDevice
+{
+    KeyboardDominant,
+    KeyboardAndMouse,
+    CommonController,
+    PlaystationController,
+    XBoxController
+}
+
+namespace PlayerInputManagement
+{
+    public class PlayerController : MonoBehaviour
+    {
+        internal MoveInputDevice m_moveInputDevice;
+        [SerializeField] internal Rigidbody m_rigidbody;
+        [SerializeField] internal CapsuleCollider m_capsuleCollider;
+
+        [SerializeField] internal PlayerInput m_playerInput;
+        [SerializeField] internal PlayerMovement m_playerMovement;
+        [SerializeField] internal PlayerInteractions m_playerInteractions;
+        [SerializeField] internal PlayerHealth m_playerHealth;
+        [SerializeField] internal EMoveModi m_eCurrentMoveMode;
+
+        #region Fall-Damage
+        [Header("Fall Damage")]
+        [SerializeField] internal int m_minFallDistance = 5;             //MinimumDistance to take damage.
+        [SerializeField] internal float m_fallDamageMultiplier = 1;      //Adjustment-variable.
+        [SerializeField] internal float m_finalFallDistance;             //Calculated fallDamage.
+        [SerializeField] internal bool m_fallDamageEnabled = true;
+
+        internal bool m_allowApplyingDamageOnce = false;
+        internal bool m_allowFallDistanceRecord = false;
+        internal Vector3 m_lostGroundContact;
+        internal Vector3 m_regainedGroundContact;
+        #endregion
+
+        #region Runtime-Values
+        #region Reset on falling off the area
+        [Header("Area Fall Off Reset")]
+        [SerializeField] internal Vector3 m_repopPosition;
+        [SerializeField] internal float m_fallLimit = -100f;
+        #endregion
+        internal bool m_isDead = false;
+        internal Vector3 m_startPosition;
+        #endregion
+
+        private void Awake()
+        {
+            if (m_rigidbody == null)
+                m_rigidbody = GetComponent<Rigidbody>();
+
+            m_startPosition = transform.position;
+            m_eCurrentMoveMode = EMoveModi.Walking;
+        }
+    }
 }
