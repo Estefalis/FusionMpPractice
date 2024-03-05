@@ -6,8 +6,8 @@ namespace PlayerInputManagement
 {
     public class PlayerMovement : MonoBehaviour
     {
-        private PlayerInputActions m_playerInputActions;
         [SerializeField] private PlayerController m_playerController;
+        //[SerializeField] private InputActionReference[] m_mouseRotationActionMaps;
 
         #region MoveCharacter-Variables
         [Header("Movement")]
@@ -18,6 +18,10 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_jumpForce = 10f;
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
+        [SerializeField] private float m_rotationSpeed = 5.0f;
+        /*[SerializeField] */
+        internal bool m_blockRotation = false;
+        internal Vector3 m_horizontalMovement, m_characterRotation;
 
         #region Acceleration
         [Header("Acceleration")]
@@ -26,7 +30,7 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_breakToZeroSpeed = 1.0f;
         internal float m_acceleRatePerSec, m_deceleRatePerSec, m_breakRatePerSec, m_currentVelocity, m_individualMaxSpeed;
         internal bool m_activeBreaking = false;
-        internal EMoveModi m_lastMoveMode;
+        internal EOnFootMoveModi m_lastMoveMode;
         #endregion
 
         #region Gravity-Variables
@@ -64,12 +68,14 @@ namespace PlayerInputManagement
 
         internal float m_startMoveLerp, m_lerpTimeCounter;    //Start / End / runtime
         internal bool m_playerIsGrounded, m_moveButtonIsPressed, m_jumpIsPressed, m_shiftIsPressed = false;
+        internal bool m_menuIsOpen = false;
 
         private void OnDisable()
         {
-            m_playerInputActions.PlayerOnFoot.Disable();
-            m_playerInputActions.PlayerOnFoot.Jump.performed -= CharacterJump;
-            m_playerInputActions.PlayerOnFoot.Jump.canceled -= StopJumping;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Disable();
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed -= CharacterJump;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= StopJumping;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed -= OpenMenu;
 
             InputUser.onChange -= OnInputDeviceChange;
 
@@ -78,19 +84,33 @@ namespace PlayerInputManagement
 
         private void Start()
         {
-            m_playerInputActions = InputManager.m_InputManagerActions;
-            m_playerInputActions.PlayerOnFoot.Enable();
-            m_playerInputActions.PlayerOnFoot.Jump.performed += CharacterJump;
-            m_playerInputActions.PlayerOnFoot.Jump.canceled += StopJumping;
+            m_playerController.m_playerInputActions = InputManager.m_InputManagerActions;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Enable();
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += StopJumping;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed += OpenMenu;
 
             InputUser.onChange += OnInputDeviceChange;
             m_maxDistanceAbove = m_colliderWalkHeight;
+
+            //Debug.Log($"CurrentActionMap Name {m_playerController.m_currentActionMap.name} - CurrentActionMap ID {m_playerController.m_currentActionMap.id}");
+            //Debug.Log($"ControllerAction Name {m_playerController.m_playerInputActions.asset.actionMaps[0].name} - ControllerAction ID {m_playerController.m_playerInputActions.asset.actionMaps[0].id}");
+            //Debug.Log($"ReferenceAction Name {m_mouseRotationActionMaps[0].action.name} - ReferenceAction ID {m_mouseRotationActionMaps[0].action.id}");
         }
 
         private void Update()
         {
             if (!m_playerController.m_isDead)
             {
+                //Rotates the PlayerCharacter with A and D.
+                if (!m_blockRotation)
+                    m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0);
+                //CameraRotation();
+
+                //if (InputManager.m_InputManagerActions.PlayerOnFootRH.enabled && !m_useCameraRotation)
+                //    m_characterRotation =
+                //        new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0);
+
                 //TODO: Coyote Timer.
                 //if (m_playerIsGrounded)
                 //    {
@@ -148,18 +168,68 @@ namespace PlayerInputManagement
         }
 #endif
 
+        //private void CameraRotation()
+        //{
+        //    switch (m_useCameraRotation)
+        //    {
+        //        case false:
+        //        {
+        //            //switch (m_playerController.m_currentActionMap.id)     //How to use this Map-IDs...?
+        //            switch (m_playerController.m_currentActionMap.name)
+        //            {
+        //                case "PlayerOnFootRH":
+        //                {
+        //                    m_characterRotation =
+        //                    new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0);
+        //                    break;
+        //                }
+        //                //case "PlayerOnFootLH":
+        //                //{
+        //                //    m_characterRotation =
+        //                //    new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootLH.Rotation.ReadValue<Vector2>().x, 0);
+        //                //    break;
+        //                //}
+        //                default:
+        //                    break;
+        //            }
+        //            break;
+        //        }
+        //        case true:
+        //        default:
+        //            break;
+        //    }
+        //}
+
         private void MoveRigidbody()
         {
-            Vector3 horizontalMovement = new Vector3(m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x, 0, m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y);
+            switch (m_blockRotation)
+            {
+                case false: //m_characterRotation set the Y-Rotation with PlayerOnFootRH.Movement.ReadValue<Vector2>().x.
+                {
+                    m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+                    break;
+                }
+                case true:
+                {
+                    m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+                    m_characterRotation.y = 0;
+                    break;
+                }
+            }
 
-            //if (m_playerIsGrounded && horizontalMovement.y <= 0)
+            m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+
+            //if (m_playerIsGrounded && m_horizontalMovement.y <= 0)
             //{
             //Einmaliges ausloesen bei wiedererlangtem Bodenkontakt ueber den InputManager.
             //if (m_jumpEventTriggered)
             //InputManager.m_RegainedGroundContact?.Invoke();
             //}
 
-            m_playerController.m_rigidbody.MovePosition(transform.position + horizontalMovement * Time.fixedDeltaTime * m_individualMaxSpeed);
+            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement);
+
+            Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_rotationSpeed, 0);
+            m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
         }
 
         #region Crouching
@@ -257,15 +327,15 @@ namespace PlayerInputManagement
         {
             switch (m_playerController.m_eCurrentMoveMode)
             {
-                case EMoveModi.Walking:
+                case EOnFootMoveModi.Walking:
                 {
                     m_individualMaxSpeed = m_walkSpeed;
                     break;
                 }
-                case EMoveModi.Running:
+                case EOnFootMoveModi.Running:
                     m_individualMaxSpeed = m_runSpeed;
                     break;
-                case EMoveModi.Crouching:
+                case EOnFootMoveModi.Crouching:
                     m_individualMaxSpeed = m_crouchSpeed;
                     break;
                 default:
@@ -318,30 +388,30 @@ namespace PlayerInputManagement
             m_currentVelocity = Mathf.Clamp(m_currentVelocity, /*m_playerController.*/m_stopMovementValue, m_individualMaxSpeed);
         }
 
-        internal void SetTargetSpeedMode(float _currentMoveSpeed, EMoveModi _lastMoveMode = EMoveModi.Idle, EMoveModi _targetMoveMode = EMoveModi.Walking)
+        internal void SetTargetSpeedMode(float _currentMoveSpeed, EOnFootMoveModi _lastMoveMode = EOnFootMoveModi.Idle, EOnFootMoveModi _targetMoveMode = EOnFootMoveModi.Walking)
         {
             m_lastMoveMode = _lastMoveMode;
             m_startMoveLerp = _currentMoveSpeed;
 
             switch (_lastMoveMode)
             {
-                case EMoveModi.Idle:
+                case EOnFootMoveModi.Idle:
                 {
                     break;
                 }
-                case EMoveModi.Walking:
+                case EOnFootMoveModi.Walking:
                 {
                     m_deceleRatePerSec = -m_walkSpeed / m_durationToZeroSpeed;
                     m_breakRatePerSec = -m_walkSpeed / m_breakToZeroSpeed;
                     break;
                 }
-                case EMoveModi.Running:
+                case EOnFootMoveModi.Running:
                 {
                     m_deceleRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
                     m_breakRatePerSec = -m_runSpeed / m_breakToZeroSpeed;
                     break;
                 }
-                case EMoveModi.Crouching:
+                case EOnFootMoveModi.Crouching:
                 {
                     m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                     m_breakRatePerSec = -m_crouchSpeed / m_breakToZeroSpeed;
@@ -353,17 +423,17 @@ namespace PlayerInputManagement
 
             switch (_targetMoveMode)
             {
-                case EMoveModi.Walking:
+                case EOnFootMoveModi.Walking:
                 {
                     m_acceleRatePerSec = m_walkSpeed / m_durationToMaxSpeed;
                     break;
                 }
-                case EMoveModi.Running:
+                case EOnFootMoveModi.Running:
                 {
                     m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
                     break;
                 }
-                case EMoveModi.Crouching:
+                case EOnFootMoveModi.Crouching:
                 {
                     m_acceleRatePerSec = m_crouchSpeed / m_durationToMaxSpeed;
                     break;
@@ -378,23 +448,22 @@ namespace PlayerInputManagement
         #region Fall-Damage
         private void FallDamageCalculationStart()
         {
-            if (!m_playerController.m_allowFallDistanceRecord)
+            if (!m_playerController.m_isGroundContactLost)
             {
                 m_playerController.m_lostGroundContact.y = transform.position.y - m_groundCheckDistance;
-                m_playerController.m_allowFallDistanceRecord = true;
+                m_playerController.m_isGroundContactLost = true;
                 m_playerController.m_allowApplyingDamageOnce = true;
             }
         }
 
         private void FallDamageCalculationEnd()
         {
-            if (m_playerController.m_allowFallDistanceRecord && m_playerController.m_allowApplyingDamageOnce)
+            if (m_playerController.m_isGroundContactLost && m_playerController.m_allowApplyingDamageOnce)
             {
                 m_playerController.m_regainedGroundContact.y = transform.position.y - m_groundCheckDistance;
-                m_playerController.m_allowFallDistanceRecord = false;
+                m_playerController.m_isGroundContactLost = false;
+                CalculateFallDamage();
             }
-
-            CalculateFallDamage();
         }
 
         private void CalculateFallDamage()
@@ -423,7 +492,7 @@ namespace PlayerInputManagement
             //    }
             //}
         }
-        #endregion
+        #endregion        
         #endregion
         #region CallbackContexts
         #region InputDeviceChange
@@ -454,7 +523,13 @@ namespace PlayerInputManagement
         {
             m_playerController.m_playerMovement.m_jumpIsPressed = false;
         }
-        #endregion        
+        #endregion
+        #region Menu
+        private void OpenMenu(InputAction.CallbackContext _callbackContext)
+        {
+
+        }
+        #endregion
         #endregion
     }
 }

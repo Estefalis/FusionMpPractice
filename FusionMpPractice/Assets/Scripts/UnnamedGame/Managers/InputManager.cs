@@ -10,27 +10,23 @@ namespace PlayerInputManagement
         internal static PlayerInputActions m_InputManagerActions;
         internal static event Action<InputActionMap> m_changeActiveActionMap;
 
-        public static bool InputManagerIsSet { get => m_inputManagerIsSet; }
-        internal static bool m_inputManagerIsSet = false;
-
         private void Awake()
         {
-            if (m_InputManagerActions == null)
-                m_InputManagerActions = new PlayerInputActions();
+            //if (m_InputManagerActions == null)
+            //    m_InputManagerActions = new PlayerInputActions();
+            m_InputManagerActions ??= new PlayerInputActions();
 
             SceneManager.sceneLoaded += OnSceneFinishedLoading;
-            m_inputManagerIsSet = true;
         }
 
         private void OnDisable()
         {
             SceneManager.sceneLoaded -= OnSceneFinishedLoading;
-            m_inputManagerIsSet = false;
         }
 
         private void Start()
         {
-            ToggleActionMaps(m_InputManagerActions.PlayerOnFoot);
+            ToggleActionMaps(m_InputManagerActions.PlayerOnFootRH);
         }
 
         private void OnSceneFinishedLoading(Scene _scene, LoadSceneMode _mode)
@@ -45,7 +41,7 @@ namespace PlayerInputManagement
                 case 1:
                 case 2:
                 {
-                    ToggleActionMaps(m_InputManagerActions.PlayerOnFoot);
+                    ToggleActionMaps(m_InputManagerActions.PlayerOnFootRH);
                     break;
                 }
                 default:

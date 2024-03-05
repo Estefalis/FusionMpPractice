@@ -37,7 +37,7 @@ namespace PlayerInputManagement
         //[SerializeField] private float m_breakToZeroSpeed;
         //private float /*m_lerpedMoveSpeed,*/ m_acceleRatePerSec, m_deceleRatePerSec, m_breakRatePerSec, m_currentVelocity, m_individualMaxSpeed;
         //private bool m_activeBreaking = false;
-        //private EMoveModi m_lastMoveMode;
+        //private EOnFootMoveModi m_lastMoveMode;
         //#endregion
         //#endregion
 
@@ -78,7 +78,7 @@ namespace PlayerInputManagement
         //[SerializeField] private bool m_fallDamageEnabled = true;
 
         //private bool m_allowApplyingDamageOnce = false;
-        //private bool m_allowFallDistanceRecord = false;
+        //private bool m_isGroundContactLost = false;
         //private Vector3 m_lostGroundContact;
         //private Vector3 m_regainedGroundContact;
         //#endregion
@@ -111,7 +111,7 @@ namespace PlayerInputManagement
 
             //m_lerpedMoveSpeed = m_walkSpeed;
             //m_currentVelocity = m_walkSpeed;
-            //SetTargetSpeedMode(m_stopMovementValue, EMoveModi.Walking);
+            //SetTargetSpeedMode(m_stopMovementValue, EOnFootMoveModi.Walking);
         }
 
         //private void OnEnable()
@@ -340,15 +340,15 @@ namespace PlayerInputManagement
         //{
         //    switch (m_playerController.m_eCurrentMoveMode)
         //    {
-        //        case EMoveModi.Walking:
+        //        case EOnFootMoveModi.Walking:
         //        {
         //            m_individualMaxSpeed = m_walkSpeed;
         //            break;
         //        }
-        //        case EMoveModi.Running:
+        //        case EOnFootMoveModi.Running:
         //            m_individualMaxSpeed = m_runSpeed;
         //            break;
-        //        case EMoveModi.Crouching:
+        //        case EOnFootMoveModi.Crouching:
         //            m_individualMaxSpeed = m_crouchSpeed;
         //            break;
         //        default:
@@ -393,30 +393,30 @@ namespace PlayerInputManagement
         //    }
         //}
 
-        //private void SetTargetSpeedMode(float _currentMoveSpeed, EMoveModi _lastMoveMode = EMoveModi.Idle, EMoveModi _targetMoveMode = EMoveModi.Walking)
+        //private void SetTargetSpeedMode(float _currentMoveSpeed, EOnFootMoveModi _lastMoveMode = EOnFootMoveModi.Idle, EOnFootMoveModi _targetMoveMode = EOnFootMoveModi.Walking)
         //{
         //    m_lastMoveMode = _lastMoveMode;
         //    m_startMoveLerp = _currentMoveSpeed;
 
         //    switch (_lastMoveMode)
         //    {
-        //        case EMoveModi.Idle:
+        //        case EOnFootMoveModi.Idle:
         //        {
         //            break;
         //        }
-        //        case EMoveModi.Walking:
+        //        case EOnFootMoveModi.Walking:
         //        {
         //            m_deceleRatePerSec = -m_walkSpeed / m_durationToZeroSpeed;
         //            m_breakRatePerSec = -m_walkSpeed / m_breakToZeroSpeed;
         //            break;
         //        }
-        //        case EMoveModi.Running:
+        //        case EOnFootMoveModi.Running:
         //        {
         //            m_deceleRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
         //            m_breakRatePerSec = -m_runSpeed / m_breakToZeroSpeed;
         //            break;
         //        }
-        //        case EMoveModi.Crouching:
+        //        case EOnFootMoveModi.Crouching:
         //        {
         //            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
         //            m_breakRatePerSec = -m_crouchSpeed / m_breakToZeroSpeed;
@@ -428,17 +428,17 @@ namespace PlayerInputManagement
 
         //    switch (_targetMoveMode)
         //    {
-        //        case EMoveModi.Walking:
+        //        case EOnFootMoveModi.Walking:
         //        {
         //            m_acceleRatePerSec = m_walkSpeed / m_durationToMaxSpeed;
         //            break;
         //        }
-        //        case EMoveModi.Running:
+        //        case EOnFootMoveModi.Running:
         //        {
         //            m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
         //            break;
         //        }
-        //        case EMoveModi.Crouching:
+        //        case EOnFootMoveModi.Crouching:
         //        {
         //            m_acceleRatePerSec = m_crouchSpeed / m_durationToMaxSpeed;
         //            break;
@@ -460,20 +460,20 @@ namespace PlayerInputManagement
         //#region Fall-Damage
         //private void FallDamageCalculationStart()
         //{
-        //    if (!m_allowFallDistanceRecord)
+        //    if (!m_isGroundContactLost)
         //    {
         //        m_lostGroundContact.y = transform.position.y - m_groundCheckDistance;
-        //        m_allowFallDistanceRecord = true;
+        //        m_isGroundContactLost = true;
         //        m_allowApplyingDamageOnce = true;
         //    }
         //}
 
         //private void FallDamageCalculationEnd()
         //{
-        //    if (m_allowFallDistanceRecord && m_allowApplyingDamageOnce)
+        //    if (m_isGroundContactLost && m_allowApplyingDamageOnce)
         //    {
         //        m_regainedGroundContact.y = transform.position.y - m_groundCheckDistance;
-        //        m_allowFallDistanceRecord = false;
+        //        m_isGroundContactLost = false;
         //    }
 
         //    CalculateFallDamage();
@@ -556,8 +556,8 @@ namespace PlayerInputManagement
         ////Set fast moveSpeed by pressing shift and controller relatives.
         //private void AccelerateMovespeed(InputAction.CallbackContext _callbackContext)
         //{
-        //    SetTargetSpeedMode(m_currentVelocity, m_playerController.m_eCurrentMoveMode, EMoveModi.Running);
-        //    //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode, EMoveModi.Running);
+        //    SetTargetSpeedMode(m_currentVelocity, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Running);
+        //    //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Running);
         //    m_lerpTimeCounter = 0.0f;
         //    m_shiftIsPressed = _callbackContext.ReadValueAsButton();
         //}
@@ -621,8 +621,8 @@ namespace PlayerInputManagement
         //    m_groundCheckHeightAdjustment = (m_colliderWalkHeight - m_colliderCrouchHeight) / 2;
         //    m_groundCheckTransform.position = new Vector3(m_groundCheckTransform.position.x, transform.position.y + m_groundCheckHeightAdjustment, m_groundCheckTransform.position.z);
 
-        //    SetTargetSpeedMode(m_currentVelocity, m_playerController.m_eCurrentMoveMode, EMoveModi.Crouching);
-        //    //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode, EMoveModi.Crouching);
+        //    SetTargetSpeedMode(m_currentVelocity, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Crouching);
+        //    //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Crouching);
         //}
 
         //private void StopDucking(InputAction.CallbackContext _callbackContext)

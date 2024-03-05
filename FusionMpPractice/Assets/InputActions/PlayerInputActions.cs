@@ -24,7 +24,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     ""name"": ""PlayerInputActions"",
     ""maps"": [
         {
-            ""name"": ""PlayerOnFoot"",
+            ""name"": ""PlayerOnFootRH"",
             ""id"": ""87a4940e-19dd-4b33-af22-4770d81f8cf4"",
             ""actions"": [
                 {
@@ -44,6 +44,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""SwitchMoveMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""d27bd797-7532-422b-9cc2-b9bcb7d56439"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""Jump"",
@@ -82,7 +91,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Menu"",
+                    ""name"": ""OpenMenu"",
                     ""type"": ""Button"",
                     ""id"": ""c3069b14-60b6-4fcc-bb46-c1d80ca04829"",
                     ""expectedControlType"": ""Button"",
@@ -98,6 +107,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraZoom"",
+                    ""type"": ""Value"",
+                    ""id"": ""5e95e7aa-5003-43d6-9486-b875ef4aaa9e"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CameraRotation"",
+                    ""type"": ""Value"",
+                    ""id"": ""609f6b9c-896b-484e-b839-5adfe784b544"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -372,7 +399,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardAndMouse"",
-                    ""action"": ""Menu"",
+                    ""action"": ""OpenMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -383,7 +410,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""UniversalController"",
-                    ""action"": ""Menu"",
+                    ""action"": ""OpenMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -394,7 +421,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""PlaystationController"",
-                    ""action"": ""Menu"",
+                    ""action"": ""OpenMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -405,7 +432,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XBoxController"",
-                    ""action"": ""Menu"",
+                    ""action"": ""OpenMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -494,6 +521,72 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""XBoxController"",
                     ""action"": ""ActiveBreaking"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f5e1e91e-41cb-447f-bfc9-b41b72dbcb8f"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardAndMouse"",
+                    ""action"": ""SwitchMoveMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0779ecb4-f0fc-497e-8c0b-f03045fd174a"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""UniversalController"",
+                    ""action"": ""SwitchMoveMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""98c4feb5-2b70-49fa-b50c-d2613e95b15d"",
+                    ""path"": ""<DualShockGamepad>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""PlaystationController"",
+                    ""action"": ""SwitchMoveMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""54f25ade-9931-43bf-92e7-a945708ed0ae"",
+                    ""path"": ""<XInputController>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XBoxController"",
+                    ""action"": ""SwitchMoveMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9f947089-e984-4a3e-b8d1-76b4e2439800"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraZoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""19c74f23-8ab0-4a1b-bc36-9e3ef64bcacf"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraRotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1083,16 +1176,19 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     ]
 }");
-        // PlayerOnFoot
-        m_PlayerOnFoot = asset.FindActionMap("PlayerOnFoot", throwIfNotFound: true);
-        m_PlayerOnFoot_Movement = m_PlayerOnFoot.FindAction("Movement", throwIfNotFound: true);
-        m_PlayerOnFoot_Rotation = m_PlayerOnFoot.FindAction("Rotation", throwIfNotFound: true);
-        m_PlayerOnFoot_Jump = m_PlayerOnFoot.FindAction("Jump", throwIfNotFound: true);
-        m_PlayerOnFoot_Duck = m_PlayerOnFoot.FindAction("Duck", throwIfNotFound: true);
-        m_PlayerOnFoot_Acceleration = m_PlayerOnFoot.FindAction("Acceleration", throwIfNotFound: true);
-        m_PlayerOnFoot_ActiveBreaking = m_PlayerOnFoot.FindAction("ActiveBreaking", throwIfNotFound: true);
-        m_PlayerOnFoot_Menu = m_PlayerOnFoot.FindAction("Menu", throwIfNotFound: true);
-        m_PlayerOnFoot_CursorLockMode = m_PlayerOnFoot.FindAction("CursorLockMode", throwIfNotFound: true);
+        // PlayerOnFootRH
+        m_PlayerOnFootRH = asset.FindActionMap("PlayerOnFootRH", throwIfNotFound: true);
+        m_PlayerOnFootRH_Movement = m_PlayerOnFootRH.FindAction("Movement", throwIfNotFound: true);
+        m_PlayerOnFootRH_Rotation = m_PlayerOnFootRH.FindAction("Rotation", throwIfNotFound: true);
+        m_PlayerOnFootRH_SwitchMoveMode = m_PlayerOnFootRH.FindAction("SwitchMoveMode", throwIfNotFound: true);
+        m_PlayerOnFootRH_Jump = m_PlayerOnFootRH.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerOnFootRH_Duck = m_PlayerOnFootRH.FindAction("Duck", throwIfNotFound: true);
+        m_PlayerOnFootRH_Acceleration = m_PlayerOnFootRH.FindAction("Acceleration", throwIfNotFound: true);
+        m_PlayerOnFootRH_ActiveBreaking = m_PlayerOnFootRH.FindAction("ActiveBreaking", throwIfNotFound: true);
+        m_PlayerOnFootRH_OpenMenu = m_PlayerOnFootRH.FindAction("OpenMenu", throwIfNotFound: true);
+        m_PlayerOnFootRH_CursorLockMode = m_PlayerOnFootRH.FindAction("CursorLockMode", throwIfNotFound: true);
+        m_PlayerOnFootRH_CameraZoom = m_PlayerOnFootRH.FindAction("CameraZoom", throwIfNotFound: true);
+        m_PlayerOnFootRH_CameraRotation = m_PlayerOnFootRH.FindAction("CameraRotation", throwIfNotFound: true);
         // DefaultUI
         m_DefaultUI = asset.FindActionMap("DefaultUI", throwIfNotFound: true);
         m_DefaultUI_Navigate = m_DefaultUI.FindAction("Navigate", throwIfNotFound: true);
@@ -1163,44 +1259,53 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // PlayerOnFoot
-    private readonly InputActionMap m_PlayerOnFoot;
-    private List<IPlayerOnFootActions> m_PlayerOnFootActionsCallbackInterfaces = new List<IPlayerOnFootActions>();
-    private readonly InputAction m_PlayerOnFoot_Movement;
-    private readonly InputAction m_PlayerOnFoot_Rotation;
-    private readonly InputAction m_PlayerOnFoot_Jump;
-    private readonly InputAction m_PlayerOnFoot_Duck;
-    private readonly InputAction m_PlayerOnFoot_Acceleration;
-    private readonly InputAction m_PlayerOnFoot_ActiveBreaking;
-    private readonly InputAction m_PlayerOnFoot_Menu;
-    private readonly InputAction m_PlayerOnFoot_CursorLockMode;
-    public struct PlayerOnFootActions
+    // PlayerOnFootRH
+    private readonly InputActionMap m_PlayerOnFootRH;
+    private List<IPlayerOnFootRHActions> m_PlayerOnFootRHActionsCallbackInterfaces = new List<IPlayerOnFootRHActions>();
+    private readonly InputAction m_PlayerOnFootRH_Movement;
+    private readonly InputAction m_PlayerOnFootRH_Rotation;
+    private readonly InputAction m_PlayerOnFootRH_SwitchMoveMode;
+    private readonly InputAction m_PlayerOnFootRH_Jump;
+    private readonly InputAction m_PlayerOnFootRH_Duck;
+    private readonly InputAction m_PlayerOnFootRH_Acceleration;
+    private readonly InputAction m_PlayerOnFootRH_ActiveBreaking;
+    private readonly InputAction m_PlayerOnFootRH_OpenMenu;
+    private readonly InputAction m_PlayerOnFootRH_CursorLockMode;
+    private readonly InputAction m_PlayerOnFootRH_CameraZoom;
+    private readonly InputAction m_PlayerOnFootRH_CameraRotation;
+    public struct PlayerOnFootRHActions
     {
         private @PlayerInputActions m_Wrapper;
-        public PlayerOnFootActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Movement => m_Wrapper.m_PlayerOnFoot_Movement;
-        public InputAction @Rotation => m_Wrapper.m_PlayerOnFoot_Rotation;
-        public InputAction @Jump => m_Wrapper.m_PlayerOnFoot_Jump;
-        public InputAction @Duck => m_Wrapper.m_PlayerOnFoot_Duck;
-        public InputAction @Acceleration => m_Wrapper.m_PlayerOnFoot_Acceleration;
-        public InputAction @ActiveBreaking => m_Wrapper.m_PlayerOnFoot_ActiveBreaking;
-        public InputAction @Menu => m_Wrapper.m_PlayerOnFoot_Menu;
-        public InputAction @CursorLockMode => m_Wrapper.m_PlayerOnFoot_CursorLockMode;
-        public InputActionMap Get() { return m_Wrapper.m_PlayerOnFoot; }
+        public PlayerOnFootRHActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Movement => m_Wrapper.m_PlayerOnFootRH_Movement;
+        public InputAction @Rotation => m_Wrapper.m_PlayerOnFootRH_Rotation;
+        public InputAction @SwitchMoveMode => m_Wrapper.m_PlayerOnFootRH_SwitchMoveMode;
+        public InputAction @Jump => m_Wrapper.m_PlayerOnFootRH_Jump;
+        public InputAction @Duck => m_Wrapper.m_PlayerOnFootRH_Duck;
+        public InputAction @Acceleration => m_Wrapper.m_PlayerOnFootRH_Acceleration;
+        public InputAction @ActiveBreaking => m_Wrapper.m_PlayerOnFootRH_ActiveBreaking;
+        public InputAction @OpenMenu => m_Wrapper.m_PlayerOnFootRH_OpenMenu;
+        public InputAction @CursorLockMode => m_Wrapper.m_PlayerOnFootRH_CursorLockMode;
+        public InputAction @CameraZoom => m_Wrapper.m_PlayerOnFootRH_CameraZoom;
+        public InputAction @CameraRotation => m_Wrapper.m_PlayerOnFootRH_CameraRotation;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerOnFootRH; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PlayerOnFootActions set) { return set.Get(); }
-        public void AddCallbacks(IPlayerOnFootActions instance)
+        public static implicit operator InputActionMap(PlayerOnFootRHActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerOnFootRHActions instance)
         {
-            if (instance == null || m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Add(instance);
             @Movement.started += instance.OnMovement;
             @Movement.performed += instance.OnMovement;
             @Movement.canceled += instance.OnMovement;
             @Rotation.started += instance.OnRotation;
             @Rotation.performed += instance.OnRotation;
             @Rotation.canceled += instance.OnRotation;
+            @SwitchMoveMode.started += instance.OnSwitchMoveMode;
+            @SwitchMoveMode.performed += instance.OnSwitchMoveMode;
+            @SwitchMoveMode.canceled += instance.OnSwitchMoveMode;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
@@ -1213,15 +1318,21 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ActiveBreaking.started += instance.OnActiveBreaking;
             @ActiveBreaking.performed += instance.OnActiveBreaking;
             @ActiveBreaking.canceled += instance.OnActiveBreaking;
-            @Menu.started += instance.OnMenu;
-            @Menu.performed += instance.OnMenu;
-            @Menu.canceled += instance.OnMenu;
+            @OpenMenu.started += instance.OnOpenMenu;
+            @OpenMenu.performed += instance.OnOpenMenu;
+            @OpenMenu.canceled += instance.OnOpenMenu;
             @CursorLockMode.started += instance.OnCursorLockMode;
             @CursorLockMode.performed += instance.OnCursorLockMode;
             @CursorLockMode.canceled += instance.OnCursorLockMode;
+            @CameraZoom.started += instance.OnCameraZoom;
+            @CameraZoom.performed += instance.OnCameraZoom;
+            @CameraZoom.canceled += instance.OnCameraZoom;
+            @CameraRotation.started += instance.OnCameraRotation;
+            @CameraRotation.performed += instance.OnCameraRotation;
+            @CameraRotation.canceled += instance.OnCameraRotation;
         }
 
-        private void UnregisterCallbacks(IPlayerOnFootActions instance)
+        private void UnregisterCallbacks(IPlayerOnFootRHActions instance)
         {
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
@@ -1229,6 +1340,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Rotation.started -= instance.OnRotation;
             @Rotation.performed -= instance.OnRotation;
             @Rotation.canceled -= instance.OnRotation;
+            @SwitchMoveMode.started -= instance.OnSwitchMoveMode;
+            @SwitchMoveMode.performed -= instance.OnSwitchMoveMode;
+            @SwitchMoveMode.canceled -= instance.OnSwitchMoveMode;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
@@ -1241,29 +1355,35 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ActiveBreaking.started -= instance.OnActiveBreaking;
             @ActiveBreaking.performed -= instance.OnActiveBreaking;
             @ActiveBreaking.canceled -= instance.OnActiveBreaking;
-            @Menu.started -= instance.OnMenu;
-            @Menu.performed -= instance.OnMenu;
-            @Menu.canceled -= instance.OnMenu;
+            @OpenMenu.started -= instance.OnOpenMenu;
+            @OpenMenu.performed -= instance.OnOpenMenu;
+            @OpenMenu.canceled -= instance.OnOpenMenu;
             @CursorLockMode.started -= instance.OnCursorLockMode;
             @CursorLockMode.performed -= instance.OnCursorLockMode;
             @CursorLockMode.canceled -= instance.OnCursorLockMode;
+            @CameraZoom.started -= instance.OnCameraZoom;
+            @CameraZoom.performed -= instance.OnCameraZoom;
+            @CameraZoom.canceled -= instance.OnCameraZoom;
+            @CameraRotation.started -= instance.OnCameraRotation;
+            @CameraRotation.performed -= instance.OnCameraRotation;
+            @CameraRotation.canceled -= instance.OnCameraRotation;
         }
 
-        public void RemoveCallbacks(IPlayerOnFootActions instance)
+        public void RemoveCallbacks(IPlayerOnFootRHActions instance)
         {
-            if (m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IPlayerOnFootActions instance)
+        public void SetCallbacks(IPlayerOnFootRHActions instance)
         {
-            foreach (var item in m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public PlayerOnFootActions @PlayerOnFoot => new PlayerOnFootActions(this);
+    public PlayerOnFootRHActions @PlayerOnFootRH => new PlayerOnFootRHActions(this);
 
     // DefaultUI
     private readonly InputActionMap m_DefaultUI;
@@ -1418,16 +1538,19 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_XBoxControllerSchemeIndex];
         }
     }
-    public interface IPlayerOnFootActions
+    public interface IPlayerOnFootRHActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnRotation(InputAction.CallbackContext context);
+        void OnSwitchMoveMode(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnDuck(InputAction.CallbackContext context);
         void OnAcceleration(InputAction.CallbackContext context);
         void OnActiveBreaking(InputAction.CallbackContext context);
-        void OnMenu(InputAction.CallbackContext context);
+        void OnOpenMenu(InputAction.CallbackContext context);
         void OnCursorLockMode(InputAction.CallbackContext context);
+        void OnCameraZoom(InputAction.CallbackContext context);
+        void OnCameraRotation(InputAction.CallbackContext context);
     }
     public interface IDefaultUIActions
     {
