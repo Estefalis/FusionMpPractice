@@ -102,14 +102,9 @@ namespace PlayerInputManagement
         {
             if (!m_playerController.m_isDead)
             {
-                //Rotates the PlayerCharacter with A and D.
+                //YRotation with A and D.
                 if (!m_blockRotation)
                     m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0);
-                //CameraRotation();
-
-                //if (InputManager.m_InputManagerActions.PlayerOnFootRH.enabled && !m_useCameraRotation)
-                //    m_characterRotation =
-                //        new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0);
 
                 //TODO: Coyote Timer.
                 //if (m_playerIsGrounded)
@@ -167,38 +162,6 @@ namespace PlayerInputManagement
             Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereRadius);
         }
 #endif
-
-        //private void CameraRotation()
-        //{
-        //    switch (m_useCameraRotation)
-        //    {
-        //        case false:
-        //        {
-        //            //switch (m_playerController.m_currentActionMap.id)     //How to use this Map-IDs...?
-        //            switch (m_playerController.m_currentActionMap.name)
-        //            {
-        //                case "PlayerOnFootRH":
-        //                {
-        //                    m_characterRotation =
-        //                    new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0);
-        //                    break;
-        //                }
-        //                //case "PlayerOnFootLH":
-        //                //{
-        //                //    m_characterRotation =
-        //                //    new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootLH.Rotation.ReadValue<Vector2>().x, 0);
-        //                //    break;
-        //                //}
-        //                default:
-        //                    break;
-        //            }
-        //            break;
-        //        }
-        //        case true:
-        //        default:
-        //            break;
-        //    }
-        //}
 
         private void MoveRigidbody()
         {

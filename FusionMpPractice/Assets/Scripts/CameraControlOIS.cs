@@ -146,7 +146,7 @@ public class CameraControlOIS : MonoBehaviour
         //Update nur, wenn ein Positionswechsel stattgefunden hat.
         if (m_camera.localPosition.z != this.m_cameraDistance * -1f)
         {
-            //Interpolierung zwischen aktuieller und Zielposition/m_cameraDistance.
+            //Interpolierung zwischen aktuieller und Zielposition/m_clampedCameraDistance.
             this.m_camera.localPosition = new Vector3(0f, 0f, Mathf.Lerp(this.m_camera.localPosition.z, this.m_cameraDistance * -1f,
                 Time.deltaTime * m_scrollSpeed));
         }
