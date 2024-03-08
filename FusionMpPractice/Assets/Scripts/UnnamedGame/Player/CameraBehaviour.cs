@@ -13,6 +13,9 @@ namespace PlayerInputManagement
         [SerializeField] internal Camera m_camera;
         [SerializeField] private Transform m_parentTransform;
         [SerializeField] internal Transform m_lookAtTarget;
+        [SerializeField] private bool m_keepWorldPos = true;
+        [SerializeField] private bool m_differentChildHeight;
+        [SerializeField] private Vector3 m_childPosOffset;
         private Transform m_currentLookAtTarget;
         #endregion
 
@@ -21,9 +24,13 @@ namespace PlayerInputManagement
         [SerializeField] private CursorLockMode m_cursorLockMode;
         [SerializeField] private float m_sphereCheckRadius = 0.5f;
         [SerializeField] private LayerMask m_sphereCheckLayerMask;
-        [SerializeField] private bool m_keepWorldPos = true;
         internal bool m_obstacleIsBelow;
-        [SerializeField] private float m_lastHitObjectYPos;
+        #region Calculations
+        /*[SerializeField] */
+        private float m_flexibleMinMouseAngle;
+        /*[SerializeField] */
+        private float m_lastHitObjectYPos;
+        #endregion
         #endregion
 
         #region Camera-Rotation
@@ -41,22 +48,23 @@ namespace PlayerInputManagement
         [SerializeField] private bool m_disableCameraRotation = false;                  //Disabled CameraRotation
         [SerializeField] private bool m_disableCameraZoom = false;                      //Disabled CameraZoom
         private Vector3 runtimeRotationVector;
-        private float m_flexibleMinMousePitch;
-        private bool m_runtimePitchSwitch;  //<(~.^)"
+        private float m_runtimeMinMousePitch;
+        internal bool m_runtimePitchSwitch;
         internal Vector3 m_playerInputRotationVector;
         internal Vector2 m_mousePosition;
         #endregion
 
         #region Camera-Zoom
+        //Possible Array of ZoomDistances for different distances, instead of back to front?
         [Header("Camera-Zoom")]
         [SerializeField] internal float m_zoomSpeed;
         [SerializeField] private float m_zoomDampening;
         [SerializeField] private float m_startZoomDistance = 10.0f;
         [SerializeField] private float m_minZoomDistance;
         [SerializeField] private float m_maxZoomDistance;
-        internal float m_clampedCameraDistance;                                              //Clamped in CameraZoom.
-        internal float m_runtimeZoomHeight;
-        #endregion                                             //Zoom/Scroll-Variable.
+        internal float m_clampedCameraDistance;                                         //Clamped in private void CameraZoom().
+        internal float m_runtimeZoomHeight;                                             //Used in PlayerInput ZoomCamera().
+        #endregion
 
         #region Debug.Drawline & DrawWireSphere
         [Header("Debug Drawings")]
@@ -71,8 +79,8 @@ namespace PlayerInputManagement
             if (m_camera == null)
                 m_camera = GetComponentInChildren<Camera>();
 
+            m_runtimeMinMousePitch = m_minMousePitch;
             m_clampedCameraDistance = m_startZoomDistance;
-            m_flexibleMinMousePitch = m_minMousePitch;
             m_mousePosition = Vector2.zero;
             Cursor.lockState = m_cursorLockMode;
             SetCurrentLookAtTarget(m_lookAtTarget, m_keepWorldPos);
@@ -82,7 +90,7 @@ namespace PlayerInputManagement
         {
             GetMousePosition();
             SetCurrentLookAtTarget(m_lookAtTarget, true);
-            MinCameraPosSphereCast();   //Shall set a new MinCamPos on hitting an Object.
+            FomorMinCameraPosSphereCast();
         }
 
         private void FixedUpdate()
@@ -111,13 +119,13 @@ namespace PlayerInputManagement
         {
             if (!m_disableCameraRotation)
             {
-                if (m_camera.transform.position.y <= 0 && m_playerInputRotationVector.y < 0.5f)
-                    m_playerInputRotationVector.y += m_camera.transform.position.y + 50f * Time.fixedDeltaTime;
+                //if (m_camera.transform.position.y <= 0 && m_playerInputRotationVector.y < 0.5f)
+                //    m_playerInputRotationVector.y += m_camera.transform.position.y + 50f * Time.fixedDeltaTime;
 
                 switch (m_playerInputRotationVector.magnitude)
                 {
-                    case 0:
-                        break;
+                    //case 0:
+                    //    break;
                     default:
                     {
                         switch (m_invertXRotation)
@@ -133,17 +141,36 @@ namespace PlayerInputManagement
                         switch (m_invertYRotation)
                         {
                             case false:
+                            {
                                 runtimeRotationVector.y -= m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
                                 break;
+                            }
                             case true:
+                            {
                                 runtimeRotationVector.y += m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
                                 break;
+                            }
                         }
                     }
                     break;
                 }
 
-                runtimeRotationVector.x = Mathf.Clamp(runtimeRotationVector.x, m_flexibleMinMousePitch, m_maxMousePitch);   //Rotation around X.                
+
+                switch (m_runtimePitchSwitch)
+                {
+                    case false:
+                    {
+                        m_flexibleMinMouseAngle = m_runtimeMinMousePitch;
+                        break;
+                    }
+                    case true:
+                    {
+                        m_flexibleMinMouseAngle = m_lastHitObjectYPos;
+                        break;
+                    }
+                }
+
+                runtimeRotationVector.x = Mathf.Clamp(runtimeRotationVector.x, m_flexibleMinMouseAngle, m_maxMousePitch);   //Rotation around X.
             }
         }
 
@@ -168,7 +195,7 @@ namespace PlayerInputManagement
             }
         }
 
-        private void MinCameraPosSphereCast()
+        private void FomorMinCameraPosSphereCast()
         {
             m_lineOrigin = m_camera.transform.position;
             m_sphereCastDirection = -m_parentTransform.up;
@@ -181,44 +208,34 @@ namespace PlayerInputManagement
                 case false:
                 {
                     m_hitCheckDistance = m_sphereCheckRadius;
-                    m_flexibleMinMousePitch = m_minMousePitch;
-                    SetNewMinMousePitch(m_flexibleMinMousePitch);
+                    //if (m_minMousePitch != m_runtimeMinMousePitch)
+                    GetComponent<CameraBehaviour>().m_minMousePitch = m_runtimeMinMousePitch;
+                    SetNewMinMousePitch(false);
                     break;
                 }
                 case true:
                 {
                     m_hitCheckDistance = hitObject.distance;
-                    m_lastHitObjectYPos = hitObject.transform.position.y;
-                    m_flexibleMinMousePitch = m_parentTransform.localRotation.x;
-                    SetNewMinMousePitch(m_flexibleMinMousePitch);
+                    float lowestPos = -1f;
+                    //m_lastHitObjectYPos = hitObject.transform.position.y;
+                    //if (m_minMousePitch != m_lastHitObjectYPos)
+                    GetComponent<CameraBehaviour>().m_minMousePitch = lowestPos;
+                    SetNewMinMousePitch(true);
                     break;
                 }
             }
         }
 
-        private void SetNewMinMousePitch(float _newMinMousePitch)
+        private void SetNewMinMousePitch(bool _switch)
         {
-            m_runtimePitchSwitch = _newMinMousePitch == m_minMousePitch;
-            switch (m_runtimePitchSwitch)
+            switch (_switch)
             {
-                case false: //m_parentTransform.(local)Rotation.x;
-                {
-                    if (m_flexibleMinMousePitch != _newMinMousePitch)
-                    {
-                        m_flexibleMinMousePitch = _newMinMousePitch;
-                        Debug.Log(m_flexibleMinMousePitch);
-                    }
+                case false:
+                    m_runtimePitchSwitch = false;
                     break;
-                }
-                case true:  //m_minMousePitch;
-                {
-                    if (m_minMousePitch != _newMinMousePitch)
-                    {
-                        m_flexibleMinMousePitch = _newMinMousePitch;
-                        Debug.Log(m_flexibleMinMousePitch);
-                    }
+                case true:
+                    m_runtimePitchSwitch = true;
                     break;
-                }
             }
         }
 
@@ -227,7 +244,10 @@ namespace PlayerInputManagement
             if (m_currentLookAtTarget != _lookAtTarget || m_currentLookAtTarget == null)
             {
                 m_parentTransform.SetParent(_lookAtTarget, _keepWorldPosition);
-                m_parentTransform.position = _lookAtTarget.position;
+                if (m_differentChildHeight)
+                    m_parentTransform.position = new Vector3(_lookAtTarget.position.x + m_childPosOffset.x, _lookAtTarget.position.y + m_childPosOffset.y, _lookAtTarget.position.z + m_childPosOffset.z);
+                else
+                    m_parentTransform.position = _lookAtTarget.position;
                 m_currentLookAtTarget = _lookAtTarget;
             }
 

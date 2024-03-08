@@ -65,22 +65,8 @@ namespace PlayerInputManagement
             {
                 case "PlayerOnFootRH":
                 {
-                    //switch (m_playerController.m_cameraBehaviour.AnyCondition)
-                    //{
-                    //    case false:
-                    //    {
-                            //ReadValue.x = Rotation around YAxis.
-                            m_playerController.m_cameraBehaviour.m_playerInputRotationVector =
-                        new Vector3(-m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().y, 0.0f);
-                    //        break;
-                    //    }
-                    //    default:
-                    //    {
-                    //        break;
-                    //    }
-
-                    //}
-
+                    m_playerController.m_cameraBehaviour.m_playerInputRotationVector =
+                new Vector3(-m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().y, 0.0f);
                     break;
                 }
                 //TODO: Add new ActionMap cases on demand.
@@ -180,11 +166,6 @@ namespace PlayerInputManagement
         #endregion
         private void ZoomCamera(InputAction.CallbackContext _callbackContext)
         {
-            //if (!(m_mousePosition.x < (m_playerController.m_cameraBehaviour.m_camera.rect.width - m_playerController.m_cameraBehaviour.m_camera.rect.width)) &&
-            //    !(m_mousePosition.x > m_playerController.m_cameraBehaviour.m_camera.rect.width) &&
-            //    !(m_mousePosition.y < (m_playerController.m_cameraBehaviour.m_camera.rect.height - m_playerController.m_cameraBehaviour.m_camera.rect.height)) &&
-            //    !(m_mousePosition.y > m_playerController.m_cameraBehaviour.m_camera.rect.height))
-            //{
             float readValueY = -_callbackContext.ReadValue<Vector2>().y * m_playerController.m_cameraBehaviour.m_zoomSpeed;
 
             if (Mathf.Abs(readValueY) > 0.001f)
@@ -196,7 +177,6 @@ namespace PlayerInputManagement
                 else if (m_playerController.m_cameraBehaviour.m_runtimeZoomHeight > m_playerController.m_cameraBehaviour.m_clampedCameraDistance)
                     m_playerController.m_cameraBehaviour.m_runtimeZoomHeight = m_playerController.m_cameraBehaviour.m_clampedCameraDistance;
             }
-            //}
         }
         #endregion
     }
