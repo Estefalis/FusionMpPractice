@@ -1156,8 +1156,8 @@ MonoBehaviour:
   m_invertYRotation: 0
   m_disableCameraRotation: 0
   m_disableCameraZoom: 0
-  m_zoomSpeed: 2
-  m_zoomDampening: 0.3
+  m_zoomSpeed: 5
+  m_zoomDampening: 1
   m_startZoomDistance: 8
   m_minZoomDistance: 0.2
   m_maxZoomDistance: 8

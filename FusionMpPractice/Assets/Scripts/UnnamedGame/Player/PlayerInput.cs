@@ -26,6 +26,7 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions.PlayerOnFootRH.Acceleration.canceled += DecelerateMovespeed;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed += SwitchCursorLockMode;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.performed += ZoomCamera;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.canceled += StopCameraZoom;
             #endregion
 
             InputUser.onChange += OnInputDeviceChange;
@@ -47,6 +48,7 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions.PlayerOnFootRH.Acceleration.canceled -= DecelerateMovespeed;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed -= SwitchCursorLockMode;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.performed -= ZoomCamera;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.canceled -= StopCameraZoom;
             #endregion
 
             InputUser.onChange -= OnInputDeviceChange;
@@ -166,17 +168,13 @@ namespace PlayerInputManagement
         #endregion
         private void ZoomCamera(InputAction.CallbackContext _callbackContext)
         {
-            float readValueY = -_callbackContext.ReadValue<Vector2>().y * m_playerController.m_cameraBehaviour.m_zoomSpeed;
+            m_playerController.m_cameraBehaviour.m_zoomValueY = _callbackContext.ReadValue<Vector2>().y * m_playerController.m_cameraBehaviour.m_zoomSpeed;
+            //float readValueY = -_callbackContext.ReadValue<Vector2>().y * m_playerController.m_cameraBehaviour.m_zoomSpeed;
+        }
 
-            if (Mathf.Abs(readValueY) > 0.001f)
-            {
-                m_playerController.m_cameraBehaviour.m_runtimeZoomHeight = m_playerController.m_cameraBehaviour.m_camera.transform.localRotation.y + readValueY * m_playerController.m_cameraBehaviour.m_zoomSpeed;
-
-                if (m_playerController.m_cameraBehaviour.m_runtimeZoomHeight < m_playerController.m_cameraBehaviour.m_clampedCameraDistance)
-                    m_playerController.m_cameraBehaviour.m_runtimeZoomHeight = m_playerController.m_cameraBehaviour.m_clampedCameraDistance;
-                else if (m_playerController.m_cameraBehaviour.m_runtimeZoomHeight > m_playerController.m_cameraBehaviour.m_clampedCameraDistance)
-                    m_playerController.m_cameraBehaviour.m_runtimeZoomHeight = m_playerController.m_cameraBehaviour.m_clampedCameraDistance;
-            }
+        private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
+        {
+            m_playerController.m_cameraBehaviour.m_zoomValueY = 0.0f;
         }
         #endregion
     }

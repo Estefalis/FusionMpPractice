@@ -63,7 +63,7 @@ namespace PlayerInputManagement
         [SerializeField] private float m_minZoomDistance;
         [SerializeField] private float m_maxZoomDistance;
         internal float m_clampedCameraDistance;                                         //Clamped in private void CameraZoom().
-        internal float m_runtimeZoomHeight;                                             //Used in PlayerInput ZoomCamera().
+        internal float m_zoomValueY;
         #endregion
 
         #region Debug.Drawline & DrawWireSphere
@@ -90,7 +90,7 @@ namespace PlayerInputManagement
         {
             GetMousePosition();
             SetCurrentLookAtTarget(m_lookAtTarget, true);
-            FomorMinCameraPosSphereCast();
+            MinCameraPosSphereCast();
         }
 
         private void FixedUpdate()
@@ -119,9 +119,6 @@ namespace PlayerInputManagement
         {
             if (!m_disableCameraRotation)
             {
-                //if (m_camera.transform.position.y <= 0 && m_playerInputRotationVector.y < 0.5f)
-                //    m_playerInputRotationVector.y += m_camera.transform.position.y + 50f * Time.fixedDeltaTime;
-
                 switch (m_playerInputRotationVector.magnitude)
                 {
                     //case 0:
@@ -178,24 +175,38 @@ namespace PlayerInputManagement
         {
             if (!m_disableCameraZoom)
             {
-                if (m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.ReadValue<Vector2>().y != 0.0f)
+                if (m_zoomValueY != 0.0f)
+                //if (m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.ReadValue<Vector2>().y != 0.0f)
                 {
-                    float scrollAmount = m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.ReadValue<Vector2>().y * m_zoomSpeed;
+                    float scrollAmount = m_zoomValueY * m_zoomSpeed;
                     scrollAmount *= m_clampedCameraDistance * m_zoomDampening;
                     m_clampedCameraDistance += scrollAmount * -1f;
+                    Debug.Log($"ScrollAmount{scrollAmount} - ClampCamDis {m_clampedCameraDistance} - ZoomDamp {m_zoomDampening}");
                     m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
                 }
 
                 if (m_camera.transform.localPosition.z != m_clampedCameraDistance * -1f)
                 {
-                    //m_clampedCameraDistance Interpolation.
-                    m_camera.transform.localPosition = new Vector3(0f, 0f, Mathf.Lerp(m_camera.transform.localPosition.z, m_clampedCameraDistance * -1f,
-                        Time.deltaTime * m_zoomSpeed));
+                    switch (m_zoomValueY)
+                    {
+                        case 0.0f:
+                        {
+                            //Camera gets stopped here!
+                            m_camera.transform.localPosition = new Vector3(0f, 0f, m_camera.transform.localPosition.z);
+                            break;
+                        }
+                        default:
+                        {
+                            //m_clampedCameraDistance Interpolation.
+                            m_camera.transform.localPosition = new Vector3(0f, 0f, Mathf.Lerp(m_camera.transform.localPosition.z, m_clampedCameraDistance * -1f, Time.deltaTime * m_zoomSpeed));
+                            break;
+                        }
+                    }
                 }
             }
         }
 
-        private void FomorMinCameraPosSphereCast()
+        private void MinCameraPosSphereCast()
         {
             m_lineOrigin = m_camera.transform.position;
             m_sphereCastDirection = -m_parentTransform.up;
@@ -208,18 +219,17 @@ namespace PlayerInputManagement
                 case false:
                 {
                     m_hitCheckDistance = m_sphereCheckRadius;
-                    //if (m_minMousePitch != m_runtimeMinMousePitch)
-                    GetComponent<CameraBehaviour>().m_minMousePitch = m_runtimeMinMousePitch;
+                    if (m_minMousePitch != m_runtimeMinMousePitch)
+                        m_minMousePitch = m_runtimeMinMousePitch;
                     SetNewMinMousePitch(false);
                     break;
                 }
                 case true:
                 {
                     m_hitCheckDistance = hitObject.distance;
-                    float lowestPos = -1f;
-                    //m_lastHitObjectYPos = hitObject.transform.position.y;
-                    //if (m_minMousePitch != m_lastHitObjectYPos)
-                    GetComponent<CameraBehaviour>().m_minMousePitch = lowestPos;
+                    m_lastHitObjectYPos = hitObject.transform.position.y;
+                    if (m_minMousePitch != m_lastHitObjectYPos)
+                        m_minMousePitch = m_lastHitObjectYPos;
                     SetNewMinMousePitch(true);
                     break;
                 }
