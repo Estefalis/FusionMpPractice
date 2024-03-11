@@ -16,10 +16,12 @@ namespace PlayerInputManagement
             #region InputAction-Subscriptions
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.performed += MoveCharacter;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.canceled += StopMovement;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += StopJumping;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed += OnRightMouseButtonDown;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled += OnRightMouseButtonUp;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBreaking.performed += ActiveBreaking;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBreaking.canceled += CancelActiveBreaking;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.performed += ActiveBraking;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.canceled += CancelActiveBraking;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Duck.performed += CharacterDuck;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Duck.canceled += StopDucking;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Acceleration.performed += AccelerateMovespeed;
@@ -27,9 +29,14 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed += SwitchCursorLockMode;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.performed += ZoomCamera;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.canceled += StopCameraZoom;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed += OpenMenu;
             #endregion
 
             InputUser.onChange += OnInputDeviceChange;
+
+            //Debug.Log($"CurrentActionMap Name {m_playerController.m_currentActionMap.name} - CurrentActionMap ID {m_playerController.m_currentActionMap.id}");
+            //Debug.Log($"ControllerAction Name {m_playerController.m_playerInputActions.asset.actionMaps[0].name} - ControllerAction ID {m_playerController.m_playerInputActions.asset.actionMaps[0].id}");
+            //Debug.Log($"ReferenceAction Name {m_mouseRotationActionMaps[0].action.name} - ReferenceAction ID {m_mouseRotationActionMaps[0].action.id}");
         }
 
         private void OnDisable()
@@ -38,10 +45,12 @@ namespace PlayerInputManagement
             #region InputAction-UnSubscriptions
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.performed -= MoveCharacter;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.canceled -= StopMovement;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += StopJumping;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed -= OnRightMouseButtonDown;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled -= OnRightMouseButtonUp;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBreaking.performed -= ActiveBreaking;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBreaking.canceled -= CancelActiveBreaking;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.performed -= ActiveBraking;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.canceled -= CancelActiveBraking;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Duck.performed -= CharacterDuck;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Duck.canceled -= StopDucking;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Acceleration.performed -= AccelerateMovespeed;
@@ -49,6 +58,7 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed -= SwitchCursorLockMode;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.performed -= ZoomCamera;
             m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.canceled -= StopCameraZoom;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed -= OpenMenu;
             #endregion
 
             InputUser.onChange -= OnInputDeviceChange;
@@ -90,6 +100,17 @@ namespace PlayerInputManagement
             m_playerController.m_playerMovement.m_moveButtonIsPressed = false;
         }
         #endregion
+        #region Character Jump
+        private void CharacterJump(InputAction.CallbackContext _callbackContext)
+        {
+            m_playerController.m_playerMovement.m_jumpIsPressed = _callbackContext.ReadValueAsButton();
+        }
+
+        private void StopJumping(InputAction.CallbackContext _callbackContext)
+        {
+            m_playerController.m_playerMovement.m_jumpIsPressed = false;
+        }
+        #endregion
         #region Rotation
         private void OnRightMouseButtonDown(InputAction.CallbackContext _callbackContext)
         {
@@ -102,11 +123,11 @@ namespace PlayerInputManagement
         }
         #endregion
         #region Active Breaking
-        private void ActiveBreaking(InputAction.CallbackContext _callbackContext)
+        private void ActiveBraking(InputAction.CallbackContext _callbackContext)
         {
             m_playerController.m_playerMovement.m_activeBreaking = true;
         }
-        private void CancelActiveBreaking(InputAction.CallbackContext _callbackContext)
+        private void CancelActiveBraking(InputAction.CallbackContext _callbackContext)
         {
             m_playerController.m_playerMovement.m_activeBreaking = false;
         }
@@ -115,16 +136,12 @@ namespace PlayerInputManagement
         //Set fast moveSpeed by pressing shift and controller relatives.
         private void AccelerateMovespeed(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.SetTargetSpeedMode(m_playerController.m_playerMovement.m_currentVelocity, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Running);
-            //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Running);
-            m_playerController.m_playerMovement.m_lerpTimeCounter = 0.0f;
             m_playerController.m_playerMovement.m_shiftIsPressed = _callbackContext.ReadValueAsButton();
+            m_playerController.m_playerMovement.m_lerpTimeCounter = 0.0f;
         }
 
         private void DecelerateMovespeed(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.SetTargetSpeedMode(m_playerController.m_playerMovement.m_currentVelocity, m_playerController.m_eCurrentMoveMode);
-            //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode);
             m_playerController.m_playerMovement.m_shiftIsPressed = false;
         }
         #endregion
@@ -137,9 +154,6 @@ namespace PlayerInputManagement
 
             m_playerController.m_playerMovement.m_groundCheckHeightAdjustment = (m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight) / 2;
             m_playerController.m_playerMovement.m_groundCheckTransform.position = new Vector3(m_playerController.m_playerMovement.m_groundCheckTransform.position.x, transform.position.y + m_playerController.m_playerMovement.m_groundCheckHeightAdjustment, m_playerController.m_playerMovement.m_groundCheckTransform.position.z);
-
-            m_playerController.m_playerMovement.SetTargetSpeedMode(m_playerController.m_playerMovement.m_currentVelocity, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Crouching);
-            //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode, EOnFootMoveModi.Crouching);
         }
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
@@ -149,8 +163,6 @@ namespace PlayerInputManagement
                 m_playerController.m_playerMovement.m_kneelToCrouch = false;
             }
 
-            m_playerController.m_playerMovement.SetTargetSpeedMode(m_playerController.m_playerMovement.m_currentVelocity, m_playerController.m_eCurrentMoveMode);
-            //SetTargetSpeedMode(m_lerpedMoveSpeed, m_playerController.m_eCurrentMoveMode);
             m_playerController.m_playerMovement.m_groundCheckTransform.position = transform.position;
         }
         #endregion
@@ -166,6 +178,7 @@ namespace PlayerInputManagement
             //TODO: Possible Notifications on changing the inpunt device.
         }
         #endregion
+        #region Camera Zoom
         private void ZoomCamera(InputAction.CallbackContext _callbackContext)
         {
             m_playerController.m_cameraBehaviour.m_zoomValueY = _callbackContext.ReadValue<Vector2>().y * m_playerController.m_cameraBehaviour.m_zoomSpeed;
@@ -176,6 +189,13 @@ namespace PlayerInputManagement
         {
             m_playerController.m_cameraBehaviour.m_zoomValueY = 0.0f;
         }
+        #endregion
+        #region Menu
+        private void OpenMenu(InputAction.CallbackContext _callbackContext)
+        {
+
+        }
+        #endregion
         #endregion
     }
 }

@@ -35,10 +35,6 @@ namespace PlayerInputManagement
 
         #region Camera-Rotation
         [Header("Camera-Rotation")]
-        //[SerializeField] private MouseAxisAdjustments m_mouseAxisAdjustments;
-        //private enum MouseAxisAdjustments { MouseXAndY = default, MouseX = 1, MouseY = 2, DefaultReset = 3 };
-        //[SerializeField, Min(0.05f)] private float m_adjustSensitivityStep = 0.1f;
-        //private float m_xMouseSensitivityDefault = 3.0f, m_yMouseSensitivityDefault = 4.0f;
         [SerializeField, Range(-85.0f, 85.0f)] private float m_minMousePitch;
         [SerializeField, Range(-85.0f, 85.0f)] private float m_maxMousePitch;
         [SerializeField, Range(0.0001f, 20f)] private float m_xAxisRotationSpeed = 4.0f;
@@ -152,7 +148,6 @@ namespace PlayerInputManagement
                     break;
                 }
 
-
                 switch (m_runtimePitchSwitch)
                 {
                     case false:
@@ -162,7 +157,18 @@ namespace PlayerInputManagement
                     }
                     case true:
                     {
-                        m_flexibleMinMouseAngle = m_lastHitObjectYPos;
+                        switch (m_playerController.m_eCurrentMoveMode)
+                        {
+                            case EOnFootMoveModi.Crouching:
+                            {
+                                //Magic Number == 4!
+                                m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight);
+                                break;
+                            }
+                            default:
+                                m_flexibleMinMouseAngle = m_lastHitObjectYPos;
+                                break;
+                        }
                         break;
                     }
                 }
@@ -181,7 +187,7 @@ namespace PlayerInputManagement
                     float scrollAmount = m_zoomValueY * m_zoomSpeed;
                     scrollAmount *= m_clampedCameraDistance * m_zoomDampening;
                     m_clampedCameraDistance += scrollAmount * -1f;
-                    Debug.Log($"ScrollAmount{scrollAmount} - ClampCamDis {m_clampedCameraDistance} - ZoomDamp {m_zoomDampening}");
+                    //Debug.Log($"ScrollAmount{scrollAmount} - ClampCamDis {m_clampedCameraDistance} - ZoomDamp {m_zoomDampening}");
                     m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
                 }
 
@@ -219,8 +225,10 @@ namespace PlayerInputManagement
                 case false:
                 {
                     m_hitCheckDistance = m_sphereCheckRadius;
+
                     if (m_minMousePitch != m_runtimeMinMousePitch)
                         m_minMousePitch = m_runtimeMinMousePitch;
+
                     SetNewMinMousePitch(false);
                     break;
                 }
@@ -228,8 +236,10 @@ namespace PlayerInputManagement
                 {
                     m_hitCheckDistance = hitObject.distance;
                     m_lastHitObjectYPos = hitObject.transform.position.y;
+
                     if (m_minMousePitch != m_lastHitObjectYPos)
                         m_minMousePitch = m_lastHitObjectYPos;
+
                     SetNewMinMousePitch(true);
                     break;
                 }
@@ -273,57 +283,6 @@ namespace PlayerInputManagement
                 m_parentTransform.rotation = Quaternion.Lerp(m_parentTransform.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));
             }
         }
-
-        #region Axis Sensitivity
-        //internal void IncreaseAxisSensitivity()
-        //{
-        //    switch (m_mouseAxisAdjustments)
-        //    {
-        //        case MouseAxisAdjustments.MouseXAndY:
-        //        {
-        //            m_xAxisRotationSpeed += m_adjustSensitivityStep;
-        //            m_yAxisRotationSpeed += m_adjustSensitivityStep;
-        //            break;
-        //        }
-        //        case MouseAxisAdjustments.MouseX:
-        //            m_xAxisRotationSpeed += m_adjustSensitivityStep;
-        //            break;
-        //        case MouseAxisAdjustments.MouseY:
-        //            m_yAxisRotationSpeed += m_adjustSensitivityStep;
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //}
-
-        //internal void DecreaseAxisSensitivity()
-        //{
-        //    switch (m_mouseAxisAdjustments)
-        //    {
-        //        case MouseAxisAdjustments.MouseXAndY:
-        //        {
-        //            m_xAxisRotationSpeed -= m_adjustSensitivityStep;
-        //            m_yAxisRotationSpeed -= m_adjustSensitivityStep;
-        //            break;
-        //        }
-        //        case MouseAxisAdjustments.MouseX:
-        //            m_xAxisRotationSpeed -= m_adjustSensitivityStep;
-        //            break;
-        //        case MouseAxisAdjustments.MouseY:
-        //            m_yAxisRotationSpeed -= m_adjustSensitivityStep;
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //}
-
-        //internal void ResetAxisSensitivity()
-        //{
-        //    m_mouseAxisAdjustments = MouseAxisAdjustments.MouseXAndY;
-        //    m_xAxisRotationSpeed = m_xMouseSensitivityDefault;
-        //    m_yAxisRotationSpeed = m_yMouseSensitivityDefault;
-        //}
-        #endregion
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Users;
 
 namespace PlayerInputManagement
 {
@@ -27,8 +26,8 @@ namespace PlayerInputManagement
         [Header("Acceleration")]
         [SerializeField] internal float m_durationToMaxSpeed = 2.5f;
         [SerializeField] internal float m_durationToZeroSpeed = 6.0f;
-        [SerializeField] internal float m_breakToZeroSpeed = 1.0f;
-        internal float m_acceleRatePerSec, m_deceleRatePerSec, m_breakRatePerSec, m_currentVelocity, m_individualMaxSpeed;
+        [SerializeField] internal float m_brakeToZeroSpeed = 1.0f;
+        internal float m_acceleRatePerSec, m_deceleRatePerSec, m_brakeRatePerSec, m_currentVelocity, m_individualMaxSpeed;
         internal bool m_activeBreaking = false;
         internal EOnFootMoveModi m_lastMoveMode;
         #endregion
@@ -74,10 +73,6 @@ namespace PlayerInputManagement
         {
             m_playerController.m_playerInputActions.PlayerOnFootRH.Disable();
             m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed -= CharacterJump;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= StopJumping;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed -= OpenMenu;
-
-            InputUser.onChange -= OnInputDeviceChange;
 
             m_permitCrouchLerp = false;
         }
@@ -87,15 +82,12 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions = InputManager.m_InputManagerActions;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Enable();
             m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += StopJumping;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed += OpenMenu;
 
-            InputUser.onChange += OnInputDeviceChange;
+            m_acceleRatePerSec = m_individualMaxSpeed / m_durationToMaxSpeed;
+            m_deceleRatePerSec = -m_individualMaxSpeed / m_durationToZeroSpeed;
+            m_brakeRatePerSec = -m_individualMaxSpeed / m_brakeToZeroSpeed;
+
             m_maxDistanceAbove = m_colliderWalkHeight;
-
-            //Debug.Log($"CurrentActionMap Name {m_playerController.m_currentActionMap.name} - CurrentActionMap ID {m_playerController.m_currentActionMap.id}");
-            //Debug.Log($"ControllerAction Name {m_playerController.m_playerInputActions.asset.actionMaps[0].name} - ControllerAction ID {m_playerController.m_playerInputActions.asset.actionMaps[0].id}");
-            //Debug.Log($"ReferenceAction Name {m_mouseRotationActionMaps[0].action.name} - ReferenceAction ID {m_mouseRotationActionMaps[0].action.id}");
         }
 
         private void Update()
@@ -288,25 +280,70 @@ namespace PlayerInputManagement
         #region Acceleration
         private void MoveSpeedAcceleration()
         {
-            switch (m_playerController.m_eCurrentMoveMode)
+            switch (m_moveButtonIsPressed)
             {
-                case EOnFootMoveModi.Walking:
+                case false:
                 {
-                    m_individualMaxSpeed = m_walkSpeed;
+                    switch (m_kneelToCrouch)
+                    {
+                        case false:
+                        {
+                            m_individualMaxSpeed = m_stopMovementValue;
+                            m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Idle;
+                            break;
+                        }
+                        case true:
+                        {
+                            m_individualMaxSpeed = m_crouchSpeed;
+                            m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Crouching;
+                            break;
+                        }
+                    }
                     break;
                 }
-                case EOnFootMoveModi.Running:
-                    m_individualMaxSpeed = m_runSpeed;
-                    break;
-                case EOnFootMoveModi.Crouching:
-                    m_individualMaxSpeed = m_crouchSpeed;
-                    break;
-                default:
+                case true:
                 {
-                    m_individualMaxSpeed = m_stopMovementValue;
-#if UNITY_EDITOR
-                    Debug.Log("PlayerMovement: Undefined MaxSpeed. Please set a definition for it.");
-#endif
+                    switch (m_shiftIsPressed)
+                    {
+                        case false:
+                        {
+                            switch (m_kneelToCrouch)
+                            {
+                                case false:
+                                {
+                                    m_individualMaxSpeed = m_walkSpeed;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Walking;
+                                    break;
+                                }
+                                case true:
+                                {
+                                    m_individualMaxSpeed = m_crouchSpeed;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Crouching;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case true:
+                        {
+                            switch (m_kneelToCrouch)
+                            {
+                                case false:
+                                {
+                                    m_individualMaxSpeed = m_runSpeed;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Running;
+                                    break;
+                                }
+                                case true:
+                                {
+                                    m_individualMaxSpeed = m_crouchSpeed;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Crouching;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
                     break;
                 }
             }
@@ -315,10 +352,6 @@ namespace PlayerInputManagement
             {
                 case false:
                 {
-                    //m_currentVelocity += m_breakRatePerSec + Time.deltaTime;
-                    //m_currentVelocity += m_deceleRatePerSec + Time.deltaTime;
-                    //m_currentVelocity = Mathf.Max(m_currentVelocity, m_stopMovementValue);
-
                     switch (m_activeBreaking)
                     {
                         case false:
@@ -328,7 +361,7 @@ namespace PlayerInputManagement
                         }
                         case true:
                         {
-                            Acceleration(m_breakRatePerSec);
+                            Acceleration(m_brakeRatePerSec);
                             break;
                         }
                     }
@@ -337,8 +370,6 @@ namespace PlayerInputManagement
                 }
                 case true:
                 {
-                    //m_currentVelocity += m_acceleRatePerSec + Time.deltaTime;
-                    //m_currentVelocity = Mathf.Min(m_currentVelocity, m_individualMaxSpeed);
                     Acceleration(m_acceleRatePerSec);
                     break;
                 }
@@ -348,65 +379,10 @@ namespace PlayerInputManagement
         private void Acceleration(float _accelerationValue)
         {
             m_currentVelocity += _accelerationValue + Time.deltaTime;
-            m_currentVelocity = Mathf.Clamp(m_currentVelocity, /*m_playerController.*/m_stopMovementValue, m_individualMaxSpeed);
+            Debug.Log($"AccelerationValue: {_accelerationValue}");
+            m_currentVelocity = Mathf.Clamp(m_currentVelocity, m_stopMovementValue, m_individualMaxSpeed);
         }
-
-        internal void SetTargetSpeedMode(float _currentMoveSpeed, EOnFootMoveModi _lastMoveMode = EOnFootMoveModi.Idle, EOnFootMoveModi _targetMoveMode = EOnFootMoveModi.Walking)
-        {
-            m_lastMoveMode = _lastMoveMode;
-            m_startMoveLerp = _currentMoveSpeed;
-
-            switch (_lastMoveMode)
-            {
-                case EOnFootMoveModi.Idle:
-                {
-                    break;
-                }
-                case EOnFootMoveModi.Walking:
-                {
-                    m_deceleRatePerSec = -m_walkSpeed / m_durationToZeroSpeed;
-                    m_breakRatePerSec = -m_walkSpeed / m_breakToZeroSpeed;
-                    break;
-                }
-                case EOnFootMoveModi.Running:
-                {
-                    m_deceleRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
-                    m_breakRatePerSec = -m_runSpeed / m_breakToZeroSpeed;
-                    break;
-                }
-                case EOnFootMoveModi.Crouching:
-                {
-                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
-                    m_breakRatePerSec = -m_crouchSpeed / m_breakToZeroSpeed;
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            switch (_targetMoveMode)
-            {
-                case EOnFootMoveModi.Walking:
-                {
-                    m_acceleRatePerSec = m_walkSpeed / m_durationToMaxSpeed;
-                    break;
-                }
-                case EOnFootMoveModi.Running:
-                {
-                    m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
-                    break;
-                }
-                case EOnFootMoveModi.Crouching:
-                {
-                    m_acceleRatePerSec = m_crouchSpeed / m_durationToMaxSpeed;
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            m_playerController.m_eCurrentMoveMode = _targetMoveMode;
-        }
+        
         #endregion
         #region Fall-Damage
         private void FallDamageCalculationStart()
@@ -458,16 +434,9 @@ namespace PlayerInputManagement
         #endregion        
         #endregion
         #region CallbackContexts
-        #region InputDeviceChange
-        private void OnInputDeviceChange(InputUser _inputUser, InputUserChange _inputUserChange, InputDevice _inputDevice)
-        {
-            //TODO: Possible Notifications on changing the inpunt device.
-        }
-        #endregion
         #region Character Jump
         private void CharacterJump(InputAction.CallbackContext _callbackContext)
         {
-            m_jumpIsPressed = _callbackContext.ReadValueAsButton();
             if (m_jumpIsPressed && m_playerIsGrounded) //m_playerIsGrounded <-> m_coyoteTimeCounter.
             {
                 //Coyotetime Jump with more following.
@@ -481,18 +450,7 @@ namespace PlayerInputManagement
                 //    m_jumpIsPressed = false;
             }
         }
-
-        private void StopJumping(InputAction.CallbackContext _callbackContext)
-        {
-            m_playerController.m_playerMovement.m_jumpIsPressed = false;
-        }
-        #endregion
-        #region Menu
-        private void OpenMenu(InputAction.CallbackContext _callbackContext)
-        {
-
-        }
-        #endregion
+        #endregion        
         #endregion
     }
 }

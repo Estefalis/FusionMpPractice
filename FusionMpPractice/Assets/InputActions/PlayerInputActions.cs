@@ -82,7 +82,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ActiveBreaking"",
+                    ""name"": ""ActiveBraking"",
                     ""type"": ""Button"",
                     ""id"": ""c39db1d9-01bc-4296-897b-e8b8123ce96a"",
                     ""expectedControlType"": ""Button"",
@@ -487,7 +487,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardAndMouse"",
-                    ""action"": ""ActiveBreaking"",
+                    ""action"": ""ActiveBraking"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -498,7 +498,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""UniversalController"",
-                    ""action"": ""ActiveBreaking"",
+                    ""action"": ""ActiveBraking"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -509,7 +509,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""PlaystationController"",
-                    ""action"": ""ActiveBreaking"",
+                    ""action"": ""ActiveBraking"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -520,7 +520,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XBoxController"",
-                    ""action"": ""ActiveBreaking"",
+                    ""action"": ""ActiveBraking"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1184,7 +1184,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_PlayerOnFootRH_Jump = m_PlayerOnFootRH.FindAction("Jump", throwIfNotFound: true);
         m_PlayerOnFootRH_Duck = m_PlayerOnFootRH.FindAction("Duck", throwIfNotFound: true);
         m_PlayerOnFootRH_Acceleration = m_PlayerOnFootRH.FindAction("Acceleration", throwIfNotFound: true);
-        m_PlayerOnFootRH_ActiveBreaking = m_PlayerOnFootRH.FindAction("ActiveBreaking", throwIfNotFound: true);
+        m_PlayerOnFootRH_ActiveBraking = m_PlayerOnFootRH.FindAction("ActiveBraking", throwIfNotFound: true);
         m_PlayerOnFootRH_OpenMenu = m_PlayerOnFootRH.FindAction("OpenMenu", throwIfNotFound: true);
         m_PlayerOnFootRH_CursorLockMode = m_PlayerOnFootRH.FindAction("CursorLockMode", throwIfNotFound: true);
         m_PlayerOnFootRH_CameraZoom = m_PlayerOnFootRH.FindAction("CameraZoom", throwIfNotFound: true);
@@ -1268,7 +1268,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerOnFootRH_Jump;
     private readonly InputAction m_PlayerOnFootRH_Duck;
     private readonly InputAction m_PlayerOnFootRH_Acceleration;
-    private readonly InputAction m_PlayerOnFootRH_ActiveBreaking;
+    private readonly InputAction m_PlayerOnFootRH_ActiveBraking;
     private readonly InputAction m_PlayerOnFootRH_OpenMenu;
     private readonly InputAction m_PlayerOnFootRH_CursorLockMode;
     private readonly InputAction m_PlayerOnFootRH_CameraZoom;
@@ -1283,7 +1283,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_PlayerOnFootRH_Jump;
         public InputAction @Duck => m_Wrapper.m_PlayerOnFootRH_Duck;
         public InputAction @Acceleration => m_Wrapper.m_PlayerOnFootRH_Acceleration;
-        public InputAction @ActiveBreaking => m_Wrapper.m_PlayerOnFootRH_ActiveBreaking;
+        public InputAction @ActiveBraking => m_Wrapper.m_PlayerOnFootRH_ActiveBraking;
         public InputAction @OpenMenu => m_Wrapper.m_PlayerOnFootRH_OpenMenu;
         public InputAction @CursorLockMode => m_Wrapper.m_PlayerOnFootRH_CursorLockMode;
         public InputAction @CameraZoom => m_Wrapper.m_PlayerOnFootRH_CameraZoom;
@@ -1315,9 +1315,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Acceleration.started += instance.OnAcceleration;
             @Acceleration.performed += instance.OnAcceleration;
             @Acceleration.canceled += instance.OnAcceleration;
-            @ActiveBreaking.started += instance.OnActiveBreaking;
-            @ActiveBreaking.performed += instance.OnActiveBreaking;
-            @ActiveBreaking.canceled += instance.OnActiveBreaking;
+            @ActiveBraking.started += instance.OnActiveBraking;
+            @ActiveBraking.performed += instance.OnActiveBraking;
+            @ActiveBraking.canceled += instance.OnActiveBraking;
             @OpenMenu.started += instance.OnOpenMenu;
             @OpenMenu.performed += instance.OnOpenMenu;
             @OpenMenu.canceled += instance.OnOpenMenu;
@@ -1352,9 +1352,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Acceleration.started -= instance.OnAcceleration;
             @Acceleration.performed -= instance.OnAcceleration;
             @Acceleration.canceled -= instance.OnAcceleration;
-            @ActiveBreaking.started -= instance.OnActiveBreaking;
-            @ActiveBreaking.performed -= instance.OnActiveBreaking;
-            @ActiveBreaking.canceled -= instance.OnActiveBreaking;
+            @ActiveBraking.started -= instance.OnActiveBraking;
+            @ActiveBraking.performed -= instance.OnActiveBraking;
+            @ActiveBraking.canceled -= instance.OnActiveBraking;
             @OpenMenu.started -= instance.OnOpenMenu;
             @OpenMenu.performed -= instance.OnOpenMenu;
             @OpenMenu.canceled -= instance.OnOpenMenu;
@@ -1546,7 +1546,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnDuck(InputAction.CallbackContext context);
         void OnAcceleration(InputAction.CallbackContext context);
-        void OnActiveBreaking(InputAction.CallbackContext context);
+        void OnActiveBraking(InputAction.CallbackContext context);
         void OnOpenMenu(InputAction.CallbackContext context);
         void OnCursorLockMode(InputAction.CallbackContext context);
         void OnCameraZoom(InputAction.CallbackContext context);
