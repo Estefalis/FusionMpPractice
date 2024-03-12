@@ -159,7 +159,7 @@ namespace PlayerInputManagement
                     {
                         switch (m_playerController.m_eCurrentMoveMode)
                         {
-                            case EOnFootMoveModi.Crouching:
+                            case EOnFootTargetMoveModi.Crouching:
                             {
                                 //Magic Number == 4!
                                 m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight);

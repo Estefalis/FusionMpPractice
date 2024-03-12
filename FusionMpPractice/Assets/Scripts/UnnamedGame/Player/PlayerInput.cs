@@ -125,11 +125,11 @@ namespace PlayerInputManagement
         #region Active Breaking
         private void ActiveBraking(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.m_activeBreaking = true;
+            m_playerController.m_playerMovement.m_activeBraking = true;
         }
         private void CancelActiveBraking(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.m_activeBreaking = false;
+            m_playerController.m_playerMovement.m_activeBraking = false;
         }
         #endregion
         #region Increasing Acceleration

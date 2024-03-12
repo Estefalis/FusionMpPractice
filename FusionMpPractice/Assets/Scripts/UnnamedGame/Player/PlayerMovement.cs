@@ -27,9 +27,10 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_durationToMaxSpeed = 2.5f;
         [SerializeField] internal float m_durationToZeroSpeed = 6.0f;
         [SerializeField] internal float m_brakeToZeroSpeed = 1.0f;
-        internal float m_acceleRatePerSec, m_deceleRatePerSec, m_brakeRatePerSec, m_currentVelocity, m_individualMaxSpeed;
-        internal bool m_activeBreaking = false;
-        internal EOnFootMoveModi m_lastMoveMode;
+        internal float m_acceleRatePerSec, m_deceleRatePerSec, m_brakeRatePerSec;
+        internal float m_individualMaxSpeed, m_setRunTimeMaxSpeed;
+        internal bool m_activeBraking = false;
+        internal EOnFootTargetMoveModi m_lastMoveMode;
         #endregion
 
         #region Gravity-Variables
@@ -83,10 +84,7 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions.PlayerOnFootRH.Enable();
             m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
 
-            m_acceleRatePerSec = m_individualMaxSpeed / m_durationToMaxSpeed;
-            m_deceleRatePerSec = -m_individualMaxSpeed / m_durationToZeroSpeed;
-            m_brakeRatePerSec = -m_individualMaxSpeed / m_brakeToZeroSpeed;
-
+            m_setRunTimeMaxSpeed = 0.0f;
             m_maxDistanceAbove = m_colliderWalkHeight;
         }
 
@@ -109,7 +107,7 @@ namespace PlayerInputManagement
                 //    }
 
                 Crouching();
-                MoveSpeedAcceleration();
+                SetMoveAcceleration();
             }
 
             if (transform.position.y < m_playerController.m_fallLimit)
@@ -278,66 +276,184 @@ namespace PlayerInputManagement
         }
         #endregion
         #region Acceleration
-        private void MoveSpeedAcceleration()
+        private void SetMoveAcceleration()
         {
             switch (m_moveButtonIsPressed)
             {
-                case false:
+                #region While Movement Buttons are not pressed (WASD, Left Stick).
+                case false: //When no Movement button is pressed.
                 {
-                    switch (m_kneelToCrouch)
+                    switch (m_activeBraking)
                     {
-                        case false:
+                        case false: //If the character shall not stop fast.
                         {
-                            m_individualMaxSpeed = m_stopMovementValue;
-                            m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Idle;
-                            break;
-                        }
-                        case true:
-                        {
-                            m_individualMaxSpeed = m_crouchSpeed;
-                            m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Crouching;
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case true:
-                {
-                    switch (m_shiftIsPressed)
-                    {
-                        case false:
-                        {
-                            switch (m_kneelToCrouch)
+                            switch (m_kneelToCrouch) //In case the character shall slow down from Walking or Running.
                             {
                                 case false:
                                 {
-                                    m_individualMaxSpeed = m_walkSpeed;
-                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Walking;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                    m_setRunTimeMaxSpeed = m_stopMovementValue;
+                                    Acceleration(m_deceleRatePerSec);
                                     break;
                                 }
                                 case true:
                                 {
-                                    m_individualMaxSpeed = m_crouchSpeed;
-                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Crouching;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                    m_setRunTimeMaxSpeed = m_crouchSpeed;
+                                    Acceleration(m_deceleRatePerSec);
                                     break;
                                 }
                             }
                             break;
                         }
-                        case true:
+                        case true:  //In case the character shall stop (brake) fast.
                         {
-                            switch (m_kneelToCrouch)
+                            switch (m_kneelToCrouch) //In case the character shall slow down from Walking or Running.
                             {
-                                case false:
+                                case false: //Fast stop while not crouching.
                                 {
-                                    m_individualMaxSpeed = m_runSpeed;
-                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Running;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                    m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
+                                    m_setRunTimeMaxSpeed = m_stopMovementValue;
+                                    Acceleration(m_brakeRatePerSec);
                                     break;
                                 }
-                                case true:
+                                case true:  //Fast stop while crouching.
                                 {
-                                    m_individualMaxSpeed = m_crouchSpeed;
-                                    m_playerController.m_eCurrentMoveMode = EOnFootMoveModi.Crouching;
+                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
+                                    m_setRunTimeMaxSpeed = m_stopMovementValue;
+                                    Acceleration(m_brakeRatePerSec);
+                                    break;
+                                }
+                            }
+#if UNITY_EDITOR
+                            Debug.Log($"Active braking: {m_activeBraking} & Kneel: {m_kneelToCrouch}!");
+#endif
+                            break;
+                        }
+                    }
+                    break;
+                }
+                #endregion
+                #region While Movement Buttons ARE pressed (WASD, Left Stick).
+                case true:  //When a Movement button IS pressed.
+                {
+                    switch (m_shiftIsPressed)   //Runspeed Switch
+                    {
+                        case false:             //Shift IS NOT pressed.
+                        {
+                            switch (m_activeBraking)
+                            {
+                                case false:     //Character shall NOT stop fast, while Shift is pressed.
+                                {
+                                    switch (m_kneelToCrouch)
+                                    {
+                                        case false: //Shift is not pressed and character shall walk.
+                                        {
+                                            //In case the character shall speed up from walking.
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Walking;
+                                            m_setRunTimeMaxSpeed = m_walkSpeed;
+                                            if (m_individualMaxSpeed < m_setRunTimeMaxSpeed)    //current vs. set speed.
+                                            {
+                                                m_acceleRatePerSec = m_walkSpeed / m_durationToZeroSpeed;
+                                                Acceleration(m_acceleRatePerSec);
+                                            }
+                                            else
+                                            {
+                                                m_deceleRatePerSec = -m_walkSpeed / m_durationToZeroSpeed;
+                                                Acceleration(m_deceleRatePerSec);
+                                            }
+                                            break;
+                                        }
+                                        case true:  //Shift is not pressed and character shall kneel down from Walking or Running.
+                                        {
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                            m_setRunTimeMaxSpeed = m_crouchSpeed;
+                                            Acceleration(m_deceleRatePerSec);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                                case true:      //Character SHALL stop fast, while shift is NOT pressed.
+                                {
+                                    switch (m_kneelToCrouch)
+                                    {
+                                        case false:
+                                        {
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                            m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
+                                            m_setRunTimeMaxSpeed = m_stopMovementValue;
+                                            Acceleration(m_brakeRatePerSec);
+                                            break;
+                                        }
+                                        case true:  //Fast stop while crouching.
+                                        {
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
+                                            m_setRunTimeMaxSpeed = m_stopMovementValue;
+                                            Acceleration(m_brakeRatePerSec);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case true:  //Shift IS pressed! <---
+                        {
+                            switch (m_activeBraking)
+                            {
+                                case false:     //Character shall act as normal, while m_activeBraking is NOT activated.
+                                {
+                                    switch (m_kneelToCrouch)
+                                    {
+                                        case false: //If Shift IS pressed and the character shall not kneel down, but run.
+                                        {
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Running;
+                                            m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
+                                            m_setRunTimeMaxSpeed = m_runSpeed;
+                                            Acceleration(m_acceleRatePerSec);
+                                            break;
+                                        }
+                                        case true:  //If Shift IS pressed and the character shall kneel down.
+                                        {
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                            m_setRunTimeMaxSpeed = m_crouchSpeed;
+                                            Acceleration(m_deceleRatePerSec);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                                case true:      //Character shall STOP while m_activeBraking is activated, even when Movement Buttons ARE pressed.
+                                {
+                                    switch (m_kneelToCrouch)
+                                    {
+                                        case false:
+                                        {
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                            m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
+                                            m_setRunTimeMaxSpeed = m_stopMovementValue;
+                                            Acceleration(m_brakeRatePerSec);
+                                            break;
+                                        }
+                                        case true:
+                                        {
+                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
+                                            m_setRunTimeMaxSpeed = m_stopMovementValue;
+                                            Acceleration(m_brakeRatePerSec);
+                                            break;
+                                        }
+                                    }
+                                    Debug.Log($"Active braking: {m_activeBraking} & Kneel: {m_kneelToCrouch}!");
                                     break;
                                 }
                             }
@@ -346,43 +462,44 @@ namespace PlayerInputManagement
                     }
                     break;
                 }
-            }
-
-            switch (m_moveButtonIsPressed)
-            {
-                case false:
-                {
-                    switch (m_activeBreaking)
-                    {
-                        case false:
-                        {
-                            Acceleration(m_deceleRatePerSec);
-                            break;
-                        }
-                        case true:
-                        {
-                            Acceleration(m_brakeRatePerSec);
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-                case true:
-                {
-                    Acceleration(m_acceleRatePerSec);
-                    break;
-                }
+                #endregion
             }
         }
 
-        private void Acceleration(float _accelerationValue)
+        private void Acceleration(float _sentDeAccelerationRate)
         {
-            m_currentVelocity += _accelerationValue + Time.deltaTime;
-            Debug.Log($"AccelerationValue: {_accelerationValue}");
-            m_currentVelocity = Mathf.Clamp(m_currentVelocity, m_stopMovementValue, m_individualMaxSpeed);
+            switch (m_playerController.m_eCurrentMoveMode)
+            {
+                case EOnFootTargetMoveModi.Walking:
+                {
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    break;
+                }
+                case EOnFootTargetMoveModi.Running:
+                {
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    break;
+                }
+                case EOnFootTargetMoveModi.Crouching:
+                {
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    break;
+                }
+                case EOnFootTargetMoveModi.Idle:
+                {
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    break;
+                }
+            }
+#if UNITY_EDITOR
+            Debug.Log($"MoveSpeed Switch: {m_individualMaxSpeed} on SetMaxSpeed: {m_setRunTimeMaxSpeed}.");
+#endif
         }
-        
+
         #endregion
         #region Fall-Damage
         private void FallDamageCalculationStart()

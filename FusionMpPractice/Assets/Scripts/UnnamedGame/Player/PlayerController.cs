@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-internal enum EOnFootMoveModi
+internal enum EOnFootTargetMoveModi
 {
     Idle,
     Walking,
@@ -24,7 +24,7 @@ namespace PlayerInputManagement
         [SerializeField] internal PlayerInteractions m_playerInteractions;
         [SerializeField] internal PlayerHealth m_playerHealth;
         [SerializeField] internal CameraBehaviour m_cameraBehaviour;
-        [SerializeField] internal EOnFootMoveModi m_eCurrentMoveMode;
+        [SerializeField] internal EOnFootTargetMoveModi m_eCurrentMoveMode;
 
         #region Fall-Damage
         [Header("Fall Damage")]
@@ -55,7 +55,7 @@ namespace PlayerInputManagement
                 m_rigidbody = GetComponent<Rigidbody>();
 
             m_startPosition = transform.position;
-            m_eCurrentMoveMode = EOnFootMoveModi.Walking;
+            m_eCurrentMoveMode = EOnFootTargetMoveModi.Walking;
 
             InputManager.m_changeActiveActionMap += CurrentlyActiveActionMap;
         }
