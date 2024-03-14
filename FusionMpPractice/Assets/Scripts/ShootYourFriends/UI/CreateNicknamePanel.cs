@@ -10,7 +10,6 @@ public class CreateNicknamePanel : MonoBehaviour
     [SerializeField] private TMP_InputField m_nameInputField;
     [SerializeField] private Button m_createNicknameButton;
     //[SerializeField] private int m_minNameLength = 6;
-    [SerializeField] LobbyPanelTypes m_ownLobbyType;
 
     [SerializeField] internal Animator m_panelAnimator;
     //const string popInClipName = "In";

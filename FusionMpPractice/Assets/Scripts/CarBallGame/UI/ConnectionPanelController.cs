@@ -52,16 +52,16 @@ namespace LobbyUI
             //if (gameObject == null || gameObject.activeInHierarchy == false)
             //    return;
 
-            //if (_waitingStartGameTextCoroutine != null)
+            //if (m_waitingStartGameTextCoroutine != null)
             //{
-            //    StopCoroutine(_waitingStartGameTextCoroutine);
+            //    StopCoroutine(m_waitingStartGameTextCoroutine);
             //}
 
-            //infoText.text = string.Empty;
+            //m_waitingInfoText.text = string.Empty;
 
-            //if (cancelButton != null)
+            //if (m_cancelButton != null)
             //{
-            //    cancelButton.SetActive(false);
+            //    m_cancelButton.SetActive(false);
             //}
             #endregion
         }
@@ -96,7 +96,7 @@ namespace LobbyUI
         
         public void OnCancelButtonClicked()
         {
-            //infoText.text = string.Empty;
+            //m_waitingInfoText.text = string.Empty;
             _cancellationTokenSource?.Cancel();
 
             if (_waitingStartGameTextCoroutine != null)

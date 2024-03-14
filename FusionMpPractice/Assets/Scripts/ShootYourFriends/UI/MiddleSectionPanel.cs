@@ -16,7 +16,7 @@ public class MiddleSectionPanel : MonoBehaviour
     [SerializeField] private TMP_InputField m_joinRoomByArgIF;
 
     //[SerializeField] private int m_minNameLength = 6;
-    [SerializeField] internal LobbyPanelTypes m_ownLobbyType;
+    //[SerializeField] internal LobbyPanelTypes m_ownLobbyType;
 
     private NetworkRunnerController m_networkRunnerController;
 
