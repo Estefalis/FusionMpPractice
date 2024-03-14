@@ -46,7 +46,7 @@ namespace LobbyUI
             _cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _cancellationTokenSource.Token;
 
-            await Managers.m_Instance.m_NetworkManager.StartGame(GameMode.Host, SessionCodeGenerator.GenerateSessionCode(), cancellationToken);
+            await Managers.Instance.NetworkManager.StartGame(GameMode.Host, SessionCodeGenerator.GenerateSessionCode(), cancellationToken);
 
             #region Removed in Guide Process
             //if (gameObject == null || gameObject.activeInHierarchy == false)
@@ -79,7 +79,7 @@ namespace LobbyUI
             _cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _cancellationTokenSource.Token;
 
-            await Managers.m_Instance.m_NetworkManager.StartGame(GameMode.Client, _roomCodeInputField.text, cancellationToken);
+            await Managers.Instance.NetworkManager.StartGame(GameMode.Client, _roomCodeInputField.text, cancellationToken);
 
             if (_waitingStartGameTextCoroutine != null)
             {

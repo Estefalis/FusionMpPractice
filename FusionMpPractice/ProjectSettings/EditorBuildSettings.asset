@@ -5,13 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/Scenes/UnnamedGame/Lobby.unity
+    guid: fa199411a1a5b1642a1b298d407f0469
+  - enabled: 0
+    path: Assets/Scenes/UnnamedGame/MainGame.unity
+    guid: 6fc0dd7d5d7a6a247a0791004c8ebb93
   - enabled: 1
     path: Assets/Scenes/CarBallGame/Lobby.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
     path: Assets/Scenes/CarBallGame/Game.unity
     guid: 384b74e1561511f4eb22b4a0c3684c36
-  - enabled: 1
-    path: Assets/Scenes/UnnamedGame/TestScene.unity
-    guid: 011fbfe54501ec74b98a1c97f16061f7
   m_configObjects: {}

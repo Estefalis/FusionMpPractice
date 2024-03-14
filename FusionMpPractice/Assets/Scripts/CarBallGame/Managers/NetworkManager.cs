@@ -101,8 +101,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             roomCode = _sessionCode;
             #region Replaced in Guide Process
-            //m_networkRunner = gameObject.AddComponent<NetworkRunner>();
-            //m_networkRunner.ProvideInput = true;
+            //m_networkRunnerInstance = gameObject.AddComponent<NetworkRunner>();
+            //m_networkRunnerInstance.ProvideInput = true;
             #endregion
 
             if (m_networkRunner == null)

@@ -283,7 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e17ed61b66e366d459044299c597afcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NetworkManager: {fileID: 1825399352}
+  <NetworkManager>k__BackingField: {fileID: 1825399352}
   m_LobbyUIManager: {fileID: 131237127}
 --- !u!1 &330585543
 GameObject:
