@@ -11,7 +11,8 @@ namespace PlayerInputManagement
         #region SetParent and LookAtTarget
         [Header("SetParent and LookAtTarget")]
         [SerializeField] internal Camera m_camera;
-        [SerializeField] private Transform m_parentTransform;
+        [SerializeField] private Transform m_setParentTransform;
+        [SerializeField] private Transform m_rotateParentTransform;
         [SerializeField] internal Transform m_lookAtTarget;
         [SerializeField] private bool m_keepWorldPos = true;
         [SerializeField] private bool m_differentChildHeight;
@@ -37,8 +38,8 @@ namespace PlayerInputManagement
         [Header("Camera-Rotation")]
         [SerializeField, Range(-85.0f, 85.0f)] private float m_minMousePitch;
         [SerializeField, Range(-85.0f, 85.0f)] private float m_maxMousePitch;
-        [SerializeField, Range(0.0001f, 20f)] private float m_xAxisRotationSpeed = 4.0f;
-        [SerializeField, Range(0.0001f, 20f)] private float m_yAxisRotationSpeed = 3.0f;
+        [SerializeField, Range(1.0f, 100f)] private float m_xAxisRotationSpeed = 4.0f;
+        [SerializeField, Range(1.0f, 100f)] private float m_yAxisRotationSpeed = 3.0f;
         [SerializeField] private bool m_invertXRotation = false;
         [SerializeField] private bool m_invertYRotation = false;
         [SerializeField] private bool m_disableCameraRotation = false;                  //Disabled CameraRotation
@@ -162,6 +163,7 @@ namespace PlayerInputManagement
                             case EOnFootTargetMoveModi.Crouching:
                             {
                                 //Magic Number == 4!
+
                                 m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight);
                                 break;
                             }
@@ -215,7 +217,7 @@ namespace PlayerInputManagement
         private void MinCameraPosSphereCast()
         {
             m_lineOrigin = m_camera.transform.position;
-            m_sphereCastDirection = -m_parentTransform.up;
+            m_sphereCastDirection = -m_rotateParentTransform.up;
 
             m_obstacleIsBelow =
             Physics.SphereCast(m_lineOrigin, m_sphereCheckRadius, m_sphereCastDirection, out RaycastHit hitObject, m_sphereCastLength, m_sphereCheckLayerMask, QueryTriggerInteraction.UseGlobal);
@@ -263,11 +265,11 @@ namespace PlayerInputManagement
         {
             if (m_currentLookAtTarget != _lookAtTarget || m_currentLookAtTarget == null)
             {
-                m_parentTransform.SetParent(_lookAtTarget, _keepWorldPosition);
+                m_setParentTransform.SetParent(_lookAtTarget, _keepWorldPosition);
                 if (m_differentChildHeight)
-                    m_parentTransform.position = new Vector3(_lookAtTarget.position.x + m_childPosOffset.x, _lookAtTarget.position.y + m_childPosOffset.y, _lookAtTarget.position.z + m_childPosOffset.z);
+                    m_setParentTransform.position = new Vector3(_lookAtTarget.position.x + m_childPosOffset.x, _lookAtTarget.position.y + m_childPosOffset.y, _lookAtTarget.position.z + m_childPosOffset.z);
                 else
-                    m_parentTransform.position = _lookAtTarget.position;
+                    m_setParentTransform.position = _lookAtTarget.position;
                 m_currentLookAtTarget = _lookAtTarget;
             }
 
@@ -280,7 +282,7 @@ namespace PlayerInputManagement
             if (!m_disableCameraRotation)
             {
                 Quaternion runtimeCameraOrientation = Quaternion.Euler(runtimeRotationVector.x, runtimeRotationVector.y, 0.0f);
-                m_parentTransform.rotation = Quaternion.Lerp(m_parentTransform.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));
+                m_rotateParentTransform.rotation = Quaternion.Lerp(m_rotateParentTransform.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));
             }
         }
 #if UNITY_EDITOR

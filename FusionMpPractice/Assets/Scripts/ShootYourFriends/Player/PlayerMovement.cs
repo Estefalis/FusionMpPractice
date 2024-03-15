@@ -92,10 +92,6 @@ namespace PlayerInputManagement
         {
             if (!m_playerController.m_isDead)
             {
-                //YRotation with A and D.
-                if (!m_blockRotation)
-                    m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0);
-
                 //TODO: Coyote Timer.
                 //if (m_playerIsGrounded)
                 //    {
@@ -160,12 +156,14 @@ namespace PlayerInputManagement
                 case false: //m_characterRotation set the Y-Rotation with PlayerOnFootRH.Movement.ReadValue<Vector2>().x.
                 {
                     m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+                    m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0);
                     break;
                 }
                 case true:
                 {
                     m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-                    m_characterRotation.y = 0;
+                    m_characterRotation.y = 0.0f;
+                    //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation.
                     break;
                 }
             }

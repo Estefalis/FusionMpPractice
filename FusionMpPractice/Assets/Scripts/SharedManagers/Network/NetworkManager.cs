@@ -13,7 +13,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField] private NetworkRunner m_networkRunnerPrefab;
     private NetworkRunner m_networkRunner;
-    private readonly int m_gameSceneIndex = 1; //Guide-GameScene.
 
     public void OnConnectedToServer(NetworkRunner runner)
     {
@@ -100,11 +99,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         try
         {
             roomCode = _sessionCode;
-            #region Replaced in Guide Process
-            //m_networkRunnerInstance = gameObject.AddComponent<NetworkRunner>();
-            //m_networkRunnerInstance.ProvideInput = true;
-            #endregion
-
+            
             if (m_networkRunner == null)
             {
                 m_networkRunner = Instantiate(m_networkRunnerPrefab, transform);    //On Transform attached to the GameObject in Unity.
@@ -119,17 +114,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             {
                 GameMode = mode,
                 SessionName = roomCode,
-                Scene = m_gameSceneIndex,
-                #region Replaced in Guide Process
-                //Scene = SceneManager.GetActiveScene().buildIndex,
-                //SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
-                #endregion
+                Scene = (int)EGameScene.MainGame,
                 SceneManager = m_networkRunner.GetComponent<NetworkSceneManagerDefault>()
             }).WithCancellation(_cancellationToken);
 
             if (result.Ok)
             {
-                Debug.Log(tryingHost ? "Game started successfully" : "Game join successfully");
+                Debug.Log(tryingHost ? "Game started successfully from MenuManager." : "Game join successfully from MenuManager.");
             }
             else
             {
@@ -155,20 +146,4 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             m_networkRunner = null;
         }
     }
-
-    #region Deleted in Guide Process
-    ////using EditorButton;
-
-    //[Button()]
-    //private void StartGameAsHost()
-    //{
-    //    StartGame(GameMode.Host, roomCode);
-    //}
-
-    //[Button()]
-    //private void StartGameAsClient()
-    //{
-    //    StartGame(GameMode.Client, roomCode);
-    //}
-    #endregion
 }
