@@ -20,7 +20,7 @@ namespace PlayerInputManagement
         [SerializeField] private float m_rotationSpeed = 5.0f;
         /*[SerializeField] */
         internal bool m_blockRotation = false;
-        internal Vector3 m_horizontalMovement, m_characterRotation;
+        internal Vector3 m_horizontalMovement/*, m_characterRotation*/;
 
         #region Acceleration
         [Header("Acceleration")]
@@ -121,7 +121,15 @@ namespace PlayerInputManagement
                 m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
                 //m_playerController.m_playerIsGrounded = Physics.Raycast(m_playerController.m_groundCheckTransform.position, Vector3.down, m_playerController.m_groundCheckDistance, m_playerController.m_groundCheckLayerMask);
 
-                MoveRigidbody();
+                switch (m_blockRotation)
+                {
+                    case false:
+                        RelativeMoveRigidbody();
+                        break;
+                    case true:
+                        MoveRigidbody();
+                        break;
+                }
 
                 switch (m_playerIsGrounded) //Calculate FallDamage.
                 {
@@ -151,22 +159,25 @@ namespace PlayerInputManagement
 
         private void MoveRigidbody()
         {
-            switch (m_blockRotation)
-            {
-                case false: //m_characterRotation set the Y-Rotation with PlayerOnFootRH.Movement.ReadValue<Vector2>().x.
-                {
-                    m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-                    m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0);
-                    break;
-                }
-                case true:
-                {
-                    m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-                    m_characterRotation.y = 0.0f;
-                    //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation.
-                    break;
-                }
-            }
+            //switch (m_blockRotation)
+            //{
+            //    case false: //m_characterRotation set the Y-Rotation with PlayerOnFootRH.Movement.ReadValue<Vector2>().x.
+            //    {
+            //        m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
+            //        m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0); //A & D
+            //        break;
+            //    }
+            //    case true:
+            //    {
+            //        m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            //        m_characterRotation.y = 0.0f;
+            //        break;
+            //    }
+            //}
+
+            m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            //m_characterRotation.y = 0.0f;
+            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation.
 
             m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
 
@@ -179,8 +190,28 @@ namespace PlayerInputManagement
 
             m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement);
 
-            Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_rotationSpeed, 0);
-            m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
+            //Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_rotationSpeed, 0);
+            //m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
+        }
+
+        private void RelativeMoveRigidbody()
+        {
+            Vector3 fakecameraForward = m_playerController.m_cameraBehaviour.m_relativeHelperTransform.forward;
+            #region Old Camera Transform Forward
+            //Vector3 cameraForward = m_playerController.m_cameraBehaviour.m_camera.transform.forward;
+            //cameraForward.y = 0;   //prevents characterJumps.
+            #endregion
+            Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
+            cameraRight.y = 0;    //prevents characterJumps.
+
+            Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            Vector3 relativeRight = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
+            Vector3 relativeMoveVector = relativeRight + relativeForward;
+
+            relativeMoveVector = m_playerController.m_rigidbody.transform.TransformDirection(relativeMoveVector);
+            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector);
+
+            //TODO: Lerping RigidbodyY-Rotation into MoveDirection.
         }
 
         #region Crouching
@@ -493,9 +524,9 @@ namespace PlayerInputManagement
                     break;
                 }
             }
-#if UNITY_EDITOR
-            Debug.Log($"MoveSpeed Switch: {m_individualMaxSpeed} on SetMaxSpeed: {m_setRunTimeMaxSpeed}.");
-#endif
+            //#if UNITY_EDITOR
+            //            Debug.Log($"MoveSpeed Switch: {m_individualMaxSpeed} on SetMaxSpeed: {m_setRunTimeMaxSpeed}.");
+            //#endif
         }
 
         #endregion

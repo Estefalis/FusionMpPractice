@@ -12,7 +12,8 @@ namespace PlayerInputManagement
         [Header("SetParent and LookAtTarget")]
         [SerializeField] internal Camera m_camera;
         [SerializeField] private Transform m_setParentTransform;
-        [SerializeField] private Transform m_rotateParentTransform;
+        [SerializeField] internal Transform m_rotateParentTransform;
+        [SerializeField] internal Transform m_relativeHelperTransform;
         [SerializeField] internal Transform m_lookAtTarget;
         [SerializeField] private bool m_keepWorldPos = true;
         [SerializeField] private bool m_differentChildHeight;
@@ -85,6 +86,8 @@ namespace PlayerInputManagement
 
         private void Update()
         {
+            m_rotateParentTransform.position = m_setParentTransform.position;
+            RelativeHelperPositioning();
             GetMousePosition();
             SetCurrentLookAtTarget(m_lookAtTarget, true);
             MinCameraPosSphereCast();
@@ -99,6 +102,12 @@ namespace PlayerInputManagement
         {
             LerpCameraPosition();
             CameraZoom();
+        }
+
+        private void RelativeHelperPositioning()
+        {
+            m_relativeHelperTransform.position = new Vector3(m_camera.transform.position.x, m_playerController/*.m_rigidbody*/.transform.position.y, m_camera.transform.position.z);
+            m_relativeHelperTransform.LookAt(m_playerController.transform.position);
         }
 
         #region Custom Methods
@@ -270,6 +279,7 @@ namespace PlayerInputManagement
                     m_setParentTransform.position = new Vector3(_lookAtTarget.position.x + m_childPosOffset.x, _lookAtTarget.position.y + m_childPosOffset.y, _lookAtTarget.position.z + m_childPosOffset.z);
                 else
                     m_setParentTransform.position = _lookAtTarget.position;
+
                 m_currentLookAtTarget = _lookAtTarget;
             }
 
@@ -282,7 +292,7 @@ namespace PlayerInputManagement
             if (!m_disableCameraRotation)
             {
                 Quaternion runtimeCameraOrientation = Quaternion.Euler(runtimeRotationVector.x, runtimeRotationVector.y, 0.0f);
-                m_rotateParentTransform.rotation = Quaternion.Lerp(m_rotateParentTransform.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));
+                m_rotateParentTransform.rotation = Quaternion.Lerp(m_rotateParentTransform.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));  //(x * y) * 0.5f prevents rotationHickUps on unsynchronous values.
             }
         }
 #if UNITY_EDITOR
