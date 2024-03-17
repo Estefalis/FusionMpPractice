@@ -13,7 +13,7 @@ namespace PlayerInputManagement
         [SerializeField] internal Camera m_camera;
         [SerializeField] private Transform m_setParentTransform;
         [SerializeField] internal Transform m_rotateParentTransform;
-        [SerializeField] internal Transform m_relativeHelperTransform;
+        //[SerializeField] internal Transform m_relativeHelperTransform;    //HelperTransform before knowing the need of cameraForward/cameraRight.normalize. 
         [SerializeField] internal Transform m_lookAtTarget;
         [SerializeField] private bool m_keepWorldPos = true;
         [SerializeField] private bool m_differentChildHeight;
@@ -87,7 +87,7 @@ namespace PlayerInputManagement
         private void Update()
         {
             m_rotateParentTransform.position = m_setParentTransform.position;
-            RelativeHelperPositioning();
+            //RelativeHelperPositioning();
             GetMousePosition();
             SetCurrentLookAtTarget(m_lookAtTarget, true);
             MinCameraPosSphereCast();
@@ -104,11 +104,11 @@ namespace PlayerInputManagement
             CameraZoom();
         }
 
-        private void RelativeHelperPositioning()
-        {
-            m_relativeHelperTransform.position = new Vector3(m_camera.transform.position.x, m_playerController/*.m_rigidbody*/.transform.position.y, m_camera.transform.position.z);
-            m_relativeHelperTransform.LookAt(m_playerController.transform.position);
-        }
+        //private void RelativeHelperPositioning()
+        //{
+        //    m_relativeHelperTransform.position = new Vector3(m_camera.transform.position.x, m_playerController/*.m_rigidbody*/.transform.position.y, m_camera.transform.position.z);
+        //    m_relativeHelperTransform.LookAt(m_playerController.transform.position);
+        //}
 
         #region Custom Methods
         private void GetMousePosition()

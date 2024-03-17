@@ -17,10 +17,11 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_jumpForce = 10f;
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
-        [SerializeField] private float m_rotationSpeed = 5.0f;
+        [SerializeField] private float m_smoothRotationTime = 15.0f;
         /*[SerializeField] */
         internal bool m_blockRotation = false;
         internal Vector3 m_horizontalMovement/*, m_characterRotation*/;
+        float m_mathfSmoothValue;
 
         #region Acceleration
         [Header("Acceleration")]
@@ -196,22 +197,39 @@ namespace PlayerInputManagement
 
         private void RelativeMoveRigidbody()
         {
-            Vector3 fakecameraForward = m_playerController.m_cameraBehaviour.m_relativeHelperTransform.forward;
-            #region Old Camera Transform Forward
-            //Vector3 cameraForward = m_playerController.m_cameraBehaviour.m_camera.transform.forward;
-            //cameraForward.y = 0;   //prevents characterJumps.
-            #endregion
+            #region No use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
+            Vector3 cameraForward = m_playerController.m_cameraBehaviour.m_camera.transform.forward;
             Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
+            cameraForward.y = 0;   //prevents characterJumps.
             cameraRight.y = 0;    //prevents characterJumps.
+            cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+            cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+            Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * cameraForward;
+            #endregion
 
-            Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            #region Use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
+            //Vector3 fakecameraForward = m_playerController.m_cameraBehaviour.m_relativeHelperTransform.forward;
+            //Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
+            ////cameraForward = cameraForward.normalized;
+            //cameraRight.y = 0;    //prevents characterJumps.
+            //cameraRight = cameraRight.normalized;
+            //Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            #endregion
+
             Vector3 relativeRight = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
             Vector3 relativeMoveVector = relativeRight + relativeForward;
 
-            relativeMoveVector = m_playerController.m_rigidbody.transform.TransformDirection(relativeMoveVector);
+            //relativeMoveVector = m_playerController.m_rigidbody.transform.TransformDirection(relativeMoveVector);
             m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector);
 
-            //TODO: Lerping RigidbodyY-Rotation into MoveDirection.
+            //Debug.Log(relativeMoveVector);
+            if (relativeMoveVector != Vector3.zero)
+            {
+                float angle = Mathf.Atan2(relativeMoveVector.x, relativeMoveVector.z) * Mathf.Rad2Deg;
+                float smoothRotation =
+                    Mathf.SmoothDampAngle(m_playerController.m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
+                m_playerController.m_rigidbody.transform.rotation = Quaternion.Euler(0, smoothRotation, 0);
+            }
         }
 
         #region Crouching

@@ -1060,7 +1060,7 @@ MonoBehaviour:
   m_jumpForce: 8
   m_kneelTime: 0.1
   m_moveSpeedLerpTime: 0.5
-  m_rotationSpeed: 500
+  m_smoothRotationTime: 15
   m_durationToMaxSpeed: 2.5
   m_durationToZeroSpeed: 6
   m_brakeToZeroSpeed: 1
@@ -1142,7 +1142,6 @@ MonoBehaviour:
   m_camera: {fileID: 877053081}
   m_setParentTransform: {fileID: 1597012888}
   m_rotateParentTransform: {fileID: 1269870956}
-  m_relativeHelperTransform: {fileID: 1680919464}
   m_lookAtTarget: {fileID: 178408991}
   m_keepWorldPos: 1
   m_differentChildHeight: 1
