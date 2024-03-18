@@ -162,7 +162,8 @@ namespace PlayerInputManagement
                 {
                     case false:
                     {
-                        m_flexibleMinMouseAngle = m_runtimeMinMousePitch;
+                        if (!m_playerController.m_playerMovement.m_obstacleIsAbove)
+                            m_flexibleMinMouseAngle = m_runtimeMinMousePitch;
                         break;
                     }
                     case true:
@@ -172,12 +173,11 @@ namespace PlayerInputManagement
                             case EOnFootTargetMoveModi.Crouching:
                             {
                                 //Magic Number == 4!
-
                                 m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight);
                                 break;
                             }
                             default:
-                                m_flexibleMinMouseAngle = m_lastHitObjectYPos;
+                                m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight);
                                 break;
                         }
                         break;

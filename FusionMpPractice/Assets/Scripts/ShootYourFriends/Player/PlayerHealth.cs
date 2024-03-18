@@ -17,9 +17,10 @@ namespace PlayerInputManagement
         }
 
         #region HP-Management
-        public void IncreaseHealth(float _healAmount)
+        internal void IncreaseHealth(float _healAmount)
         {
-            //Erhoehen der HP, solange der daraus resultierende Betrag unter der MaxHP liegt, ansonsten wird der MaxHP-Wert gesetzt.
+            //HP cap on m_maxHealth, even if the total healAmount goes beyond.
+            //TODO: May add an option to reuse any value above m_maxHeath here. 
             if (m_currentHP + _healAmount >= m_maxHealth)
             {
                 m_currentHP = m_maxHealth;
@@ -31,12 +32,14 @@ namespace PlayerInputManagement
 
             //UpdateHealthUI(m_currentHP);
         }
-        public void TakeDamage(float _damage)
+        internal void TakeDamage(float _damage)
         {
             m_currentHP = Mathf.Max(m_currentHP - _damage, 0);
 
             //UpdateHealthUI(m_currentHP);
-
+#if UNITY_EDITOR
+            Debug.Log(m_currentHP);
+#endif
             m_playerController.m_isDead = m_currentHP <= 0;
 
             if (m_playerController.m_isDead)

@@ -17,7 +17,7 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.performed += MoveCharacter;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.canceled += StopMovement;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += StopJumping;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed += OnRightMouseButtonDown;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled += OnRightMouseButtonUp;
             m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.performed += ActiveBraking;
@@ -46,7 +46,7 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.performed -= MoveCharacter;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.canceled -= StopMovement;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += StopJumping;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed -= OnRightMouseButtonDown;
             m_playerController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled -= OnRightMouseButtonUp;
             m_playerController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.performed -= ActiveBraking;
@@ -103,12 +103,14 @@ namespace PlayerInputManagement
         #region Character Jump
         private void CharacterJump(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.m_jumpIsPressed = _callbackContext.ReadValueAsButton();
+            m_playerController.m_playerMovement.m_jumpButtonIsPressed = _callbackContext.ReadValueAsButton();
+            m_playerController.m_playerMovement.m_jumpButtonIsReleased = false;
         }
 
-        private void StopJumping(InputAction.CallbackContext _callbackContext)
+        private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.m_jumpIsPressed = false;
+            m_playerController.m_playerMovement.m_jumpButtonIsPressed = false;
+            m_playerController.m_playerMovement.m_jumpButtonIsReleased = true;
         }
         #endregion
         #region Rotation
@@ -137,7 +139,6 @@ namespace PlayerInputManagement
         private void AccelerateMovespeed(InputAction.CallbackContext _callbackContext)
         {
             m_playerController.m_playerMovement.m_shiftIsPressed = _callbackContext.ReadValueAsButton();
-            m_playerController.m_playerMovement.m_lerpTimeCounter = 0.0f;
         }
 
         private void DecelerateMovespeed(InputAction.CallbackContext _callbackContext)

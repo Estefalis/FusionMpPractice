@@ -26,19 +26,6 @@ namespace PlayerInputManagement
         [SerializeField] internal CameraBehaviour m_cameraBehaviour;
         [SerializeField] internal EOnFootTargetMoveModi m_eCurrentMoveMode;
 
-        #region Fall-Damage
-        [Header("Fall Damage")]
-        [SerializeField] internal int m_minFallDistance = 5;             //MinimumDistance to take damage.
-        [SerializeField] internal float m_fallDamageMultiplier = 1;      //Adjustment-variable.
-        [SerializeField] internal float m_finalFallDistance;             //Calculated fallDamage.
-        [SerializeField] internal bool m_fallDamageEnabled = true;
-
-        internal bool m_allowApplyingDamageOnce = false;
-        internal bool m_isGroundContactLost = false;
-        internal Vector3 m_lostGroundContact;
-        internal Vector3 m_regainedGroundContact;
-        #endregion
-
         #region Runtime-Values
         #region Reset on falling off the area
         [Header("Area Fall Off Reset")]

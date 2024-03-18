@@ -40,7 +40,6 @@ namespace PlayerInputManagement
         [SerializeField] internal Transform m_groundCheckTransform;
         [SerializeField] internal float m_groundCheckDistance = 0.2f;
         [SerializeField] internal float m_gravityValue = -9.81f;
-        [SerializeField] internal float m_coyoteTime = 0.2f;
         [SerializeField, Range(0.0001f, 2f)] internal float m_inversedGravityMultiplier = 1.0f;
         #endregion
 
@@ -56,6 +55,19 @@ namespace PlayerInputManagement
         internal float m_groundCheckHeightAdjustment;
         #endregion
 
+        #region Fall-Damage
+        [Header("Fall Damage")]
+        [SerializeField] internal int m_minFallDistance = 5;             //MinimumDistance to take damage.
+        [SerializeField] internal float m_fallDamageMultiplier = 1;      //Adjustment-variable.
+        [SerializeField] internal float m_finalFallDistance;             //Calculated fallDamage.
+        [SerializeField] internal bool m_fallDamageEnabled = true;
+
+        internal bool m_allowApplyingDamageOnce = false;
+        internal bool m_isGroundContactLost = false;
+        internal Vector3 m_lostGroundContactVector;
+        internal Vector3 m_regainedGroundContactVector;
+        #endregion
+
         #region Debug.Drawline & DrawWireSphere
         [Header("Debug Drawings")]
         internal Vector3 m_lineOrigin;
@@ -64,17 +76,21 @@ namespace PlayerInputManagement
         #endregion
         #endregion
 
+        #region Coyote Time
+        [Header("Coyote Time")]
+        [SerializeField] internal float m_coyoteTime = 0.2f;
         internal float m_crouchTimer;                        //Used to calculate the LerpTime to move up or down.
         internal float m_coyoteTimeCounter;                  //resets coyoteTimer on regained groundContact.
+        #endregion
 
-        internal float m_startMoveLerp, m_lerpTimeCounter;    //Start / End / runtime
-        internal bool m_playerIsGrounded, m_moveButtonIsPressed, m_jumpIsPressed, m_shiftIsPressed = false;
+        internal bool m_playerIsGrounded, m_moveButtonIsPressed, m_jumpButtonIsPressed, m_jumpButtonIsReleased = false, m_shiftIsPressed = false;
         internal bool m_menuIsOpen = false;
 
         private void OnDisable()
         {
             m_playerController.m_playerInputActions.PlayerOnFootRH.Disable();
             m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed -= CharacterJump;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
 
             m_permitCrouchLerp = false;
         }
@@ -84,6 +100,7 @@ namespace PlayerInputManagement
             m_playerController.m_playerInputActions = InputManager.m_InputManagerActions;
             m_playerController.m_playerInputActions.PlayerOnFootRH.Enable();
             m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
+            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
 
             m_setRunTimeMaxSpeed = 0.0f;
             m_maxDistanceAbove = m_colliderWalkHeight;
@@ -93,24 +110,14 @@ namespace PlayerInputManagement
         {
             if (!m_playerController.m_isDead)
             {
-                //TODO: Coyote Timer.
-                //if (m_playerIsGrounded)
-                //    {
-                //        m_coyoteTimeCounter = m_coyoteTime;
-                //    }
-                //    else if (m_coyoteTimeCounter > 0)
-                //    {
-                //        m_coyoteTimeCounter -= Time.deltaTime;
-                //    }
-
+                CoyoteTimerReSet();
                 Crouching();
                 SetMoveAcceleration();
             }
 
             if (transform.position.y < m_playerController.m_fallLimit)
             {
-                //AreaFallOffReset
-                m_playerController.m_rigidbody.transform.position = m_playerController.m_repopPosition;
+                m_playerController.m_rigidbody.transform.position = m_playerController.m_repopPosition; //AreaFallOffReset
             }
         }
 
@@ -125,7 +132,7 @@ namespace PlayerInputManagement
                 switch (m_blockRotation)
                 {
                     case false:
-                        RelativeMoveRigidbody();
+                        MoveRigidbodyRelative();
                         break;
                     case true:
                         MoveRigidbody();
@@ -150,7 +157,7 @@ namespace PlayerInputManagement
 
         #region Custom Methods
 #if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;
             Debug.DrawLine(m_lineOrigin, m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance);
@@ -160,24 +167,15 @@ namespace PlayerInputManagement
 
         private void MoveRigidbody()
         {
-            //switch (m_blockRotation)
-            //{
-            //    case false: //m_characterRotation set the Y-Rotation with PlayerOnFootRH.Movement.ReadValue<Vector2>().x.
-            //    {
-            //        m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
-            //        m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0); //A & D
-            //        break;
-            //    }
-            //    case true:
-            //    {
-            //        m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-            //        m_characterRotation.y = 0.0f;
-            //        break;
-            //    }
-            //}
+            #region Alternative Movement
+            //  m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
+            //  m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0); //A & D
+            //  Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_rotationSpeed, 0);
+            //  m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
+            #endregion
 
             m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-            //m_characterRotation.y = 0.0f;
+
             //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation.
 
             m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
@@ -190,13 +188,19 @@ namespace PlayerInputManagement
             //}
 
             m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement);
-
-            //Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_rotationSpeed, 0);
-            //m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
         }
 
-        private void RelativeMoveRigidbody()
+        private void MoveRigidbodyRelative()
         {
+            #region Use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
+            //Vector3 fakecameraForward = m_playerController.m_cameraBehaviour.m_relativeHelperTransform.forward;
+            //Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
+            ////cameraForward = cameraForward.normalized;
+            //cameraRight.y = 0;    //prevents characterJumps.
+            //cameraRight = cameraRight.normalized;
+            //Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            #endregion
+
             #region No use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
             Vector3 cameraForward = m_playerController.m_cameraBehaviour.m_camera.transform.forward;
             Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
@@ -207,22 +211,12 @@ namespace PlayerInputManagement
             Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * cameraForward;
             #endregion
 
-            #region Use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-            //Vector3 fakecameraForward = m_playerController.m_cameraBehaviour.m_relativeHelperTransform.forward;
-            //Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
-            ////cameraForward = cameraForward.normalized;
-            //cameraRight.y = 0;    //prevents characterJumps.
-            //cameraRight = cameraRight.normalized;
-            //Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
-            #endregion
-
             Vector3 relativeRight = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
             Vector3 relativeMoveVector = relativeRight + relativeForward;
 
             //relativeMoveVector = m_playerController.m_rigidbody.transform.TransformDirection(relativeMoveVector);
             m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector);
 
-            //Debug.Log(relativeMoveVector);
             if (relativeMoveVector != Vector3.zero)
             {
                 float angle = Mathf.Atan2(relativeMoveVector.x, relativeMoveVector.z) * Mathf.Rad2Deg;
@@ -260,21 +254,6 @@ namespace PlayerInputManagement
 
         private void Crouching()
         {
-            //switch (m_playerIsGrounded)
-            //{
-            //    case false:
-            //    {
-            //        if (m_coyoteTimeCounter > 0)
-            //            m_coyoteTimeCounter -= Time.deltaTime;
-            //        break;
-            //    }
-            //    case true:
-            //    {
-            //        m_coyoteTimeCounter = m_coyoteTime;
-            //        break;
-            //    }
-            //}
-
             if (m_permitCrouchLerp)
             {
                 m_crouchTimer += Time.deltaTime;
@@ -376,9 +355,6 @@ namespace PlayerInputManagement
                                     break;
                                 }
                             }
-#if UNITY_EDITOR
-                            Debug.Log($"Active braking: {m_activeBraking} & Kneel: {m_kneelToCrouch}!");
-#endif
                             break;
                         }
                     }
@@ -500,7 +476,6 @@ namespace PlayerInputManagement
                                             break;
                                         }
                                     }
-                                    Debug.Log($"Active braking: {m_activeBraking} & Kneel: {m_kneelToCrouch}!");
                                     break;
                                 }
                             }
@@ -542,29 +517,47 @@ namespace PlayerInputManagement
                     break;
                 }
             }
-            //#if UNITY_EDITOR
-            //            Debug.Log($"MoveSpeed Switch: {m_individualMaxSpeed} on SetMaxSpeed: {m_setRunTimeMaxSpeed}.");
-            //#endif
         }
 
+        #endregion
+        #region Coyote Time
+        private void CoyoteTimerReSet()
+        {
+            switch (m_playerIsGrounded) //Coyote Timer Subtraction/Reset.
+            {
+                case false:
+                {
+                    if (m_coyoteTimeCounter > 0)
+                    {
+                        m_coyoteTimeCounter -= Time.deltaTime;
+                    }
+                    break;
+                }
+                case true:
+                {
+                    m_coyoteTimeCounter = m_coyoteTime;
+                    break;
+                }
+            }
+        }
         #endregion
         #region Fall-Damage
         private void FallDamageCalculationStart()
         {
-            if (!m_playerController.m_isGroundContactLost)
+            if (!m_isGroundContactLost)
             {
-                m_playerController.m_lostGroundContact.y = transform.position.y - m_groundCheckDistance;
-                m_playerController.m_isGroundContactLost = true;
-                m_playerController.m_allowApplyingDamageOnce = true;
+                m_lostGroundContactVector.y = transform.position.y - m_groundCheckDistance;
+                m_isGroundContactLost = true;
+                m_allowApplyingDamageOnce = true;
             }
         }
 
         private void FallDamageCalculationEnd()
         {
-            if (m_playerController.m_isGroundContactLost && m_playerController.m_allowApplyingDamageOnce)
+            if (m_isGroundContactLost && m_allowApplyingDamageOnce)
             {
-                m_playerController.m_regainedGroundContact.y = transform.position.y - m_groundCheckDistance;
-                m_playerController.m_isGroundContactLost = false;
+                m_regainedGroundContactVector.y = transform.position.y - m_groundCheckDistance;
+                m_isGroundContactLost = false;
                 CalculateFallDamage();
             }
         }
@@ -573,27 +566,33 @@ namespace PlayerInputManagement
         {
             //TODO: Calculate the final FallDamage.
 
-            ////Minimale Anpassung der Falldistanz, je nach Absprung oder Vorwärtslaufen mit Sicht auf die GroundCheck-Sphäre.
-            ////Bessere Anpassung gehen vielleicht mit mehr Wissen.
-            //if ((m_lostGroundContact.y - m_regainedGroundContact.y) >= m_minFallDistance && m_fallDamageEnabled)
-            //{
-            //    if (m_rigidbody.velocity.y > 0)
-            //    {
-            //        m_finalFallDistance = m_lostGroundContact.y - m_regainedGroundContact.y - m_groundCheckDistance;
-            //    }
-            //    else
-            //    {
-            //        m_finalFallDistance = m_lostGroundContact.y - m_regainedGroundContact.y + m_groundCheckDistance;
-            //    }
+            //Minimale Anpassung der Falldistanz, je nach Absprung oder Vorwärtslaufen mit Sicht auf die GroundCheck-Sphäre.
+            //Bessere Anpassung gehen vielleicht mit mehr Wissen.
+            if ((m_lostGroundContactVector.y - m_regainedGroundContactVector.y) >= m_minFallDistance && m_fallDamageEnabled)
+            {
+                if (m_playerController.m_rigidbody.velocity.y > 0)
+                {
+                    m_finalFallDistance = m_lostGroundContactVector.y - m_regainedGroundContactVector.y - m_groundCheckDistance;
+                }
+                else
+                {
+                    m_finalFallDistance = m_lostGroundContactVector.y - m_regainedGroundContactVector.y + m_groundCheckDistance;
+                }
 
-            //    //Die sofortige Blockierung der Schadensübertragung auf den Player, wird die Falldistanz nur einmal übergeben.
-            //    //Damit die Health-Komponente den Schaden verarbeiten kann, wird er in einer Extra-Methode erst einmal berechnet. 
-            //    if (m_allowApplyingDamageOnce)
-            //    {
-            //        m_allowApplyingDamageOnce = false;
-            //        ApplyFallDamage(m_finalFallDistance);
-            //    }
-            //}
+                //Die sofortige Blockierung der Schadensübertragung auf den Player, wird die Falldistanz nur einmal übergeben.
+                //Damit die Health-Komponente den Schaden verarbeiten kann, wird er in einer Extra-Methode erst einmal berechnet. 
+                if (m_allowApplyingDamageOnce)
+                {
+                    m_allowApplyingDamageOnce = false;
+                    ApplyFallDamage(m_finalFallDistance);
+                }
+            }
+        }
+
+        private void ApplyFallDamage(float _finalFallDistance)
+        {
+            _finalFallDistance *= m_fallDamageMultiplier;
+            m_playerController.m_playerHealth.TakeDamage(Mathf.Round(_finalFallDistance));
         }
         #endregion        
         #endregion
@@ -601,18 +600,19 @@ namespace PlayerInputManagement
         #region Character Jump
         private void CharacterJump(InputAction.CallbackContext _callbackContext)
         {
-            if (m_jumpIsPressed && m_playerIsGrounded) //m_playerIsGrounded <-> m_coyoteTimeCounter.
+            //if (m_jumpButtonIsPressed && m_playerIsGrounded)    //Original.
+            if (m_jumpButtonIsPressed && m_coyoteTimeCounter > 0) //m_playerIsGrounded <-> m_coyoteTimeCounter.
             {
-                //Coyotetime Jump with more following.
                 m_playerController.m_rigidbody.AddForce(Vector3.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
 
                 ////Einmaliges ausloesen bei verlorenem Bodenkontakt ueber den InputManager.
                 //InputManager.m_LostGroundContact?.Invoke();
-
-                ////Verzoegertes Ruecksetzen des Jump-Bools mit 'm_coyoteTimeCounter'.
-                //if (m_jumpIsPressed && m_coyoteTimeCounter > 0)
-                //    m_jumpIsPressed = false;
             }
+        }
+
+        private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
+        {
+            m_coyoteTimeCounter = 0.0f; //Prevents the player from 'double jumping' on pressing the JumpButton multiple times.
         }
         #endregion        
         #endregion
