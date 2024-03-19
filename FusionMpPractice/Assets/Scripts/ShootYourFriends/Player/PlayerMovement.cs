@@ -176,7 +176,7 @@ namespace PlayerInputManagement
 
             m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
 
-            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation.
+            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation?
 
             m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
 
@@ -546,7 +546,7 @@ namespace PlayerInputManagement
         {
             if (!m_isGroundContactLost)
             {
-                m_lostGroundContactVector.y = transform.position.y - m_groundCheckDistance;
+                m_lostGroundContactVector.y = transform.position.y - (m_groundCheckDistance * 0.5f);    //Radius instead of Diameter.
                 m_isGroundContactLost = true;
                 m_allowApplyingDamageOnce = true;
             }
@@ -556,7 +556,7 @@ namespace PlayerInputManagement
         {
             if (m_isGroundContactLost && m_allowApplyingDamageOnce)
             {
-                m_regainedGroundContactVector.y = transform.position.y - m_groundCheckDistance;
+                m_regainedGroundContactVector.y = transform.position.y - (m_groundCheckDistance * 0.5f);    //Radius instead of Diameter.
                 m_isGroundContactLost = false;
                 CalculateFallDamage();
             }
@@ -564,23 +564,11 @@ namespace PlayerInputManagement
 
         private void CalculateFallDamage()
         {
-            //TODO: Calculate the final FallDamage.
-
-            //Minimale Anpassung der Falldistanz, je nach Absprung oder Vorwärtslaufen mit Sicht auf die GroundCheck-Sphäre.
-            //Bessere Anpassung gehen vielleicht mit mehr Wissen.
             if ((m_lostGroundContactVector.y - m_regainedGroundContactVector.y) >= m_minFallDistance && m_fallDamageEnabled)
             {
-                if (m_playerController.m_rigidbody.velocity.y > 0)
-                {
-                    m_finalFallDistance = m_lostGroundContactVector.y - m_regainedGroundContactVector.y - m_groundCheckDistance;
-                }
-                else
-                {
-                    m_finalFallDistance = m_lostGroundContactVector.y - m_regainedGroundContactVector.y + m_groundCheckDistance;
-                }
+                m_finalFallDistance = m_lostGroundContactVector.y - m_regainedGroundContactVector.y;
 
-                //Die sofortige Blockierung der Schadensübertragung auf den Player, wird die Falldistanz nur einmal übergeben.
-                //Damit die Health-Komponente den Schaden verarbeiten kann, wird er in einer Extra-Methode erst einmal berechnet. 
+                //"Entrance"-Bool ensures that the calculated damage only gets applied once.
                 if (m_allowApplyingDamageOnce)
                 {
                     m_allowApplyingDamageOnce = false;

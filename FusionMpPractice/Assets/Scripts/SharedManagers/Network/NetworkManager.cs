@@ -1,6 +1,7 @@
 using Extensions;
 using Fusion;
 using Fusion.Sockets;
+//using Fusion.Photon.Realtime;   //For Regions.
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -108,7 +109,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             var tryingHost = mode == GameMode.Host;
-            Debug.Log(tryingHost ? $"Starting as host with {roomCode}." : $"Starting as client with {roomCode}.");
+            Debug.Log($"Starting with {roomCode}.");
+            //Debug.Log(tryingHost ? $"Starting as host with {roomCode}." : $"Starting as client with {roomCode}.");
 
             var result = await m_networkRunner.StartGame(new StartGameArgs()
             {
@@ -120,7 +122,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
             if (result.Ok)
             {
-                Debug.Log(tryingHost ? "Game started successfully from MenuManager." : "Game join successfully from MenuManager.");
+                Debug.Log(tryingHost ? "Game started successfully by the NetworkManager." : "Game joined successfully by the NetworkManager.");
             }
             else
             {
