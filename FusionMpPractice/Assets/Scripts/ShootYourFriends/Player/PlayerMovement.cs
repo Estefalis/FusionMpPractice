@@ -5,6 +5,16 @@ namespace PlayerInputManagement
 {
     public class PlayerMovement : MonoBehaviour
     {
+        internal enum EmoveMethod
+        {
+            Basic,
+            Relative,
+            ADRotateY,
+            Locked
+        }
+
+        [SerializeField] internal EmoveMethod m_eMoveMethod;
+
         [SerializeField] private PlayerController m_playerController;
         //[SerializeField] private InputActionReference[] m_mouseRotationActionMaps;
 
@@ -18,10 +28,12 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
         [SerializeField] private float m_smoothRotationTime = 15.0f;
+        [SerializeField] private float m_quaternionRotTime = 500.0f;
         /*[SerializeField] */
-        internal bool m_blockRotation = false;
-        internal Vector3 m_horizontalMovement/*, m_characterRotation*/;
+        internal bool m_switchMoveMethod = false;
+        internal Vector3 m_horizontalMovement, m_characterRotation;
         float m_mathfSmoothValue;
+        private Quaternion m_targetRotation;
 
         #region Acceleration
         [Header("Acceleration")]
@@ -129,15 +141,39 @@ namespace PlayerInputManagement
                 m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
                 //m_playerController.m_playerIsGrounded = Physics.Raycast(m_playerController.m_groundCheckTransform.position, Vector3.down, m_playerController.m_groundCheckDistance, m_playerController.m_groundCheckLayerMask);
 
-                switch (m_blockRotation)
+                switch (m_eMoveMethod)
                 {
-                    case false:
+                    case EmoveMethod.Basic:
+                    {
+                        MoveRigidbodyBasic();
+                        break;
+                    }
+                    case EmoveMethod.Relative:
+                    {
                         MoveRigidbodyRelative();
                         break;
-                    case true:
-                        MoveRigidbody();
+                    }
+                    case EmoveMethod.ADRotateY:
+                    {
+                        MoveRigidbodyAD();
                         break;
+                    }
+                    case EmoveMethod.Locked:
+                    {
+                        MoveRigidbodyLocked();
+                        break;
+                    }
                 }
+
+                //switch (m_switchMoveMethod)
+                //{
+                //    case false:
+                //        MoveRigidbodyRelative();
+                //        break;
+                //    case true:
+                //        MoveRigidbodyLocked();
+                //        break;
+                //}
 
                 switch (m_playerIsGrounded) //Calculate FallDamage.
                 {
@@ -164,30 +200,18 @@ namespace PlayerInputManagement
             Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereRadius);
         }
 #endif
-
-        private void MoveRigidbody()
+        private void MoveRigidbodyBasic()
         {
-            #region Alternative Movement
-            //  m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
-            //  m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0); //A & D
-            //  Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_rotationSpeed, 0);
-            //  m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
-            #endregion
-
             m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
 
-            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation?
+            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
 
-            m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
-
-            //if (m_playerIsGrounded && m_horizontalMovement.y <= 0)
-            //{
-            //Einmaliges ausloesen bei wiedererlangtem Bodenkontakt ueber den InputManager.
-            //if (m_jumpEventTriggered)
-            //InputManager.m_RegainedGroundContact?.Invoke();
-            //}
-
-            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement);
+            if (m_horizontalMovement != Vector3.zero)
+            {
+                m_targetRotation = Quaternion.LookRotation(m_horizontalMovement, Vector3.up);
+                m_targetRotation = Quaternion.RotateTowards(m_playerController.m_rigidbody.transform.rotation, m_targetRotation, m_quaternionRotTime * Time.fixedDeltaTime);
+                m_playerController.m_rigidbody.MoveRotation(m_targetRotation);
+            }
         }
 
         private void MoveRigidbodyRelative()
@@ -214,8 +238,7 @@ namespace PlayerInputManagement
             Vector3 relativeRight = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
             Vector3 relativeMoveVector = relativeRight + relativeForward;
 
-            //relativeMoveVector = m_playerController.m_rigidbody.transform.TransformDirection(relativeMoveVector);
-            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector);
+            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector.normalized);
 
             if (relativeMoveVector != Vector3.zero)
             {
@@ -224,6 +247,36 @@ namespace PlayerInputManagement
                     Mathf.SmoothDampAngle(m_playerController.m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
                 m_playerController.m_rigidbody.transform.rotation = Quaternion.Euler(0, smoothRotation, 0);
             }
+        }
+
+        private void MoveRigidbodyAD()
+        {
+            m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
+            m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0); //A & D
+
+            m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
+
+            Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_quaternionRotTime, 0);
+            m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
+        }
+
+        private void MoveRigidbodyLocked()
+        {
+            m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+
+            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation?
+
+            m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+
+            //if (m_playerIsGrounded && m_horizontalMovement.y <= 0)
+            //{
+            //Einmaliges ausloesen bei wiedererlangtem Bodenkontakt ueber den InputManager.
+            //if (m_jumpEventTriggered)
+            //InputManager.m_RegainedGroundContact?.Invoke();
+            //}
+
+            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
         }
 
         #region Crouching

@@ -42,7 +42,7 @@ public class TimerTest : MonoBehaviour
     private int m_today, m_thisYear, /*m_silvester,*/ m_moduloLeapYear;
     private IEnumerator m_checkOnDayChange;
 
-    private float m_pauseTime;
+    private float m_pauseTime;  //Pauses the Timer on adding Time.deltaTime in 'Update()'.
 
     private void Awake()
     {
@@ -66,24 +66,24 @@ public class TimerTest : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            InitialStartTime();
-        }
+        //if (Input.GetKeyDown(KeyCode.S))
+        //{
+        //    InitialStartTime();
+        //}
 
-        if (Input.GetKey(KeyCode.P))
-        {
-            m_pauseTime += Time.deltaTime;
-            Debug.Log($"{m_pauseTime}");
-        }
+        //if (Input.GetKey(KeyCode.P))
+        //{
+        //    m_pauseTime += Time.deltaTime;
+        //    Debug.Log($"{m_pauseTime}");
+        //}
 
         SwitchTimer();
     }
 
-    private void InitialStartTime()
-    {
-        m_matchStartTime = Time.time;
-    }
+    //private void InitialStartTime()
+    //{
+    //    m_matchStartTime = Time.time;
+    //}
 
     private void SwitchTimer()
     {

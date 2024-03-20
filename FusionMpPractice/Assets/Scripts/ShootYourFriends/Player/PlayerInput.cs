@@ -116,12 +116,12 @@ namespace PlayerInputManagement
         #region Rotation
         private void OnRightMouseButtonDown(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.m_blockRotation = true; //m_characterRotation.y will also get set to 0 in PlayerMovement.cs.
+            m_playerController.m_playerMovement.m_eMoveMethod = PlayerMovement.EmoveMethod.Locked;
         }
 
         private void OnRightMouseButtonUp(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.m_blockRotation = false;
+            m_playerController.m_playerMovement.m_eMoveMethod = PlayerMovement.EmoveMethod.Relative;
         }
         #endregion
         #region Active Breaking
