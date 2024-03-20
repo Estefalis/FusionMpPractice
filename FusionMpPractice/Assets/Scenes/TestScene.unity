@@ -384,8 +384,8 @@ GameObject:
   - component: {fileID: 388173196}
   - component: {fileID: 388173199}
   - component: {fileID: 388173198}
-  m_Layer: 3
-  m_Name: Glasses
+  m_Layer: 6
+  m_Name: Visor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -808,7 +808,7 @@ GameObject:
   - component: {fileID: 681648950}
   - component: {fileID: 681648949}
   - component: {fileID: 681648952}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1237,6 +1237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b425730b2a06b174aaee858e09bdcad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_playerPerspective: 1
   m_playerController: {fileID: 1040389692}
   m_camera: {fileID: 877053081}
   m_setParentTransform: {fileID: 1597012888}

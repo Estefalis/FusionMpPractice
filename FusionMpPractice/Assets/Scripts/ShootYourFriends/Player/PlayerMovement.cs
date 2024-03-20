@@ -10,6 +10,7 @@ namespace PlayerInputManagement
             Basic,
             Relative,
             ADRotateY,
+            MouseRotateY,
             Locked
         }
 
@@ -28,7 +29,7 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
         [SerializeField] private float m_smoothRotationTime = 15.0f;
-        [SerializeField] private float m_quaternionRotTime = 500.0f;
+        [SerializeField] private float m_quaternionRotTime = 600.0f;
         /*[SerializeField] */
         internal bool m_switchMoveMethod = false;
         internal Vector3 m_horizontalMovement, m_characterRotation;
@@ -158,6 +159,7 @@ namespace PlayerInputManagement
                         MoveRigidbodyAD();
                         break;
                     }
+                    //TODO: Mouse Rotate Y MoveRB adden!
                     case EmoveMethod.Locked:
                     {
                         MoveRigidbodyLocked();

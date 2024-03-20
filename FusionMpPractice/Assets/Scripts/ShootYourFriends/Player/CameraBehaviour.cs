@@ -1,11 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
+using PlayerInputManagement;
 using UnityEngine;
 
-namespace PlayerInputManagement
+namespace CameraManagement
 {
     public class CameraBehaviour : MonoBehaviour
     {
+        internal enum PlayerPersPective
+        {
+            FirstPerson,
+            ThirdPerson
+        }
+        [SerializeField] internal PlayerPersPective m_playerPerspective;
+        //TODO: Script an FirstPerson enum anpassen!
         [SerializeField] private PlayerController m_playerController;
 
         #region SetParent and LookAtTarget

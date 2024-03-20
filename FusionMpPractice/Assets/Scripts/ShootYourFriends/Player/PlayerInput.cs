@@ -121,7 +121,19 @@ namespace PlayerInputManagement
 
         private void OnRightMouseButtonUp(InputAction.CallbackContext _callbackContext)
         {
-            m_playerController.m_playerMovement.m_eMoveMethod = PlayerMovement.EmoveMethod.Relative;
+            switch (m_playerController.m_cameraBehaviour.m_playerPerspective)
+            {
+                case CameraManagement.CameraBehaviour.PlayerPersPective.ThirdPerson:
+                {
+                    m_playerController.m_playerMovement.m_eMoveMethod = PlayerMovement.EmoveMethod.Relative;
+                    break;
+                }
+                case CameraManagement.CameraBehaviour.PlayerPersPective.FirstPerson:
+                {
+                    m_playerController.m_playerMovement.m_eMoveMethod = PlayerMovement.EmoveMethod.ADRotateY;   //TODO: Change to 'MouseRotateY'
+                    break;
+                }
+            }
         }
         #endregion
         #region Active Breaking

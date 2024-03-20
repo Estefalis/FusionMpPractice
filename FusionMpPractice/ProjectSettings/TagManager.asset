@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Obstacles
+  - Avatar
   layers:
   - Default
   - TransparentFX
@@ -13,11 +14,11 @@ TagManager:
   - Player
   - Water
   - UI
-  - Ground
+  - Visor
   - Obstacle/Above
   - Obstacle/Below
+  - Obstacle/Vertical
   - Enemy
-  - 
   - 
   - 
   - 
