@@ -1024,8 +1024,8 @@ GameObject:
   - component: {fileID: 1040389696}
   - component: {fileID: 1040389698}
   - component: {fileID: 1040389694}
-  - component: {fileID: 1040389692}
   - component: {fileID: 1040389697}
+  - component: {fileID: 1040389692}
   - component: {fileID: 1040389690}
   - component: {fileID: 1040389693}
   m_Layer: 3
@@ -1068,7 +1068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98a81ce645fde734b83509da9f587977, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerController: {fileID: 1040389692}
+  m_playerOfflineController: {fileID: 1040389694}
 --- !u!114 &1040389692
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1078,19 +1078,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 1040389687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d232bce95db864418f952099bf156c9, type: 3}
+  m_Script: {fileID: 11500000, guid: a42dce115f5946242a1078425f5e96c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_rigidbody: {fileID: 1040389696}
-  m_capsuleCollider: {fileID: 1040389698}
-  m_playerInput: {fileID: 1040389694}
-  m_playerMovement: {fileID: 1040389697}
-  m_playerInteractions: {fileID: 1040389690}
-  m_playerHealth: {fileID: 1040389693}
-  m_cameraBehaviour: {fileID: 1269870957}
-  m_eCurrentMoveMode: 1
-  m_repopPosition: {x: 0, y: 0, z: 0}
-  m_fallLimit: -100
+  m_eMoveMethod: 1
+  m_playerOfflineController: {fileID: 1040389694}
+  m_walkSpeed: 5
+  m_runSpeed: 10
+  m_crouchSpeed: 2.5
+  m_jumpForce: 10
+  m_kneelTime: 0.1
+  m_moveSpeedLerpTime: 0.5
+  m_smoothRotationTime: 10
+  m_quaternionRotTime: 300
+  m_mouseRotYReduction: 0.5
+  m_durationToMaxSpeed: 2.5
+  m_durationToZeroSpeed: 6
+  m_brakeToZeroSpeed: 1
+  m_groundCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 1921
+  m_groundCheckTransform: {fileID: 1703700135}
+  m_groundCheckDistance: 0.2
+  m_gravityValue: -9.81
+  m_inversedGravityMultiplier: 1
+  m_crouchObstacles:
+    serializedVersion: 2
+    m_Bits: 897
+  m_currentHitObject: {fileID: 0}
+  m_sphereRadius: 0.2
+  m_colliderWalkHeight: 2
+  m_colliderCrouchHeight: 1
+  m_minFallDistance: 5
+  m_fallDamageMultiplier: 1
+  m_finalFallDistance: 0
+  m_fallDamageEnabled: 1
+  m_coyoteTime: 0.2
 --- !u!114 &1040389693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1103,7 +1126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f4a3dfaf607b564d98b7e7a28c414cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerController: {fileID: 1040389692}
+  m_playerOfflineController: {fileID: 1040389694}
   m_maxHealth: 100
 --- !u!114 &1040389694
 MonoBehaviour:
@@ -1114,10 +1137,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1040389687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00ecc178cdd21ab428f0bcf930c6cbd0, type: 3}
+  m_Script: {fileID: 11500000, guid: 6377330c6775eab468826d9df34fd25c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerController: {fileID: 1040389692}
+  m_rigidbody: {fileID: 1040389696}
+  m_capsuleCollider: {fileID: 1040389698}
+  m_playerOfflineInput: {fileID: 1040389697}
+  m_playerOfflineMovement: {fileID: 1040389692}
+  m_playerOfflineInteractions: {fileID: 1040389690}
+  m_playerHealth: {fileID: 1040389693}
+  m_cameraOfflineBehaviour: {fileID: 1269870957}
+  m_eCurrentMoveMode: 0
+  m_repopPosition: {x: 0, y: 0, z: 0}
+  m_fallLimit: -100
 --- !u!54 &1040389696
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1143,41 +1175,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1040389687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8862e58ac9731f468c46d2e75df010f, type: 3}
+  m_Script: {fileID: 11500000, guid: e526da7f14b5f324d9545ac2e7682a01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_eMoveMethod: 1
-  m_playerController: {fileID: 1040389692}
-  m_walkSpeed: 5
-  m_runSpeed: 10
-  m_crouchSpeed: 2.5
-  m_jumpForce: 8
-  m_kneelTime: 0.1
-  m_moveSpeedLerpTime: 0.5
-  m_smoothRotationTime: 15
-  m_quaternionRotTime: 600
-  m_durationToMaxSpeed: 2.5
-  m_durationToZeroSpeed: 6
-  m_brakeToZeroSpeed: 1
-  m_groundCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 961
-  m_groundCheckTransform: {fileID: 1703700135}
-  m_groundCheckDistance: 0.5
-  m_gravityValue: -9.81
-  m_inversedGravityMultiplier: 1
-  m_crouchObstacles:
-    serializedVersion: 2
-    m_Bits: 449
-  m_currentHitObject: {fileID: 0}
-  m_sphereRadius: 0.05
-  m_colliderWalkHeight: 2
-  m_colliderCrouchHeight: 1
-  m_minFallDistance: 5
-  m_fallDamageMultiplier: 1
-  m_finalFallDistance: 0
-  m_fallDamageEnabled: 1
-  m_coyoteTime: 0.2
+  m_playerOfflineController: {fileID: 1040389694}
 --- !u!136 &1040389698
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1238,7 +1239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_playerPerspective: 1
-  m_playerController: {fileID: 1040389692}
+  m_playerOfflineController: {fileID: 1617490929}
   m_camera: {fileID: 877053081}
   m_setParentTransform: {fileID: 1597012888}
   m_rotateParentTransform: {fileID: 1269870956}
@@ -1508,6 +1509,92 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!1001 &1617490928
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566600, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566601, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_Name
+      value: PCOfflineController
+      objectReference: {fileID: 0}
+    - target: {fileID: 1060936155348566601, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6eb8dfd77f13ee24ca81f4bd785f328d, type: 3}
+--- !u!114 &1617490929 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1060936155348566611, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1617490928}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6377330c6775eab468826d9df34fd25c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1635742764
 GameObject:
   m_ObjectHideFlags: 0

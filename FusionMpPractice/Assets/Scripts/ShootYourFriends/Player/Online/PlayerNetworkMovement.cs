@@ -291,7 +291,9 @@ namespace PlayerInputManagement
 
             m_playerNetworkController.m_rigidbody.MovePosition(m_playerNetworkController.m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * relativeMoveVector.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
-            if (relativeMoveVector != Vector3.zero)
+            //This if does not allow switching between FirstPerson and ThirdPerson in runtime.
+            if (relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkBehaviour.m_playerPerspective == PlayerPersPective.ThirdPerson ||
+                relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkBehaviour.m_playerPerspective == PlayerPersPective.FirstPerson && m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y >= 0.0f)
             {
                 float angle = Mathf.Atan2(relativeMoveVector.x, relativeMoveVector.z) * Mathf.Rad2Deg;
                 float smoothRotation =

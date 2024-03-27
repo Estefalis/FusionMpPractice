@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace PlayerInputManagement
-{    
+{
     public class PlayerOfflineMovement : MonoBehaviour
     {
         [SerializeField] internal EmoveMethod m_eMoveMethod;
@@ -11,15 +11,16 @@ namespace PlayerInputManagement
 
         #region MoveCharacter-Variables
         [Header("Movement")]
-        [SerializeField] internal float m_walkSpeed = 5f;
-        [SerializeField] internal float m_runSpeed = 10f;
+        [SerializeField] internal float m_walkSpeed = 5.0f;
+        [SerializeField] internal float m_runSpeed = 10.0f;
         [SerializeField] internal float m_crouchSpeed = 2.5f;
         internal float m_stopMovementValue = 0.0f;
-        [SerializeField] internal float m_jumpForce = 10f;
+        [SerializeField] internal float m_jumpForce = 10.0f;
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
         [SerializeField] private float m_smoothRotationTime = 15.0f;
-        [SerializeField] private float m_quaternionRotTime = 600.0f;
+        [SerializeField] private float m_quaternionRotTime = 300.0f;
+        [SerializeField, Range(0.001f, 1.0f)] private float m_mouseRotYReduction = 0.5f;
         /*[SerializeField] */
         internal bool m_switchMoveMethod = false;
         private Vector3 m_horizontalMovement, m_characterRotation;
@@ -43,7 +44,7 @@ namespace PlayerInputManagement
         [SerializeField] internal Transform m_groundCheckTransform;
         [SerializeField] internal float m_groundCheckDistance = 0.2f;
         [SerializeField] internal float m_gravityValue = -9.81f;
-        [SerializeField, Range(0.0001f, 2f)] internal float m_inversedGravityMultiplier = 1.0f;
+        [SerializeField, Range(0.0001f, 2.0f)] internal float m_inversedGravityMultiplier = 1.0f;
         #endregion
 
         #region Crouch-Variables
@@ -150,19 +151,19 @@ namespace PlayerInputManagement
                         MoveRigidbodyBasic();
                         break;
                     }
-                    case EmoveMethod.Relative:
-                    {
-                        MoveRigidbodyRelative();
-                        break;
-                    }
                     case EmoveMethod.ADRotateY:
                     {
-                        MoveRigidbodyAD();
+                        MoveRigidbodyADY();
                         break;
                     }
                     case EmoveMethod.MouseRotateY:
                     {
                         MoveRigidBodyMouseY();
+                        break;
+                    }
+                    case EmoveMethod.Relative:
+                    {
+                        MoveRigidbodyRelative();
                         break;
                     }
                     case EmoveMethod.Locked:
@@ -210,7 +211,7 @@ namespace PlayerInputManagement
         #region MoveRigidbody Alternatives
         private void MoveRigidbodyBasic()
         {
-            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
 
             m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
 
@@ -220,6 +221,35 @@ namespace PlayerInputManagement
                 m_targetRotation = Quaternion.RotateTowards(m_playerOfflineController.m_rigidbody.transform.rotation, m_targetRotation, m_quaternionRotTime * Time.fixedDeltaTime);
                 m_playerOfflineController.m_rigidbody.MoveRotation(m_targetRotation);
             }
+        }
+
+        private void MoveRigidbodyADY()
+        {
+            m_horizontalMovement =
+                new(0.0f, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
+            m_characterRotation =
+                new Vector3(0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f); //A & D
+
+            m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+            m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
+
+            Quaternion deltaRotation = Quaternion.Euler(0.0f, m_characterRotation.y * Time.fixedDeltaTime * m_quaternionRotTime, 0.0f);
+            m_playerOfflineController.m_rigidbody.MoveRotation(m_playerOfflineController.m_rigidbody.rotation * deltaRotation);
+        }
+
+        private void MoveRigidBodyMouseY()
+        {
+            m_horizontalMovement =
+                new(0.0f, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);    //W & S
+            m_characterRotation =
+                new Vector3(0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0.0f); //MouseX Rot Y
+
+            m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+            m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
+
+            Quaternion deltaRotation =
+                Quaternion.Euler(0.0f, m_characterRotation.y * Time.fixedDeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);
+            m_playerOfflineController.m_rigidbody.MoveRotation(m_playerOfflineController.m_rigidbody.rotation * deltaRotation);
         }
 
         private void MoveRigidbodyRelative()
@@ -233,57 +263,36 @@ namespace PlayerInputManagement
             //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
             #endregion
 
-            #region No use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
             Vector3 cameraForward = m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.forward;
             Vector3 cameraRight = m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.right;
-            cameraForward.y = 0;   //prevents characterJumps.
-            cameraRight.y = 0;    //prevents characterJumps.
+            cameraForward.y = 0.0f;   //prevents characterJumps.
+            cameraRight.y = 0.0f;    //prevents characterJumps.
             cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
             cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
             Vector3 relativeForward = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * cameraForward;
-            #endregion
 
             Vector3 relativeRight = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
             Vector3 relativeMoveVector = relativeRight + relativeForward;
 
             m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector.normalized);
 
-            if (relativeMoveVector != Vector3.zero)
+            //This if does not allow switching between FirstPerson and ThirdPerson in runtime.
+            if (relativeMoveVector != Vector3.zero && m_playerOfflineController.m_cameraOfflineBehaviour.m_playerPerspective == PlayerPersPective.ThirdPerson ||
+                relativeMoveVector != Vector3.zero && m_playerOfflineController.m_cameraOfflineBehaviour.m_playerPerspective == PlayerPersPective.FirstPerson && m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y >= 0.0f)
             {
                 float angle = Mathf.Atan2(relativeMoveVector.x, relativeMoveVector.z) * Mathf.Rad2Deg;
-                float smoothRotation =
-                    Mathf.SmoothDampAngle(m_playerOfflineController.m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
-                m_playerOfflineController.m_rigidbody.transform.rotation = Quaternion.Euler(0, smoothRotation, 0);
+                float smoothRotation = Mathf.SmoothDampAngle(m_playerOfflineController.m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
+                m_playerOfflineController.m_rigidbody.transform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
+
+                //m_targetRotation = Quaternion.LookRotation(relativeMoveVector, Vector3.up);
+                //m_targetRotation = Quaternion.RotateTowards(m_playerOfflineController.m_rigidbody.transform.rotation, m_targetRotation, m_quaternionRotTime * Time.fixedDeltaTime);
+                //m_playerOfflineController.m_rigidbody.MoveRotation(m_targetRotation);
             }
-        }
-
-        private void MoveRigidbodyAD()
-        {
-            m_horizontalMovement = new(0, 0, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
-            m_characterRotation = new Vector3(0, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0); //A & D
-
-            m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
-            m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
-
-            Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_quaternionRotTime, 0);
-            m_playerOfflineController.m_rigidbody.MoveRotation(m_playerOfflineController.m_rigidbody.rotation * deltaRotation);
-        }
-
-        private void MoveRigidBodyMouseY()
-        {
-            m_horizontalMovement = new(0, 0, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
-            m_characterRotation = new Vector3(0, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0); //MouseX Rot Y
-
-            m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
-            m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
-
-            Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_quaternionRotTime, 0);
-            m_playerOfflineController.m_rigidbody.MoveRotation(m_playerOfflineController.m_rigidbody.rotation * deltaRotation);
         }
 
         private void MoveRigidbodyLocked()
         {
-            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
 
             m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
 
