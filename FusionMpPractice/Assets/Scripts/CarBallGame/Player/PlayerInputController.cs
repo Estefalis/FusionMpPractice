@@ -20,6 +20,23 @@ public class PlayerInputController : NetworkBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        m_horizontal = Input.GetAxis(HORIZONTALAXIS);
+        m_vertical = Input.GetAxis(VERTICALAXIS);
+
+        //Debug.Log($"HorizonalValue: {m_horizontal} - VerticalValue {m_vertical}");
+        var data = new CarInputData()
+        {
+            Direction = new Vector3(m_horizontal, 0, m_vertical),
+            IsBraking = Input.GetKey(KeyCode.Space),
+            IsRocketing = Input.GetMouseButton(0),
+            IsJumping = Input.GetMouseButton(1)
+        };
+
+        input.Set(data);    //Send data to Server.
+    }
+
     public void OnConnectedToServer(NetworkRunner runner)
     {
 
@@ -48,23 +65,6 @@ public class PlayerInputController : NetworkBehaviour, INetworkRunnerCallbacks
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
     {
 
-    }
-
-    public void OnInput(NetworkRunner runner, NetworkInput input)
-    {
-        m_horizontal = Input.GetAxis(HORIZONTALAXIS);
-        m_vertical = Input.GetAxis(VERTICALAXIS);
-
-        //Debug.Log($"HorizonalValue: {m_horizontal} - VerticalValue {m_vertical}");
-        var data = new CarInputData()
-        {
-            Direction = new Vector3(m_horizontal, 0, m_vertical),
-            IsBraking = Input.GetKey(KeyCode.Space),
-            IsRocketing = Input.GetMouseButton(0),
-            IsJumping = Input.GetMouseButton(1)
-        };
-
-        input.Set(data);    //Send data to Server.
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)

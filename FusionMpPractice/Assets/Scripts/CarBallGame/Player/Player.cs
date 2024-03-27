@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
     [SerializeField] private SimpleCarController m_carController;
-    [SerializeField] private GameObject m_localComponents;
+    [SerializeField] private GameObject m_localComponents;  //Local InputParent
     [SerializeField] private CarCameraController m_carCameraController;
 
     [Networked] public CarInputData m_CarInputData { get; set; }

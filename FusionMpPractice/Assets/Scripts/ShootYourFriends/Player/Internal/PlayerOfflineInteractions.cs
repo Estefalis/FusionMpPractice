@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace PlayerInputManagement
 {
-    public class PlayerInteractions : MonoBehaviour
+    public class PlayerOfflineInteractions : MonoBehaviour
     {
-        [SerializeField] private PlayerController m_playerController;
+        [SerializeField] private PlayerOfflineController m_playerOfflineController;
 
         private void OnCollisionEnter(Collision _collision)
         {

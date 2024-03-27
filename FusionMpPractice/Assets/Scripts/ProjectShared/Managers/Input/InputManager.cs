@@ -3,6 +3,29 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
+internal enum PlayerPersPective
+{
+    FirstPerson,
+    ThirdPerson
+}
+
+internal enum EOnFootTargetMoveModi
+{
+    Idle,
+    Walking,
+    Running,
+    Crouching,
+}
+
+internal enum EmoveMethod
+{
+    Basic,
+    Relative,
+    ADRotateY,
+    MouseRotateY,
+    Locked
+}
+
 namespace PlayerInputManagement
 {
     public class InputManager : MonoBehaviour

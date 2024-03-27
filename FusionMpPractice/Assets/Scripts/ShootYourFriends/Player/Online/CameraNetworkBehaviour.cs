@@ -1,18 +1,15 @@
-using PlayerInputManagement;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace CameraManagement
+namespace PlayerInputManagement
 {
-    public class CameraBehaviour : MonoBehaviour
+    public class CameraNetworkBehaviour : MonoBehaviour
     {
-        internal enum PlayerPersPective
-        {
-            FirstPerson,
-            ThirdPerson
-        }
         [SerializeField] internal PlayerPersPective m_playerPerspective;
+
         //TODO: Script an FirstPerson enum anpassen!
-        [SerializeField] private PlayerController m_playerController;
+        [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
         #region SetParent and LookAtTarget
         [Header("SetParent and LookAtTarget")]
@@ -63,11 +60,11 @@ namespace CameraManagement
         [Header("Camera-Zoom")]
         [SerializeField] internal float m_zoomSpeed;
         [SerializeField] private float m_zoomDampening;
-        [SerializeField] private float m_startZoomDistance = 10.0f;
+        [SerializeField] private float m_startZoomDistance = 8.0f;
         [SerializeField] private float m_minZoomDistance;
         [SerializeField] private float m_maxZoomDistance;
         internal float m_clampedCameraDistance;                                         //Clamped in private void CameraZoom().
-        internal float m_zoomValueY;
+        internal float m_zoomScrollValue;
         #endregion
 
         #region Debug.Drawline & DrawWireSphere
@@ -83,20 +80,30 @@ namespace CameraManagement
             if (m_camera == null)
                 m_camera = GetComponentInChildren<Camera>();
 
-            m_runtimeMinMousePitch = m_minMousePitch;
-            m_clampedCameraDistance = m_startZoomDistance;
-            m_mousePosition = Vector2.zero;
-            Cursor.lockState = m_cursorLockMode;
-            SetCurrentLookAtTarget(m_lookAtTarget, m_keepWorldPos);
+            ResetCameraByPerspective();
         }
 
         private void Update()
         {
-            m_rotateParentTransform.position = m_setParentTransform.position;
-            //RelativeHelperPositioning();
-            GetMousePosition();
-            SetCurrentLookAtTarget(m_lookAtTarget, true);
-            MinCameraPosSphereCast();
+            //GetMousePosition();
+
+            switch (m_playerPerspective)
+            {
+                case PlayerPersPective.ThirdPerson:
+                {
+                    m_rotateParentTransform.position = m_setParentTransform.position;
+                    //RelativeHelperPositioning();
+                    SetLookAtParent(m_lookAtTarget, true);
+                    MinCameraPosSphereCast();
+                    break;
+                }
+                case PlayerPersPective.FirstPerson:
+                {
+                    break;
+                }
+                default:
+                    break;
+            }
         }
 
         private void FixedUpdate()
@@ -106,22 +113,63 @@ namespace CameraManagement
 
         private void LateUpdate()
         {
-            LerpCameraPosition();
+            switch (m_playerPerspective)
+            {
+                case PlayerPersPective.ThirdPerson:
+                {
+                    ThirdPersonCameraLerp();
+                    break;
+                }
+                case PlayerPersPective.FirstPerson:
+                {
+                    //FirstPersonCameraLerp();
+                    break;
+                }
+                default:
+                    break;
+            }
+
             CameraZoom();
+        }
+
+        private void ResetCameraByPerspective()
+        {
+            m_runtimeMinMousePitch = m_minMousePitch;
+            Cursor.lockState = m_cursorLockMode;
+            m_rotateParentTransform.rotation = m_setParentTransform.rotation;
+
+            switch (m_playerPerspective)
+            {
+                case PlayerPersPective.ThirdPerson:
+                {
+                    //m_mousePosition = Vector2.zero;
+                    m_clampedCameraDistance = m_startZoomDistance;          //m_clampedCameraDistance -= variable to adjust the cameraPos by the player?
+                    SetLookAtParent(m_lookAtTarget, m_keepWorldPos);
+                    break;
+                }
+                case PlayerPersPective.FirstPerson:
+                {
+                    m_camera.transform.SetParent(m_setParentTransform, m_keepWorldPos);
+                    //min & max - ZoomVariables get switched within the CameraZoom - Method itself.
+                    break;
+                }
+                default:
+                    break;
+            }
         }
 
         //private void RelativeHelperPositioning()
         //{
-        //    m_relativeHelperTransform.position = new Vector3(m_camera.transform.position.x, m_playerController/*.m_rigidbody*/.transform.position.y, m_camera.transform.position.z);
-        //    m_relativeHelperTransform.LookAt(m_playerController.transform.position);
+        //    m_relativeHelperTransform.position = new Vector3(m_camera.transform.position.x, m_playerNetworkController/*.m_rigidbody*/.transform.position.y, m_camera.transform.position.z);
+        //    m_relativeHelperTransform.LookAt(m_playerNetworkController.transform.position);
         //}
 
         #region Custom Methods
         private void GetMousePosition()
         {
 #if ENABLE_INPUT_SYSTEM
-            m_mousePosition = m_playerController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>();
-            //or Mouse.current.position.ReadValue();
+        m_mousePosition = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>();
+        //or Mouse.current.position.ReadValue();
 #else
             m_mousePosition = Input.mousePosition;
 #endif
@@ -168,22 +216,22 @@ namespace CameraManagement
                 {
                     case false:
                     {
-                        if (!m_playerController.m_playerMovement.m_obstacleIsAbove)
+                        if (!m_playerNetworkController.m_playerNetworkMovement.m_obstacleIsAbove)
                             m_flexibleMinMouseAngle = m_runtimeMinMousePitch;
                         break;
                     }
                     case true:
                     {
-                        switch (m_playerController.m_eCurrentMoveMode)
+                        switch (m_playerNetworkController.m_eCurrentMoveMode)
                         {
                             case EOnFootTargetMoveModi.Crouching:
                             {
                                 //Magic Number == 4!
-                                m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight);
+                                m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerNetworkController.m_playerNetworkMovement.m_colliderWalkHeight - m_playerNetworkController.m_playerNetworkMovement.m_colliderCrouchHeight);
                                 break;
                             }
                             default:
-                                m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerController.m_playerMovement.m_colliderWalkHeight - m_playerController.m_playerMovement.m_colliderCrouchHeight);
+                                m_flexibleMinMouseAngle = m_lastHitObjectYPos + (4 * m_playerNetworkController.m_playerNetworkMovement.m_colliderWalkHeight - m_playerNetworkController.m_playerNetworkMovement.m_colliderCrouchHeight);
                                 break;
                         }
                         break;
@@ -198,19 +246,34 @@ namespace CameraManagement
         {
             if (!m_disableCameraZoom)
             {
-                if (m_zoomValueY != 0.0f)
-                //if (m_playerController.m_playerInputActions.PlayerOnFootRH.CameraZoom.ReadValue<Vector2>().y != 0.0f)
+                if (m_zoomScrollValue != 0.0f)
+                //if (m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.CameraZoom.ReadValue<Vector2>().y != 0.0f)
                 {
-                    float scrollAmount = m_zoomValueY * m_zoomSpeed;
+                    float scrollAmount = m_zoomScrollValue * m_zoomSpeed;
                     scrollAmount *= m_clampedCameraDistance * m_zoomDampening;
                     m_clampedCameraDistance += scrollAmount * -1f;
                     //Debug.Log($"ScrollAmount{scrollAmount} - ClampCamDis {m_clampedCameraDistance} - ZoomDamp {m_zoomDampening}");
-                    m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
+
+                    switch (m_playerPerspective)
+                    {
+                        //Switches CameraZoom-Direction, if not disabled in FirstPerson.
+                        case PlayerPersPective.ThirdPerson:
+                        {
+                            m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
+                            break;
+                        }
+                        //If a different Clamping method is needed.
+                        case PlayerPersPective.FirstPerson:
+                        {
+                            m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
+                            break;
+                        }
+                    }
                 }
 
                 if (m_camera.transform.localPosition.z != m_clampedCameraDistance * -1f)
                 {
-                    switch (m_zoomValueY)
+                    switch (m_zoomScrollValue)
                     {
                         case 0.0f:
                         {
@@ -276,14 +339,14 @@ namespace CameraManagement
             }
         }
 
-        private void SetCurrentLookAtTarget(Transform _lookAtTarget, bool _keepWorldPosition)
+        private void SetLookAtParent(Transform _lookAtTarget = null, bool _keepWorldPosition = true)
         {
             if (m_currentLookAtTarget != _lookAtTarget || m_currentLookAtTarget == null)
             {
                 m_setParentTransform.SetParent(_lookAtTarget, _keepWorldPosition);
                 if (m_differentChildHeight)
                     m_setParentTransform.position = new Vector3(_lookAtTarget.position.x + m_childPosOffset.x, _lookAtTarget.position.y + m_childPosOffset.y, _lookAtTarget.position.z + m_childPosOffset.z);
-                else
+                else if (_lookAtTarget != null)
                     m_setParentTransform.position = _lookAtTarget.position;
 
                 m_currentLookAtTarget = _lookAtTarget;
@@ -291,9 +354,16 @@ namespace CameraManagement
 
             m_camera.transform.LookAt(_lookAtTarget);
         }
-        #endregion
 
-        private void LerpCameraPosition()
+        //private void FirstPersonCameraLerp()
+        //{
+        //    if (!m_disableCameraRotation)
+        //    {
+        //        //TODO: HeadRotationY with Rigidbody, HeadRotationX with runtimeRotationVector.x from UpdateRotation(). Look at Targeting from YBot?
+        //    }
+        //}
+
+        private void ThirdPersonCameraLerp()
         {
             if (!m_disableCameraRotation)
             {
@@ -301,13 +371,14 @@ namespace CameraManagement
                 m_rotateParentTransform.rotation = Quaternion.Lerp(m_rotateParentTransform.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));  //(x * y) * 0.5f prevents rotationHickUps on unsynchronous values.
             }
         }
+        #endregion
 #if UNITY_EDITOR
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.yellow;
-            Debug.DrawLine(m_lineOrigin, m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance);
-            Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereCheckRadius);
-        }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Debug.DrawLine(m_lineOrigin, m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance);
+        Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereCheckRadius);
+    }
 #endif
     }
 }

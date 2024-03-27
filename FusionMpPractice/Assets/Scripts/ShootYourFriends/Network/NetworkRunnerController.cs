@@ -97,7 +97,7 @@ public class NetworkRunnerController : MonoBehaviour, INetworkRunnerCallbacks
         if (m_networkRunnerInstance == null)
         {
             m_networkRunnerInstance = Instantiate(m_networkRunnerPrefab);    //On Transform attached to the GameObject in Unity.
-            m_networkRunnerInstance.AddCallbacks(this);                                 //'AddCallbacks' & 'ProvideInput' enable access to Callbacks.
+            m_networkRunnerInstance.AddCallbacks(this);                      //'AddCallbacks' & 'ProvideInput' enable access to Callbacks.
             m_networkRunnerInstance.ProvideInput = true;
         }
 

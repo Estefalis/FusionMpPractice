@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace PlayerInputManagement
 {
-    public class PlayerHealth : MonoBehaviour
+    public class PlayerNetworkHealth : MonoBehaviour
     {
-        [SerializeField] private PlayerController m_playerController;
+        [SerializeField] private PlayerNetworkController m_playerNetworkController;
         [SerializeField] private float m_maxHealth;
 
         private float m_currentHP;
@@ -40,9 +40,9 @@ namespace PlayerInputManagement
 #if UNITY_EDITOR
             Debug.Log(m_currentHP);
 #endif
-            m_playerController.m_isDead = m_currentHP <= 0;
+            m_playerNetworkController.m_isDead = m_currentHP <= 0;
 
-            if (m_playerController.m_isDead)
+            if (m_playerNetworkController.m_isDead)
             {
 #if UNITY_EDITOR
                 Debug.Log("TILT! <(x.x)>");

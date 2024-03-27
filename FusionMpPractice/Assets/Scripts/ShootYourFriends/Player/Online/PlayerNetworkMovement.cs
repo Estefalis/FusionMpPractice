@@ -1,38 +1,30 @@
+using Fusion;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace PlayerInputManagement
 {
-    public class PlayerMovement : MonoBehaviour
+    public class PlayerNetworkMovement : NetworkBehaviour
     {
-        internal enum EmoveMethod
-        {
-            Basic,
-            Relative,
-            ADRotateY,
-            MouseRotateY,
-            Locked
-        }
-
         [SerializeField] internal EmoveMethod m_eMoveMethod;
-
-        [SerializeField] private PlayerController m_playerController;
-        //[SerializeField] private InputActionReference[] m_mouseRotationActionMaps;
+        [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
         #region MoveCharacter-Variables
         [Header("Movement")]
-        [SerializeField] internal float m_walkSpeed = 5f;
-        [SerializeField] internal float m_runSpeed = 10f;
+        [SerializeField] internal float m_walkSpeed = 5.0f;
+        [SerializeField] internal float m_runSpeed = 10.0f;
         [SerializeField] internal float m_crouchSpeed = 2.5f;
         internal float m_stopMovementValue = 0.0f;
-        [SerializeField] internal float m_jumpForce = 10f;
+        [SerializeField] internal float m_jumpForce = 3.0f;
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
         [SerializeField] private float m_smoothRotationTime = 15.0f;
-        [SerializeField] private float m_quaternionRotTime = 600.0f;
+        [SerializeField] private float m_quaternionRotTime = 300.0f;
+        [SerializeField, Range(0.001f, 1.0f)] private float m_mouseRotYReduction = 0.5f;
         /*[SerializeField] */
         internal bool m_switchMoveMethod = false;
-        internal Vector3 m_horizontalMovement, m_characterRotation;
+        private Vector3 m_horizontalMovement, m_characterRotation;
         float m_mathfSmoothValue;
         private Quaternion m_targetRotation;
 
@@ -96,24 +88,35 @@ namespace PlayerInputManagement
         internal float m_coyoteTimeCounter;                  //resets coyoteTimer on regained groundContact.
         #endregion
 
-        internal bool m_playerIsGrounded, m_moveButtonIsPressed, m_jumpButtonIsPressed, m_jumpButtonIsReleased = false, m_shiftIsPressed = false;
+        internal bool m_playerIsGrounded, m_moveButtonIsPressed, m_shiftIsPressed = false;
         internal bool m_menuIsOpen = false;
+        internal bool m_jumpButtonIsPressed, m_jumpButtonIsReleased;
+
+        private event Action<bool> m_jumpButtonGotPressed;
 
         private void OnDisable()
         {
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Disable();
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed -= CharacterJump;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Disable();
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.performed -= CharacterJump;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed -= CharacterDuck;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled -= StopDucking;
+
+            m_jumpButtonGotPressed -= SwitchJumpButtonState;
 
             m_permitCrouchLerp = false;
         }
 
         private void Start()
         {
-            m_playerController.m_playerInputActions = InputManager.m_InputManagerActions;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Enable();
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
-            m_playerController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
+            m_playerNetworkController.m_playerInputActions = InputManager.m_InputManagerActions;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Enable();
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed += CharacterDuck;
+            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled += StopDucking;
+
+            m_jumpButtonGotPressed += SwitchJumpButtonState;
 
             m_setRunTimeMaxSpeed = 0.0f;
             m_maxDistanceAbove = m_colliderWalkHeight;
@@ -121,26 +124,26 @@ namespace PlayerInputManagement
 
         private void Update()
         {
-            if (!m_playerController.m_isDead)
+            if (!m_playerNetworkController.m_isDead)
             {
                 CoyoteTimerReSet();
                 Crouching();
                 SetMoveAcceleration();
             }
 
-            if (transform.position.y < m_playerController.m_fallLimit)
+            if (transform.position.y < m_playerNetworkController.m_fallLimit)
             {
-                m_playerController.m_rigidbody.transform.position = m_playerController.m_repopPosition; //AreaFallOffReset
+                m_playerNetworkController.m_rigidbody.transform.position = m_playerNetworkController.m_repopPosition; //AreaFallOffReset
             }
         }
 
         private void FixedUpdate()
         {
-            if (!m_playerController.m_isDead)
+            if (!m_playerNetworkController.m_isDead)
             {
                 //simple Groundcheck without Arrays of hitted objects or memory allocation.
                 m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
-                //m_playerController.m_playerIsGrounded = Physics.Raycast(m_playerController.m_groundCheckTransform.position, Vector3.down, m_playerController.m_groundCheckDistance, m_playerController.m_groundCheckLayerMask);
+                //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
 
                 switch (m_eMoveMethod)
                 {
@@ -149,33 +152,27 @@ namespace PlayerInputManagement
                         MoveRigidbodyBasic();
                         break;
                     }
-                    case EmoveMethod.Relative:
-                    {
-                        MoveRigidbodyRelative();
-                        break;
-                    }
                     case EmoveMethod.ADRotateY:
                     {
                         MoveRigidbodyAD();
                         break;
                     }
-                    //TODO: Mouse Rotate Y MoveRB adden!
+                    case EmoveMethod.MouseRotateY:
+                    {
+                        MoveRigidBodyMouseY();
+                        break;
+                    }
+                    case EmoveMethod.Relative:
+                    {
+                        MoveRigidbodyRelative();
+                        break;
+                    }
                     case EmoveMethod.Locked:
                     {
                         MoveRigidbodyLocked();
                         break;
                     }
                 }
-
-                //switch (m_switchMoveMethod)
-                //{
-                //    case false:
-                //        MoveRigidbodyRelative();
-                //        break;
-                //    case true:
-                //        MoveRigidbodyLocked();
-                //        break;
-                //}
 
                 switch (m_playerIsGrounded) //Calculate FallDamage.
                 {
@@ -202,85 +199,121 @@ namespace PlayerInputManagement
             Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereRadius);
         }
 #endif
+        /// <summary>
+        /// State of JumpButtonIsPressed = !JumpButtonIsReleased;
+        /// </summary>
+        /// <param name="_jumpwasPressed"></param>
+        private void SwitchJumpButtonState(bool _jumpwasPressed)
+        {
+            m_jumpButtonIsPressed = _jumpwasPressed;
+            m_jumpButtonIsReleased = !m_jumpButtonIsPressed;
+
+            NetworkJumpButtonState(m_jumpButtonIsPressed);
+        }
+
+        #region MoveRigidbody Alternatives
         private void MoveRigidbodyBasic()
         {
-            m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            //m_horizontalMovement = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
 
-            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
+            Vector3 forwardVector = new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            Vector3 rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, 0.0f);
+            SetNetworkVectors(rightVector, Vector3.zero, forwardVector);
+
+            m_horizontalMovement = new Vector3(m_playerNetworkController.m_playerNetworkData.RightVector.x, 0.0f, m_playerNetworkController.m_playerNetworkData.ForwardVector.z);
+
+            m_playerNetworkController.m_rigidbody.MovePosition(m_playerNetworkController.m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);       //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
             if (m_horizontalMovement != Vector3.zero)
             {
                 m_targetRotation = Quaternion.LookRotation(m_horizontalMovement, Vector3.up);
-                m_targetRotation = Quaternion.RotateTowards(m_playerController.m_rigidbody.transform.rotation, m_targetRotation, m_quaternionRotTime * Time.fixedDeltaTime);
-                m_playerController.m_rigidbody.MoveRotation(m_targetRotation);
-            }
-        }
-
-        private void MoveRigidbodyRelative()
-        {
-            #region Use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-            //Vector3 fakecameraForward = m_playerController.m_cameraBehaviour.m_relativeHelperTransform.forward;
-            //Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
-            ////cameraForward = cameraForward.normalized;
-            //cameraRight.y = 0;    //prevents characterJumps.
-            //cameraRight = cameraRight.normalized;
-            //Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
-            #endregion
-
-            #region No use of RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-            Vector3 cameraForward = m_playerController.m_cameraBehaviour.m_camera.transform.forward;
-            Vector3 cameraRight = m_playerController.m_cameraBehaviour.m_camera.transform.right;
-            cameraForward.y = 0;   //prevents characterJumps.
-            cameraRight.y = 0;    //prevents characterJumps.
-            cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-            cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-            Vector3 relativeForward = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * cameraForward;
-            #endregion
-
-            Vector3 relativeRight = m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
-            Vector3 relativeMoveVector = relativeRight + relativeForward;
-
-            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector.normalized);
-
-            if (relativeMoveVector != Vector3.zero)
-            {
-                float angle = Mathf.Atan2(relativeMoveVector.x, relativeMoveVector.z) * Mathf.Rad2Deg;
-                float smoothRotation =
-                    Mathf.SmoothDampAngle(m_playerController.m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
-                m_playerController.m_rigidbody.transform.rotation = Quaternion.Euler(0, smoothRotation, 0);
+                m_targetRotation = Quaternion.RotateTowards(m_playerNetworkController.m_rigidbody.transform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+                m_playerNetworkController.m_rigidbody.MoveRotation(m_targetRotation);
             }
         }
 
         private void MoveRigidbodyAD()
         {
-            m_horizontalMovement = new(0, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
-            m_characterRotation = new Vector3(0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0); //A & D
+            m_horizontalMovement = 
+                new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);    //W & S
+            m_characterRotation = 
+                new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f); //A & D
+            
+            SetNetworkVectors(Vector3.zero, m_characterRotation, m_horizontalMovement);
+            m_horizontalMovement = new Vector3(0.0f, 0.0f, m_playerNetworkController.m_playerNetworkData.ForwardVector.z);
 
-            m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
-            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
+            m_horizontalMovement = m_playerNetworkController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+            m_playerNetworkController.m_rigidbody.MovePosition(m_playerNetworkController.m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
-            Quaternion deltaRotation = Quaternion.Euler(0, m_characterRotation.y * Time.fixedDeltaTime * m_quaternionRotTime, 0);
-            m_playerController.m_rigidbody.MoveRotation(m_playerController.m_rigidbody.rotation * deltaRotation);
+            Quaternion deltaRotation = Quaternion.Euler(0.0f, m_playerNetworkController.m_playerNetworkData.RotationVector.y * Runner.DeltaTime * m_quaternionRotTime, 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_playerNetworkController.m_rigidbody.MoveRotation(m_playerNetworkController.m_rigidbody.rotation * deltaRotation);
+        }
+
+        private void MoveRigidBodyMouseY()
+        {
+            m_horizontalMovement = 
+                new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
+            m_characterRotation = 
+                new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0.0f); //MouseX Rot Y
+            
+            SetNetworkVectors(Vector3.zero, m_characterRotation, m_horizontalMovement);
+            m_horizontalMovement = new Vector3(0.0f, 0.0f, m_playerNetworkController.m_playerNetworkData.ForwardVector.z);
+
+            m_horizontalMovement = m_playerNetworkController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+            m_playerNetworkController.m_rigidbody.MovePosition(m_playerNetworkController.m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+
+            Quaternion deltaRotation = Quaternion.Euler(0.0f, m_playerNetworkController.m_playerNetworkData.RotationVector.y * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_playerNetworkController.m_rigidbody.MoveRotation(m_playerNetworkController.m_rigidbody.rotation * deltaRotation);
+        }
+
+        private void MoveRigidbodyRelative()
+        {
+            #region Use of custom RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
+            //Vector3 fakecameraForward = m_playerNetworkController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
+            //Vector3 cameraRight = m_playerNetworkController.m_cameraOfflineBehaviour.m_camera.transform.right;
+            ////cameraForward = cameraForward.normalized;
+            //cameraRight.y = 0;    //prevents characterJumps.
+            //cameraRight = cameraRight.normalized;
+            //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            #endregion
+
+            Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
+            Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
+            cameraForward.y = 0.0f;   //prevents characterJumps.
+            cameraRight.y = 0.0f;    //prevents characterJumps.
+            cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+            cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+            Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * cameraForward;
+
+            Vector3 relativeRight = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
+            SetNetworkVectors(relativeRight, Vector3.zero, relativeForward);
+            Vector3 relativeMoveVector = m_playerNetworkController.m_playerNetworkData.RightVector + m_playerNetworkController.m_playerNetworkData.ForwardVector;
+
+            m_playerNetworkController.m_rigidbody.MovePosition(m_playerNetworkController.m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * relativeMoveVector.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+
+            if (relativeMoveVector != Vector3.zero)
+            {
+                float angle = Mathf.Atan2(relativeMoveVector.x, relativeMoveVector.z) * Mathf.Rad2Deg;
+                float smoothRotation =
+                    Mathf.SmoothDampAngle(m_playerNetworkController.m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
+                m_playerNetworkController.m_rigidbody.transform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
+            }
         }
 
         private void MoveRigidbodyLocked()
         {
-            m_horizontalMovement = new(m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            m_horizontalMovement = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
 
-            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation?
+            Vector3 forwardVector = new(0, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            Vector3 rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, 0);
+            SetNetworkVectors(rightVector, Vector3.zero, forwardVector);
+            m_horizontalMovement = new Vector3(m_playerNetworkController.m_playerNetworkData.RightVector.x, 0.0f, m_playerNetworkController.m_playerNetworkData.ForwardVector.z);
 
-            m_horizontalMovement = m_playerController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
-
-            //if (m_playerIsGrounded && m_horizontalMovement.y <= 0)
-            //{
-            //Einmaliges ausloesen bei wiedererlangtem Bodenkontakt ueber den InputManager.
-            //if (m_jumpEventTriggered)
-            //InputManager.m_RegainedGroundContact?.Invoke();
-            //}
-
-            m_playerController.m_rigidbody.MovePosition(m_playerController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
+            m_horizontalMovement = m_playerNetworkController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation while being locked?
+            m_playerNetworkController.m_rigidbody.MovePosition(m_playerNetworkController.m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
         }
-
+        #endregion
         #region Crouching
         private void SphereCastCheckAbove()
         {
@@ -326,13 +359,13 @@ namespace PlayerInputManagement
                             if (m_crouchTimer < m_kneelTime)
                             {
                                 //Lerp getting up.
-                                m_playerController.m_capsuleCollider.height =
-                                    Mathf.Lerp(m_playerController.m_capsuleCollider.height, m_colliderWalkHeight, countingUp);
+                                m_playerNetworkController.m_capsuleCollider.height =
+                                    Mathf.Lerp(m_playerNetworkController.m_capsuleCollider.height, m_colliderWalkHeight, countingUp);
                                 m_crouchTimer += Time.deltaTime;
                             }
                             else
                             {
-                                m_playerController.m_capsuleCollider.height = m_colliderWalkHeight;
+                                m_playerNetworkController.m_capsuleCollider.height = m_colliderWalkHeight;
                                 m_crouchTimer = 0.0f;
                             }
                         }
@@ -344,12 +377,12 @@ namespace PlayerInputManagement
                         if (m_crouchTimer < m_kneelTime)
                         {
                             //Lerp kneeling down.
-                            m_playerController.m_capsuleCollider.height =
-                                Mathf.Lerp(m_playerController.m_capsuleCollider.height, m_colliderCrouchHeight, countingUp);
+                            m_playerNetworkController.m_capsuleCollider.height =
+                                Mathf.Lerp(m_playerNetworkController.m_capsuleCollider.height, m_colliderCrouchHeight, countingUp);
                             m_crouchTimer += Time.deltaTime;
                         }
                         else
-                            m_playerController.m_capsuleCollider.height = m_colliderCrouchHeight;
+                            m_playerNetworkController.m_capsuleCollider.height = m_colliderCrouchHeight;
                         break;
                     }
                 }
@@ -372,7 +405,7 @@ namespace PlayerInputManagement
                             {
                                 case false:
                                 {
-                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
                                     m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_stopMovementValue;
                                     Acceleration(m_deceleRatePerSec);
@@ -380,7 +413,7 @@ namespace PlayerInputManagement
                                 }
                                 case true:
                                 {
-                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
                                     m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
                                     Acceleration(m_deceleRatePerSec);
@@ -395,7 +428,7 @@ namespace PlayerInputManagement
                             {
                                 case false: //Fast stop while not crouching.
                                 {
-                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
                                     m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_stopMovementValue;
                                     Acceleration(m_brakeRatePerSec);
@@ -403,7 +436,7 @@ namespace PlayerInputManagement
                                 }
                                 case true:  //Fast stop while crouching.
                                 {
-                                    m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
                                     m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_stopMovementValue;
                                     Acceleration(m_brakeRatePerSec);
@@ -432,7 +465,7 @@ namespace PlayerInputManagement
                                         case false: //Shift is not pressed and character shall walk.
                                         {
                                             //In case the character shall speed up from walking.
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Walking;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Walking;
                                             m_setRunTimeMaxSpeed = m_walkSpeed;
                                             if (m_individualMaxSpeed < m_setRunTimeMaxSpeed)    //current vs. set speed.
                                             {
@@ -448,7 +481,7 @@ namespace PlayerInputManagement
                                         }
                                         case true:  //Shift is not pressed and character shall kneel down from Walking or Running.
                                         {
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
                                             m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                             m_setRunTimeMaxSpeed = m_crouchSpeed;
                                             Acceleration(m_deceleRatePerSec);
@@ -463,7 +496,7 @@ namespace PlayerInputManagement
                                     {
                                         case false:
                                         {
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
                                             m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
                                             m_setRunTimeMaxSpeed = m_stopMovementValue;
                                             Acceleration(m_brakeRatePerSec);
@@ -471,7 +504,7 @@ namespace PlayerInputManagement
                                         }
                                         case true:  //Fast stop while crouching.
                                         {
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
                                             m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
                                             m_setRunTimeMaxSpeed = m_stopMovementValue;
                                             Acceleration(m_brakeRatePerSec);
@@ -493,7 +526,7 @@ namespace PlayerInputManagement
                                     {
                                         case false: //If Shift IS pressed and the character shall not kneel down, but run.
                                         {
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Running;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Running;
                                             m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
                                             m_setRunTimeMaxSpeed = m_runSpeed;
                                             Acceleration(m_acceleRatePerSec);
@@ -501,7 +534,7 @@ namespace PlayerInputManagement
                                         }
                                         case true:  //If Shift IS pressed and the character shall kneel down.
                                         {
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
                                             m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                             m_setRunTimeMaxSpeed = m_crouchSpeed;
                                             Acceleration(m_deceleRatePerSec);
@@ -516,7 +549,7 @@ namespace PlayerInputManagement
                                     {
                                         case false:
                                         {
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
                                             m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
                                             m_setRunTimeMaxSpeed = m_stopMovementValue;
                                             Acceleration(m_brakeRatePerSec);
@@ -524,7 +557,7 @@ namespace PlayerInputManagement
                                         }
                                         case true:
                                         {
-                                            m_playerController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
                                             m_brakeRatePerSec = -m_runSpeed / m_durationToZeroSpeed;
                                             m_setRunTimeMaxSpeed = m_stopMovementValue;
                                             Acceleration(m_brakeRatePerSec);
@@ -545,7 +578,7 @@ namespace PlayerInputManagement
 
         private void Acceleration(float _sentDeAccelerationRate)
         {
-            switch (m_playerController.m_eCurrentMoveMode)
+            switch (m_playerNetworkController.m_eCurrentMoveMode)
             {
                 case EOnFootTargetMoveModi.Walking:
                 {
@@ -635,18 +668,24 @@ namespace PlayerInputManagement
         private void ApplyFallDamage(float _finalFallDistance)
         {
             _finalFallDistance *= m_fallDamageMultiplier;
-            m_playerController.m_playerHealth.TakeDamage(Mathf.Round(_finalFallDistance));
+            m_playerNetworkController.m_playerNetworkHealth.TakeDamage(Mathf.Round(_finalFallDistance));
         }
-        #endregion        
+        #endregion
         #endregion
         #region CallbackContexts
         #region Character Jump
+        /// <summary>
+        /// Requires 'Press And Release' Trigger Behaviour in 'PlayerInputActions > Jump > Space [Keyboard] > Interactions to set on press and relase!!!
+        /// </summary>
+        /// <param name="_callbackContext"></param>
         private void CharacterJump(InputAction.CallbackContext _callbackContext)
         {
-            //if (m_jumpButtonIsPressed && m_playerIsGrounded)    //Original.
-            if (m_jumpButtonIsPressed && m_coyoteTimeCounter > 0) //m_playerIsGrounded <-> m_coyoteTimeCounter.
+            bool jumpButtonIsPressed = _callbackContext.ReadValueAsButton();
+            m_jumpButtonGotPressed?.Invoke(jumpButtonIsPressed);                   //For use outside of Callback-Methods.
+
+            if (m_coyoteTimeCounter > 0 && jumpButtonIsPressed) //Original: if (m_jumpButtonIsPressed && m_playerIsGrounded)
             {
-                m_playerController.m_rigidbody.AddForce(Vector3.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
+                m_playerNetworkController.m_rigidbody.AddForce(Vector3.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
 
                 ////Einmaliges ausloesen bei verlorenem Bodenkontakt ueber den InputManager.
                 //InputManager.m_LostGroundContact?.Invoke();
@@ -655,9 +694,46 @@ namespace PlayerInputManagement
 
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
+            //bool jumpButtonIsReleased = _callbackContext.ReadValueAsButton();
             m_coyoteTimeCounter = 0.0f; //Prevents the player from 'double jumping' on pressing the JumpButton multiple times.
         }
-        #endregion        
+        #endregion
+        #region Ducking
+        private void CharacterDuck(InputAction.CallbackContext _callbackContext)
+        {
+            m_permitCrouchLerp = _callbackContext.ReadValueAsButton();
+            m_kneelToCrouch = m_permitCrouchLerp;
+            m_crouchTimer = 0;
+
+            m_groundCheckHeightAdjustment = (m_colliderWalkHeight - m_colliderCrouchHeight) / 2;
+            m_groundCheckTransform.position = new Vector3(m_playerNetworkController.m_rigidbody.position.x, m_playerNetworkController.m_rigidbody.position.y + m_groundCheckHeightAdjustment, m_playerNetworkController.m_rigidbody.position.z);
+        }
+
+        private void StopDucking(InputAction.CallbackContext _callbackContext)
+        {
+            if (m_permitCrouchLerp)
+            {
+                m_kneelToCrouch = false;
+            }
+
+            //Whenever the m_groundCheckTransform.position gets ReSetted, it has to be the same position as the moving Rigidbody!
+            m_groundCheckTransform.position = m_playerNetworkController.m_rigidbody.position;
+        }
+        #endregion
+        #endregion
+        #region Network Methods
+        private void SetNetworkVectors(Vector3 _rightVector, Vector3 _rotationVector, Vector3 _forwardVector)
+        {
+            m_playerNetworkController.m_playerNetworkDataInput.SidewardMovement = _rightVector;
+            m_playerNetworkController.m_playerNetworkDataInput.RotationMovement = _rotationVector;
+            m_playerNetworkController.m_playerNetworkDataInput.ForwardMovement = _forwardVector;
+        }
+
+        private void NetworkJumpButtonState(bool _jumpButtonIsPressed)
+        {
+            m_playerNetworkController.m_playerNetworkDataInput.JumpButtonGotPressed = _jumpButtonIsPressed;
+            m_playerNetworkController.m_playerNetworkDataInput.JumpButtonGotReleased = !_jumpButtonIsPressed;
+        }
         #endregion
     }
 }

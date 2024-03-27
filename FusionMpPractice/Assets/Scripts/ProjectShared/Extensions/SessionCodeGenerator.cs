@@ -4,7 +4,7 @@ namespace Extensions
 {
     public static class SessionCodeGenerator
     {
-        public static string GenerateSessionCode(int length = 4)
+        public static string GenerateSessionCode(int length = 6)
         {
             char[] chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray();
         
