@@ -6,10 +6,8 @@ using UnityEngine;
 
 namespace PlayerInputManagement
 {
-    public class PlayerNetworkDataInput : NetworkBehaviour, INetworkRunnerCallbacks
+    public class PlayerNetworkDataInput : NetworkBehaviour, INetworkRunnerCallbacks     //Equals PlayerInputController in Guide.
     {
-        //[SerializeField] private PlayerNetworkController m_playerNetworkController;
-
         //Incoming Data.
         internal Vector3 SidewardMovement;
         internal Vector3 ForwardMovement;

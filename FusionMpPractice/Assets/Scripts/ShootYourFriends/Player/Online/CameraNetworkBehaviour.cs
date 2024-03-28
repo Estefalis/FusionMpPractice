@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using PlayerInputManagement;
 using UnityEngine;
 
-namespace PlayerInputManagement
+namespace CameraManagement
 {
     public class CameraNetworkBehaviour : MonoBehaviour
     {
@@ -149,7 +148,7 @@ namespace PlayerInputManagement
                 }
                 case PlayerPersPective.FirstPerson:
                 {
-                    m_camera.transform.SetParent(m_setParentTransform, m_keepWorldPos);
+                    //m_camera.transform.SetParent(m_setParentTransform, m_keepWorldPos);
                     //min & max - ZoomVariables get switched within the CameraZoom - Method itself.
                     break;
                 }

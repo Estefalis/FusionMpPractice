@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PlayerInputManagement
 {
-    public class PlayerNetworkController : NetworkBehaviour
+    public class PlayerNetworkController : NetworkBehaviour                             //Equals Player.cs in Guide.
     {
         internal PlayerInputActions m_playerInputActions;
 
@@ -14,7 +14,7 @@ namespace PlayerInputManagement
 
         [SerializeField] internal PlayerNetworkInput m_playerNetworkInput;
         [SerializeField] internal PlayerNetworkDataInput m_playerNetworkDataInput;
-        [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;
+        [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;        //Equals SimpleCarController in Guide.
         [SerializeField] internal PlayerNetworkInteractions m_playerNetworkInteractions;
         [SerializeField] internal PlayerNetworkHealth m_playerNetworkHealth;
         [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkBehaviour;
@@ -31,7 +31,7 @@ namespace PlayerInputManagement
         #endregion
 
         #region Network
-        internal PlayerNetworkData m_playerNetworkData;
+        [Networked] internal PlayerNetworkData PlayerNetworkData { get; set; }
         #endregion
 
         private void Awake()
@@ -57,20 +57,12 @@ namespace PlayerInputManagement
 
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out PlayerNetworkData inputData))
+            if (GetInput(out PlayerNetworkData inputData))      //Equals Player.cs CarInputData in Guide.
             {
-                ProvideMovementData(inputData);
+                PlayerNetworkData = inputData;
             }
-        }
 
-        /// <summary>
-        /// IMPORTANT: Use Runner.DeltaTime instead of common DeltaTime!!!
-        /// </summary>
-        /// <param name="inputData"></param>
-        internal void ProvideMovementData(PlayerNetworkData inputData)
-        {
-            m_playerNetworkData = inputData;
-            //TODO: Update PlayerNetworkMovement.
+            m_playerNetworkMovement.SetInputData(PlayerNetworkData);
         }
     }
 }

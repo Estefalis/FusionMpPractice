@@ -2,32 +2,45 @@ using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
+public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft   //Just a different name for NetworkSpawnerController in Guide.
 {
-    [SerializeField] private NetworkPrefabRef m_playerNetworkPrefab = NetworkPrefabRef.Empty;
-    [SerializeField] private Transform[] m_spawnPoints;
+    [SerializeField] private NetworkPrefabRef m_playerNetworkPrefab;
+    [SerializeField] private Transform[] m_spawnPointsArray;
+    private List<Transform> m_spawnPointsList;
 
     private Dictionary<PlayerRef, NetworkObject> m_players = new();   //Version 2
+
+    private void Awake()
+    {
+        m_spawnPointsList = new List<Transform>();
+    }
 
     public void PlayerJoined(PlayerRef _playerRef)
     {
         SpawnPlayer(_playerRef);
     }
 
-    public void PlayerLeft(PlayerRef _playerRef)
-    {
-        DespawnPlayer(_playerRef);
-    }
-
     private void SpawnPlayer(PlayerRef _playerRef)
     {
         if (Runner.IsServer)
         {
-            int randomSpawnPosition = Random.Range(0, m_spawnPoints.Length);
-            var playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPoints[randomSpawnPosition].position, Quaternion.identity, _playerRef);
-            //Runner.SetPlayerObject(_playerRef, playerObject);   //set IsLocalPlayerObject.
+            int randomSpawnPosition = Random.Range(0, m_spawnPointsArray.Length);
+
+            foreach (Transform transform in m_spawnPointsList)
+            {
+                if (m_spawnPointsArray[randomSpawnPosition].position == transform.position)
+                    randomSpawnPosition += 1 % m_spawnPointsArray.Length;
+            }
+
+            var playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
+            m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
             m_players.Add(_playerRef, playerObject);     //Version 2
         }
+    }
+
+    public void PlayerLeft(PlayerRef _playerRef)
+    {
+        DespawnPlayer(_playerRef);
     }
 
     private void DespawnPlayer(PlayerRef _playerRef)
