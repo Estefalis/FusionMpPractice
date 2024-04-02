@@ -17,8 +17,6 @@ namespace PlayerInputManagement
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.canceled += StopMovement;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed += OnRightMouseButtonDown;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled += OnRightMouseButtonUp;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.performed += ActiveBraking;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.canceled += CancelActiveBraking;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.performed += AccelerateMovespeed;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.canceled += DecelerateMovespeed;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed += SwitchCursorLockMode;
@@ -38,8 +36,6 @@ namespace PlayerInputManagement
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.canceled -= StopMovement;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed -= OnRightMouseButtonDown;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled -= OnRightMouseButtonUp;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.performed -= ActiveBraking;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.ActiveBraking.canceled -= CancelActiveBraking;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.performed -= AccelerateMovespeed;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.canceled -= DecelerateMovespeed;
             m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed -= SwitchCursorLockMode;
@@ -100,17 +96,7 @@ namespace PlayerInputManagement
                 }
             }
         }
-        #endregion
-        #region Active Breaking
-        private void ActiveBraking(InputAction.CallbackContext _callbackContext)
-        {
-            m_playerOfflineController.m_playerOfflineMovement.m_activeBraking = true;
-        }
-        private void CancelActiveBraking(InputAction.CallbackContext _callbackContext)
-        {
-            m_playerOfflineController.m_playerOfflineMovement.m_activeBraking = false;
-        }
-        #endregion
+        #endregion        
         #region Increasing Acceleration
         //Set fast moveSpeed by pressing shift and controller relatives.
         private void AccelerateMovespeed(InputAction.CallbackContext _callbackContext)

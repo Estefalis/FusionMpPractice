@@ -18,7 +18,6 @@ namespace MenuManagement
     public class MenuManager : MonoBehaviour
     {
         [SerializeField] private EventSystem m_eventSystem;
-        [SerializeField] private Animator m_animator;
 
         #region Select First Elements by using the EventSystem.
         // The stack of active (Transform-)elements for menu-navigation needs to have a Start-Transform to prevent an error. It gets set active in 'Awake()'.

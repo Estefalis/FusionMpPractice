@@ -1109,6 +1109,7 @@ MonoBehaviour:
   m_sphereRadius: 0.2
   m_colliderWalkHeight: 2
   m_colliderCrouchHeight: 1
+  m_permitCrouchLerp: 1
   m_minFallDistance: 5
   m_fallDamageMultiplier: 1
   m_finalFallDistance: 0

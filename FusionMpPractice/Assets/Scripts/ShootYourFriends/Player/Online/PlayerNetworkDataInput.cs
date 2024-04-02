@@ -6,110 +6,111 @@ using UnityEngine;
 
 namespace PlayerInputManagement
 {
-    public class PlayerNetworkDataInput : NetworkBehaviour, INetworkRunnerCallbacks     //Equals PlayerInputController in Guide.
+    public class PlayerNetworkDataInput : MonoBehaviour
     {
-        //Incoming Data.
-        internal Vector3 SidewardMovement;
-        internal Vector3 ForwardMovement;
-        internal Vector3 RotationMovement;
-        internal bool JumpButtonGotPressed;
-        internal bool JumpButtonGotReleased;
+        ////Incoming Data.
+        //internal Vector3 SidewardMovement;
+        //internal Vector3 ForwardMovement;
+        //internal Vector3 RotationMovement;
+        //internal bool JumpButtonGotPressed;
+        //internal bool JumpButtonGotReleased;
+        //internal bool KneelButtonGotPressed;
 
-        public override void Spawned()
-        {
-            if (Object.HasInputAuthority)
-            {
-                Runner.AddCallbacks(this);
-            }
-        }
+        //public override void Spawned()
+        //{
+        //    if (Object.HasInputAuthority)
+        //    {
+        //        Runner.AddCallbacks(this);
+        //    }
+        //}
 
-        public void OnInput(NetworkRunner runner, NetworkInput input)
-        {
-            var inputData = new PlayerNetworkData()
-            {
-                ForwardVector = ForwardMovement,
-                RightVector = SidewardMovement,
-                RotationVector = RotationMovement,
-                JumpButtonIsPressed = JumpButtonGotPressed,
-                JumpButtonIsReleased = JumpButtonGotReleased,
-            };
+        //public void OnInput(NetworkRunner runner, NetworkInput input)
+        //{
+        //    var inputData = new PlayerNetworkData()
+        //    {
+        //        ForwardVector = ForwardMovement,
+        //        RightVector = SidewardMovement,
+        //        RotationVector = RotationMovement,
+        //        JumpButtonIsPressed = JumpButtonGotPressed,
+        //        KneelButtonIsPressed = KneelButtonGotPressed,
+        //    };
 
-            input.Set(inputData);
-        }
+        //    input.Set(inputData);
+        //}
 
-        public void OnConnectedToServer(NetworkRunner runner)
-        {
+        //public void OnConnectedToServer(NetworkRunner runner)
+        //{
 
-        }
+        //}
 
-        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
-        {
+        //public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+        //{
 
-        }
+        //}
 
-        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
-        {
+        //public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
+        //{
 
-        }
+        //}
 
-        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
-        {
+        //public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
+        //{
 
-        }
+        //}
 
-        public void OnDisconnectedFromServer(NetworkRunner runner)
-        {
+        //public void OnDisconnectedFromServer(NetworkRunner runner)
+        //{
 
-        }
+        //}
 
-        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-        {
+        //public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+        //{
 
-        }
+        //}
 
-        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-        {
+        //public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
+        //{
 
-        }
+        //}
 
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        {
+        //public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        //{
 
-        }
+        //}
 
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-        {
+        //public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        //{
 
-        }
+        //}
 
-        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
-        {
+        //public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
+        //{
 
-        }
+        //}
 
-        public void OnSceneLoadDone(NetworkRunner runner)
-        {
+        //public void OnSceneLoadDone(NetworkRunner runner)
+        //{
 
-        }
+        //}
 
-        public void OnSceneLoadStart(NetworkRunner runner)
-        {
+        //public void OnSceneLoadStart(NetworkRunner runner)
+        //{
 
-        }
+        //}
 
-        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-        {
+        //public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        //{
 
-        }
+        //}
 
-        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-        {
+        //public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+        //{
 
-        }
+        //}
 
-        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
-        {
+        //public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
+        //{
 
-        }
+        //}
     }
 }

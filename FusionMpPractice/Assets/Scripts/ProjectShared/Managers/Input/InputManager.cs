@@ -20,9 +20,9 @@ internal enum EOnFootTargetMoveModi
 internal enum EmoveMethod
 {
     Basic,
-    Relative,
     ADRotateY,
     MouseRotateY,
+    Relative,
     Locked
 }
 

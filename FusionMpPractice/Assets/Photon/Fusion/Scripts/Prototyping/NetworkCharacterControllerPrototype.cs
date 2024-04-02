@@ -68,7 +68,7 @@ public class NetworkCharacterControllerPrototype : NetworkTransform {
 
   /// <summary>
   /// Basic implementation of a jump impulse (immediately integrates a vertical component to Velocity).
-  /// <param name="ignoreGrounded">Jump even if not in a grounded state.</param>
+  /// <param name="ignoreGrounded">Jumping even if not in a grounded state.</param>
   /// <param name="overrideImpulse">Optional field to override the jump impulse. If null, <see cref="jumpImpulse"/> is used.</param>
   /// </summary>
   public virtual void Jump(bool ignoreGrounded = false, float? overrideImpulse = null) {

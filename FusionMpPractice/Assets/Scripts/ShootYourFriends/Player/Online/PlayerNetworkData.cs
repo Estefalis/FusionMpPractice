@@ -9,5 +9,5 @@ public struct PlayerNetworkData : INetworkInput
     public Vector3 RightVector;
     public Vector3 RotationVector;
     public bool JumpButtonIsPressed;
-    public bool JumpButtonIsReleased;
+    public bool KneelButtonIsPressed;
 }

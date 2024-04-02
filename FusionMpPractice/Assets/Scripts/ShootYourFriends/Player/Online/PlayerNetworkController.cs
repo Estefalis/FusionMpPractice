@@ -9,16 +9,14 @@ namespace PlayerInputManagement
         internal PlayerInputActions m_playerInputActions;
 
         [SerializeField] private GameObject m_localInputParent;
-        [SerializeField] internal Rigidbody m_rigidbody;
-        [SerializeField] internal CapsuleCollider m_capsuleCollider;
-
+        
         [SerializeField] internal PlayerNetworkInput m_playerNetworkInput;
-        [SerializeField] internal PlayerNetworkDataInput m_playerNetworkDataInput;
         [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;        //Equals SimpleCarController in Guide.
         [SerializeField] internal PlayerNetworkInteractions m_playerNetworkInteractions;
         [SerializeField] internal PlayerNetworkHealth m_playerNetworkHealth;
-        [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkBehaviour;
+        [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkController;
         [SerializeField] internal EOnFootTargetMoveModi m_eCurrentMoveMode;
+        [SerializeField] internal EmoveMethod m_eMoveMethod;
 
         #region Runtime-Values
         #region Reset on falling off the area
@@ -27,19 +25,14 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_fallLimit = -100f;
         #endregion
         internal bool m_isDead = false;
-        internal Vector3 m_startPosition;
         #endregion
 
         #region Network
-        [Networked] internal PlayerNetworkData PlayerNetworkData { get; set; }
+        [Networked] private PlayerNetworkData PlayerNetworkData { get; set; }
         #endregion
 
         private void Awake()
         {
-            if (m_rigidbody == null)
-                m_rigidbody = GetComponent<Rigidbody>();
-
-            m_startPosition = transform.position;
             m_eCurrentMoveMode = EOnFootTargetMoveModi.Walking;
         }
 
@@ -52,6 +45,7 @@ namespace PlayerInputManagement
             else
             {
                 m_localInputParent.SetActive(false);
+                m_cameraNetworkController.m_camera.gameObject.SetActive(false);
             }
         }
 

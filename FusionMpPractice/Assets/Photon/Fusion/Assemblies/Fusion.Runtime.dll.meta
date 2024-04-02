@@ -6,6 +6,8 @@ PluginImporter:
   iconMap: {}
   executionOrder:
     Fusion.NetworkObject: 500
+    Fusion.NetworkTransform: 600
+    Fusion.NetworkTransformAnchor: 700
   defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
