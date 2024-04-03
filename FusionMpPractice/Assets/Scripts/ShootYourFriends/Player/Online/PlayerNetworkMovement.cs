@@ -98,6 +98,10 @@ namespace PlayerInputManagement
 
         #region Network
         private Vector3 m_horizontalMovement, m_relativeMoveVector;
+        #region Additional Variables to replace Vectors and bools within the 'MoveRigidbody' methods for testing purposes.
+        //private Vector3 m_rightVector, m_rotationVector, m_forwardVector;
+        //private bool m_jumpButtonIsPressed, m_kneelButtonIsPressed;
+        #endregion
         private Quaternion m_quatDeltaRot;
         [Networked] private PlayerNetworkData PlayerNetworkData { get; set; }
         #endregion
@@ -150,6 +154,14 @@ namespace PlayerInputManagement
         public override void FixedUpdateNetwork()
         {
             base.FixedUpdateNetwork();
+
+            #region Remove 'PlayerNetworkData.Vectors' in the 'MoveRigidbody' methods with these for testing purposes.
+            //m_rightVector = PlayerNetworkedData.RightVector;
+            //m_rotationVector = PlayerNetworkedData.RotationVector;
+            //m_forwardVector = PlayerNetworkedData.ForwardVector;
+            //m_jumpButtonIsPressed = PlayerNetworkedData.JumpButtonIsPressed;
+            //m_kneelButtonIsPressed = PlayerNetworkedData.KneelButtonIsPressed;
+            #endregion
 
             if (!m_playerNetworkController.m_isDead)
             {
@@ -557,7 +569,7 @@ namespace PlayerInputManagement
         ///// <param name="_callbackContext"></param>
         //private void CharacterJump(InputAction.CallbackContext _callbackContext)
         //{
-        //    //if (m_coyoteTimeCounter > 0 && PlayerNetworkData.JumpButtonIsPressed) //Original: if (m_jumpButtonIsPressed && m_playerIsGrounded)
+        //    //if (m_coyoteTimeCounter > 0 && PlayerNetworkedData.JumpButtonIsPressed) //Original: if (m_jumpButtonIsPressed && m_playerIsGrounded)
         //    //{
         //    //    m_playerNetworkController.m_rigidbody.AddForce(Vector3.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
         //    //}
@@ -591,7 +603,7 @@ namespace PlayerInputManagement
         #endregion
 
         /// <summary>
-        /// Received PlayerInput-Data via 'PlayerNetworkData' and Photon.
+        /// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
         /// </summary>
         /// <param name="data"></param>
         internal void SetInputData(PlayerNetworkData data)

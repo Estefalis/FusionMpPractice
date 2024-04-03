@@ -78,19 +78,10 @@ namespace PlayerInputManagement
             }
         }
 
-        public override void Spawned()
-        {
-            if (Object.HasInputAuthority)
-            {
-                Runner.AddCallbacks(this);
-            }
-        }
-
         private void Update()
         {
+            SubmitInputToPhoton();  //Sends Input to Photon via the 'SetNetworkVectors()' method.
             SubmitCameraRotation();
-
-            SubmitInputToPhoton();
         }
 
         #region Custom Methods
@@ -221,7 +212,7 @@ namespace PlayerInputManagement
                 }
                 case PlayerPersPective.FirstPerson:
                 {
-                    m_playerNetworkController.m_eMoveMethod = EmoveMethod.ADRotateY;   //TODO: Change to 'MouseRotateY'
+                    m_playerNetworkController.m_eMoveMethod = EmoveMethod.ADRotateY;
                     break;
                 }
             }
@@ -291,6 +282,14 @@ namespace PlayerInputManagement
         #endregion
 
         #region INetworkRunnerCallbacks
+        public override void Spawned()
+        {
+            if (Object.HasInputAuthority)
+            {
+                Runner.AddCallbacks(this);
+            }
+        }
+
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
             var inputData = new PlayerNetworkData()

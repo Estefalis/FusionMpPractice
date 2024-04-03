@@ -26,7 +26,7 @@ namespace PlayerInputManagement
 
         //public void OnInput(NetworkRunner runner, NetworkInput input)
         //{
-        //    var inputData = new PlayerNetworkData()
+        //    var inputData = new PlayerNetworkedData()
         //    {
         //        ForwardVector = ForwardMovement,
         //        RightVector = SidewardMovement,

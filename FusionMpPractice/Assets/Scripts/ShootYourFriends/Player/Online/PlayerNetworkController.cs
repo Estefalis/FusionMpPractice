@@ -28,7 +28,7 @@ namespace PlayerInputManagement
         #endregion
 
         #region Network
-        [Networked] private PlayerNetworkData PlayerNetworkData { get; set; }
+        [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote player receive the correct input data to move their avatars.
         #endregion
 
         private void Awake()
@@ -38,7 +38,7 @@ namespace PlayerInputManagement
 
         public override void Spawned()
         {
-            if (Object.HasInputAuthority/* || Runner.LocalPlayer.IsValid*/)
+            if (Object.HasInputAuthority)
             {
                 m_localInputParent.SetActive(true);
             }
@@ -51,15 +51,15 @@ namespace PlayerInputManagement
 
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out PlayerNetworkData inputData))      //Equals Player.cs CarInputData in Guide.
+            if (GetInput(out PlayerNetworkData networkedInputData))      //Equals Player.cs CarInputData in Guide.
             {
                 //var PlayerRefStruct = Runner.LocalPlayer;
                 //var PlayerRefId = PlayerRefStruct.PlayerId;
-                //var isPlayerIndexValid = PlayerRefStruct.IsValid;
-                PlayerNetworkData = inputData;
+                //var isPlayerIndexValid = PlayerRefStruct.IsValid; //Runner.LocalPlayer.IsValid.
+                PlayerNetworkedData = networkedInputData;
             }
 
-            m_playerNetworkMovement.SetInputData(PlayerNetworkData);
+            m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
         }
     }
 }
