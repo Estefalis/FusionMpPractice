@@ -26,13 +26,16 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
         {
             int randomSpawnPosition = Random.Range(0, m_spawnPointsArray.Length);
 
-            foreach (Transform transform in m_spawnPointsList)
+            foreach (Transform takenTransform in m_spawnPointsList) //SaveList for randomed PlayerSpawns.
             {
-                if (m_spawnPointsArray[randomSpawnPosition].position == transform.position)
+                //'+= 1' on 'randomSpawnPosition', if previously randomed SpawnPoints are already in use, to prevent PlayerSpawns on the same Position.
+                if (m_spawnPointsArray[randomSpawnPosition].position == takenTransform.position)
                     randomSpawnPosition += 1 % m_spawnPointsArray.Length;
             }
 
+            //_playerRef sets (Has)InputAuthority over the spawned Object.
             var playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
+            //Add the used/randomed Position to the runtime SpawnPointList.
             m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
             m_players.Add(_playerRef, playerObject);     //Version 2
         }

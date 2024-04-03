@@ -38,7 +38,7 @@ namespace PlayerInputManagement
 
         public override void Spawned()
         {
-            if (Object.HasInputAuthority)
+            if (Object.HasInputAuthority/* || Runner.LocalPlayer.IsValid*/)
             {
                 m_localInputParent.SetActive(true);
             }
@@ -53,6 +53,9 @@ namespace PlayerInputManagement
         {
             if (GetInput(out PlayerNetworkData inputData))      //Equals Player.cs CarInputData in Guide.
             {
+                //var PlayerRefStruct = Runner.LocalPlayer;
+                //var PlayerRefId = PlayerRefStruct.PlayerId;
+                //var isPlayerIndexValid = PlayerRefStruct.IsValid;
                 PlayerNetworkData = inputData;
             }
 

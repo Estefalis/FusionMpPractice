@@ -583,7 +583,7 @@ namespace PlayerInputManagement
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
         {
-            if (Runner.ProvideInput && Object.HasInputAuthority)
+            if (Object.HasInputAuthority)
                 //Whenever the m_groundCheckTransform.position gets ReSetted, it has to be the same position as the moving Rigidbody!
                 m_groundCheckTransform.position = m_rigidbody.position;
         }
