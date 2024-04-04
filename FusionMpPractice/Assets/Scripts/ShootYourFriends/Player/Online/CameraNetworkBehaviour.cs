@@ -229,7 +229,7 @@ namespace CameraManagement
                     }
                     case true:
                     {
-                        switch (m_playerNetworkController.m_eCurrentMoveMode)
+                        switch (m_playerNetworkController.m_eRuntimeMoveMode)
                         {
                             case EOnFootTargetMoveModi.Crouching:
                             {

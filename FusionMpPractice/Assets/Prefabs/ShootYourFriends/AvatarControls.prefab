@@ -2384,6 +2384,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   m_playerNetworkController: {fileID: 0}
   m_capsuleCollider: {fileID: 4843338617716511901}
+  m_rigidbodyParent: {fileID: 1834837076352606268}
   m_walkSpeed: 5
   m_runSpeed: 7.5
   m_crouchSpeed: 2.5

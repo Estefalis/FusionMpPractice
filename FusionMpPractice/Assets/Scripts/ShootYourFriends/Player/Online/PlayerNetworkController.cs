@@ -15,7 +15,7 @@ namespace PlayerInputManagement
         [SerializeField] internal PlayerNetworkInteractions m_playerNetworkInteractions;
         [SerializeField] internal PlayerNetworkHealth m_playerNetworkHealth;
         [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkController;
-        [SerializeField] internal EOnFootTargetMoveModi m_eCurrentMoveMode;
+        [SerializeField] internal EOnFootTargetMoveModi m_eRuntimeMoveMode;
         [SerializeField] internal EmoveMethod m_eMoveMethod;
 
         #region Runtime-Values
@@ -33,7 +33,7 @@ namespace PlayerInputManagement
 
         private void Awake()
         {
-            m_eCurrentMoveMode = EOnFootTargetMoveModi.Walking;
+            m_eRuntimeMoveMode = EOnFootTargetMoveModi.Walking;
         }
 
         public override void Spawned()

@@ -1,18 +1,30 @@
 using Fusion;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft   //Just a different name for NetworkSpawnerController in Guide.
 {
+    [SerializeField] private TextMeshProUGUI m_roomCodeText;
     [SerializeField] private NetworkPrefabRef m_playerNetworkPrefab;
     [SerializeField] private Transform[] m_spawnPointsArray;
     private List<Transform> m_spawnPointsList;
 
     private Dictionary<PlayerRef, NetworkObject> m_players = new();   //Version 2
 
+    private NetworkManager m_networkManager;
+
     private void Awake()
     {
         m_spawnPointsList = new List<Transform>();
+        m_networkManager = FindObjectOfType<NetworkManager>();
+
+        if (m_roomCodeText != null)
+        {
+            m_roomCodeText.text = string.Empty;
+            string sessionCode = m_networkManager.DevRoomCode;
+            m_roomCodeText.text = sessionCode;
+        }
     }
 
     public void PlayerJoined(PlayerRef _playerRef)

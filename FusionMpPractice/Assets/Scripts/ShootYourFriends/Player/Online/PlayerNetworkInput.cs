@@ -24,6 +24,8 @@ namespace PlayerInputManagement
         internal bool KneelButtonGotPressed;
         #endregion
 
+        private EmoveMethod m_ePreviousMoveMethod;
+
         private void OnDisable()
         {
             if (transform.gameObject.activeInHierarchy)
@@ -114,8 +116,9 @@ namespace PlayerInputManagement
                 }
                 case EmoveMethod.MouseRotateY:
                 {
+                    //Alternate 'm_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x' with 0.0f, if Player shall not move sideways without a mouseClick here and in 'PlayerNetworkMovement.cs MoveRigidBodyMouseY'.
                     m_horizontalMovement =
-                            new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);     //W & S
+                            new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);     //W & S
                     m_characterRotation =
                         new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0.0f);
                     //MouseX Rot Y
@@ -176,46 +179,35 @@ namespace PlayerInputManagement
         #region Character Jump
         private void CharacterJump(InputAction.CallbackContext _callbackContext)
         {
-            NetworkJumpButtonState(_callbackContext.ReadValueAsButton());
+            JumpButtonGotPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
-            NetworkJumpButtonState(_callbackContext.ReadValueAsButton());
+            JumpButtonGotPressed = _callbackContext.ReadValueAsButton();
         }
         #endregion
         #region Ducking
         private void CharacterDuck(InputAction.CallbackContext _callbackContext)
         {
-            NetworkKneelButtonState(/*m_kneelToCrouch = */_callbackContext.ReadValueAsButton());
+            KneelButtonGotPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
         {
-            NetworkKneelButtonState(/*m_kneelToCrouch = */_callbackContext.ReadValueAsButton());
+            KneelButtonGotPressed = _callbackContext.ReadValueAsButton();
         }
         #endregion
         #region Rotation
         private void OnRightMouseButtonDown(InputAction.CallbackContext _callbackContext)
         {
+            m_ePreviousMoveMethod = m_playerNetworkController.m_eMoveMethod;
             m_playerNetworkController.m_eMoveMethod = EmoveMethod.Locked;
         }
 
         private void OnRightMouseButtonUp(InputAction.CallbackContext _callbackContext)
         {
-            switch (m_playerNetworkController.m_cameraNetworkController.m_playerPerspective)
-            {
-                case PlayerPersPective.ThirdPerson:
-                {
-                    m_playerNetworkController.m_eMoveMethod = EmoveMethod.Relative;
-                    break;
-                }
-                case PlayerPersPective.FirstPerson:
-                {
-                    m_playerNetworkController.m_eMoveMethod = EmoveMethod.ADRotateY;
-                    break;
-                }
-            }
+            m_playerNetworkController.m_eMoveMethod = m_ePreviousMoveMethod;
         }
         #endregion
         #region Increasing Acceleration
@@ -268,16 +260,6 @@ namespace PlayerInputManagement
             SidewardMovement = _rightVector;
             RotationMovement = _rotationVector;
             ForwardMovement = _forwardVector;
-        }
-
-        private void NetworkJumpButtonState(bool _jumpButtonIsPressed)
-        {
-            JumpButtonGotPressed = _jumpButtonIsPressed;
-        }
-
-        private void NetworkKneelButtonState(bool _kneelButtonIsPressed)
-        {
-            KneelButtonGotPressed = _kneelButtonIsPressed;
         }
         #endregion
 

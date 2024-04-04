@@ -12,6 +12,7 @@ namespace PlayerInputManagement
         [SerializeField] internal CapsuleCollider m_capsuleCollider;
 
         #region MoveCharacter-Variables
+        #region Movement
         [Header("Movement")]
         [SerializeField] internal float m_walkSpeed = 5.0f;
         [SerializeField] internal float m_runSpeed = 10.0f;
@@ -20,15 +21,21 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_jumpForce = 3.0f;
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
+        internal bool m_canJumpAgain; //m_canJumpAgain must be true, to enable jump on first JumpButtonPress.
+        internal bool m_switchMoveMethod = false;
+        private Transform m_rigidbodyTransform;
+        #endregion
+
+        #region Rotation
+        [Header("Rotation")]
         [SerializeField] private float m_smoothRotationTime = 15.0f;
         [SerializeField] private float m_quaternionRotTime = 300.0f;
         [SerializeField, Range(0.5f, 1.0f)] private float m_aDRotYReduction = 0.85f;
         [SerializeField, Range(0.001f, 0.5f)] private float m_mouseRotYReduction = 0.1f;
         /*[SerializeField] */
-        internal bool m_canJumpAgain; //m_canJumpAgain must be true, to enable jump on first JumpButtonPress.
-        internal bool m_switchMoveMethod = false;
         float m_mathfSmoothValue;
         private Quaternion m_targetRotation;
+        #endregion
 
         #region Acceleration
         [Header("Acceleration")]
@@ -109,14 +116,13 @@ namespace PlayerInputManagement
         private void Awake()
         {
             m_rigidbody = GetComponentInChildren<Rigidbody>();
-
+            m_rigidbodyTransform = m_rigidbody.transform;
             m_startPosition = transform.position;
         }
 
         private void OnDisable()
         {
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Disable();
-            //m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.performed -= CharacterJump;
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed -= CharacterDuck;
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled -= StopDucking;
@@ -126,7 +132,6 @@ namespace PlayerInputManagement
         {
             m_playerNetworkController.m_playerInputActions = InputManager.m_InputManagerActions;
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Enable();
-            //m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed += CharacterDuck;
             m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled += StopDucking;
@@ -147,7 +152,7 @@ namespace PlayerInputManagement
 
             if (transform.position.y < m_playerNetworkController.m_fallLimit)
             {
-                m_rigidbody.transform.position = m_playerNetworkController.m_repopPosition; //AreaFallOffReset
+                m_rigidbodyTransform.position = m_playerNetworkController.m_repopPosition; //AreaFallOffReset
             }
         }
 
@@ -230,12 +235,12 @@ namespace PlayerInputManagement
         private void MoveRigidbodyBasic()
         {
             m_horizontalMovement = new Vector3(PlayerNetworkData.RightVector.x, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_rigidbody.MovePosition(m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);       //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);       //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
             if (m_horizontalMovement != Vector3.zero)
             {
                 m_targetRotation = Quaternion.LookRotation(m_horizontalMovement, Vector3.up);
-                m_targetRotation = Quaternion.RotateTowards(m_rigidbody.transform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+                m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
                 m_rigidbody.MoveRotation(m_targetRotation);
             }
         }
@@ -243,8 +248,8 @@ namespace PlayerInputManagement
         private void MoveRigidbodyAD()
         {
             m_horizontalMovement = new Vector3(0.0f, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_horizontalMovement = m_rigidbody.transform.TransformDirection(m_horizontalMovement);
-            m_rigidbody.MovePosition(m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_horizontalMovement = m_rigidbodyTransform.TransformDirection(m_horizontalMovement);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
             m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkData.RotationVector.y * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
@@ -252,9 +257,10 @@ namespace PlayerInputManagement
 
         private void MoveRigidBodyMouseY()
         {
-            m_horizontalMovement = new Vector3(0.0f, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_horizontalMovement = m_rigidbody.transform.TransformDirection(m_horizontalMovement);
-            m_rigidbody.MovePosition(m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            //ForwardVector twice, to just send m_horizontalMovement once in 'PlayerNetworkInput EmoveMethod.MouseRotateY'.
+            m_horizontalMovement = new Vector3(PlayerNetworkData.ForwardVector.x, 0.0f, PlayerNetworkData.ForwardVector.z);
+            m_horizontalMovement = m_rigidbodyTransform.TransformDirection(m_horizontalMovement);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
             m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkData.RotationVector.y * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
@@ -263,7 +269,7 @@ namespace PlayerInputManagement
         private void MoveRigidbodyRelative()
         {
             m_relativeMoveVector = PlayerNetworkData.RightVector + PlayerNetworkData.ForwardVector;
-            m_rigidbody.MovePosition(m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
             //This if does not allow switching between FirstPerson and ThirdPerson in runtime.
             if (m_relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkController.m_playerPerspective == PlayerPersPective.ThirdPerson ||
@@ -271,17 +277,17 @@ namespace PlayerInputManagement
             {
                 float angle = Mathf.Atan2(m_relativeMoveVector.x, m_relativeMoveVector.z) * Mathf.Rad2Deg;
                 float smoothRotation =
-                    Mathf.SmoothDampAngle(m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
-                m_rigidbody.transform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
+                    Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
+                m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
             }
         }
 
         private void MoveRigidbodyLocked()
         {
             m_horizontalMovement = new Vector3(PlayerNetworkData.RightVector.x, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_horizontalMovement = m_rigidbody.transform.TransformDirection(m_horizontalMovement);
+            m_horizontalMovement = m_rigidbodyTransform.TransformDirection(m_horizontalMovement);
             //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation while being locked?
-            m_rigidbody.MovePosition(m_rigidbody.transform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
         }
 
         private void Jumping()
@@ -289,7 +295,7 @@ namespace PlayerInputManagement
             if (m_coyoteTimeCounter >= 0 && PlayerNetworkData.JumpButtonIsPressed && m_canJumpAgain && m_playerIsGrounded)
             {
                 m_canJumpAgain = false;
-                m_rigidbody.AddForce(Vector3.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
+                m_rigidbody.AddForce(m_rigidbody.transform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
             }
         }
         #endregion
@@ -380,7 +386,7 @@ namespace PlayerInputManagement
                     {
                         case false:
                         {
-                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Idle;
+                            m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Idle;
                             m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                             m_setRunTimeMaxSpeed = m_stopMovementValue;
                             Acceleration(m_deceleRatePerSec);
@@ -388,7 +394,7 @@ namespace PlayerInputManagement
                         }
                         case true:
                         {
-                            m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                            m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
                             m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                             m_setRunTimeMaxSpeed = m_crouchSpeed;
                             Acceleration(m_deceleRatePerSec);
@@ -410,7 +416,7 @@ namespace PlayerInputManagement
                                 case false: //Shift is not pressed and character shall walk.
                                 {
                                     //In case the character shall speed up from walking.
-                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Walking;
+                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Walking;
                                     m_setRunTimeMaxSpeed = m_walkSpeed;
                                     if (m_individualMaxSpeed < m_setRunTimeMaxSpeed)    //current vs. set speed.
                                     {
@@ -426,7 +432,7 @@ namespace PlayerInputManagement
                                 }
                                 case true:  //Shift is not pressed and character shall kneel down from Walking or Running.
                                 {
-                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
                                     m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
                                     Acceleration(m_deceleRatePerSec);
@@ -441,7 +447,7 @@ namespace PlayerInputManagement
                             {
                                 case false: //If Shift IS pressed and the character shall not kneel down, but run.
                                 {
-                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Running;
+                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Running;
                                     m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
                                     m_setRunTimeMaxSpeed = m_runSpeed;
                                     Acceleration(m_acceleRatePerSec);
@@ -449,7 +455,7 @@ namespace PlayerInputManagement
                                 }
                                 case true:  //If Shift IS pressed and the character shall kneel down.
                                 {
-                                    m_playerNetworkController.m_eCurrentMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
                                     m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
                                     Acceleration(m_deceleRatePerSec);
@@ -467,7 +473,7 @@ namespace PlayerInputManagement
 
         private void Acceleration(float _sentDeAccelerationRate)
         {
-            switch (m_playerNetworkController.m_eCurrentMoveMode)
+            switch (m_playerNetworkController.m_eRuntimeMoveMode)
             {
                 case EOnFootTargetMoveModi.Walking:
                 {
@@ -563,18 +569,6 @@ namespace PlayerInputManagement
         #endregion
         #region CallbackContexts
         #region Character Jump
-        ///// <summary>
-        ///// Moved into 'FixedUpdateNetwork'
-        ///// </summary>
-        ///// <param name="_callbackContext"></param>
-        //private void CharacterJump(InputAction.CallbackContext _callbackContext)
-        //{
-        //    //if (m_coyoteTimeCounter > 0 && PlayerNetworkedData.JumpButtonIsPressed) //Original: if (m_jumpButtonIsPressed && m_playerIsGrounded)
-        //    //{
-        //    //    m_playerNetworkController.m_rigidbody.AddForce(Vector3.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
-        //    //}
-        //}
-
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
             m_canJumpAgain = true;  //Move to Network on not?
