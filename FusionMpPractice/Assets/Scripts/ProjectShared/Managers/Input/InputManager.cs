@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 internal enum PlayerPersPective
 {
     FirstPerson,
-    ThirdPerson
+    ThirdPerson,
+    //whatever comes next into my mind.
 }
 
 internal enum EOnFootTargetMoveModi
@@ -20,10 +21,10 @@ internal enum EOnFootTargetMoveModi
 internal enum EmoveMethod
 {
     Basic,
-    ADRotateY,
+    KbRotateY,
     MouseRotateY,
+    Locked,
     Relative,
-    Locked
 }
 
 namespace PlayerInputManagement

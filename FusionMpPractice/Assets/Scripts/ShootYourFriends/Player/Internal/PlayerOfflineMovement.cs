@@ -151,7 +151,7 @@ namespace PlayerInputManagement
                         MoveRigidbodyBasic();
                         break;
                     }
-                    case EmoveMethod.ADRotateY:
+                    case EmoveMethod.KbRotateY:
                     {
                         MoveRigidbodyADY();
                         break;

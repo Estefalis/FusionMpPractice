@@ -104,13 +104,9 @@ namespace PlayerInputManagement
         #endregion
 
         #region Network
-        private Vector3 m_horizontalMovement, m_relativeMoveVector;
-        #region Additional Variables to replace Vectors and bools within the 'MoveRigidbody' methods for testing purposes.
-        //private Vector3 m_rightVector, m_rotationVector, m_forwardVector;
-        //private bool m_jumpButtonIsPressed, m_kneelButtonIsPressed;
-        #endregion
+        private Vector3 m_moveDirection, m_relativeMoveVector;
         private Quaternion m_quatDeltaRot;
-        [Networked] private PlayerNetworkData PlayerNetworkData { get; set; }
+        [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }
         #endregion
 
         private void Awake()
@@ -160,14 +156,6 @@ namespace PlayerInputManagement
         {
             base.FixedUpdateNetwork();
 
-            #region Remove 'PlayerNetworkData.Vectors' in the 'MoveRigidbody' methods with these for testing purposes.
-            //m_rightVector = PlayerNetworkedData.RightVector;
-            //m_rotationVector = PlayerNetworkedData.RotationVector;
-            //m_forwardVector = PlayerNetworkedData.ForwardVector;
-            //m_jumpButtonIsPressed = PlayerNetworkedData.JumpButtonIsPressed;
-            //m_kneelButtonIsPressed = PlayerNetworkedData.KneelButtonIsPressed;
-            #endregion
-
             if (!m_playerNetworkController.m_isDead)
             {
                 //simple Groundcheck without Arrays of hitted objects or memory allocation.
@@ -181,9 +169,9 @@ namespace PlayerInputManagement
                         MoveRigidbodyBasic();
                         break;
                     }
-                    case EmoveMethod.ADRotateY:
+                    case EmoveMethod.KbRotateY:
                     {
-                        MoveRigidbodyAD();
+                        MoveRigidbodyKbY();
                         break;
                     }
                     case EmoveMethod.MouseRotateY:
@@ -191,14 +179,14 @@ namespace PlayerInputManagement
                         MoveRigidBodyMouseY();
                         break;
                     }
-                    case EmoveMethod.Relative:
-                    {
-                        MoveRigidbodyRelative();
-                        break;
-                    }
                     case EmoveMethod.Locked:
                     {
                         MoveRigidbodyLocked();
+                        break;
+                    }
+                    case EmoveMethod.Relative:
+                    {
+                        MoveRigidbodyRelative();
                         break;
                     }
                 }
@@ -234,41 +222,69 @@ namespace PlayerInputManagement
         #region MoveRigidbody Alternatives
         private void MoveRigidbodyBasic()
         {
-            m_horizontalMovement = new Vector3(PlayerNetworkData.RightVector.x, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);       //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);       //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
-            if (m_horizontalMovement != Vector3.zero)
+            if (m_moveDirection != Vector3.zero)
             {
-                m_targetRotation = Quaternion.LookRotation(m_horizontalMovement, Vector3.up);
+                m_targetRotation = Quaternion.LookRotation(m_moveDirection, Vector3.up);
                 m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
                 m_rigidbody.MoveRotation(m_targetRotation);
             }
         }
 
-        private void MoveRigidbodyAD()
+        private void MoveRigidbodyKbY()
         {
-            m_horizontalMovement = new Vector3(0.0f, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_horizontalMovement = m_rigidbodyTransform.TransformDirection(m_horizontalMovement);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_moveDirection = new Vector3(0.0f, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
-            m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkData.RotationVector.y * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
         }
 
         private void MoveRigidBodyMouseY()
         {
-            //ForwardVector twice, to just send m_horizontalMovement once in 'PlayerNetworkInput EmoveMethod.MouseRotateY'.
-            m_horizontalMovement = new Vector3(PlayerNetworkData.ForwardVector.x, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_horizontalMovement = m_rigidbodyTransform.TransformDirection(m_horizontalMovement);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            //ForwardVector twice, to just send m_moveDirection once in 'PlayerNetworkInput EmoveMethod.MouseRotateY'.
+            m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
-            m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkData.RotationVector.y * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
+        }
+
+        private void MoveRigidbodyLocked()
+        {
+            m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
+            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation while being locked?
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
         }
 
         private void MoveRigidbodyRelative()
         {
-            m_relativeMoveVector = PlayerNetworkData.RightVector + PlayerNetworkData.ForwardVector;
+            #region Use of custom RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
+            //Vector3 fakecameraForward = m_playerNetworkController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
+            //Vector3 cameraRight = m_playerNetworkController.m_cameraOfflineBehaviour.m_camera.transform.right;
+            ////cameraForward = cameraForward.normalized;
+            //cameraRight.y = 0;    //prevents characterJumps.
+            //cameraRight = cameraRight.normalized;
+            //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            #endregion
+
+            Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkController.m_camera.transform.forward;
+            Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkController.m_camera.transform.right;
+            cameraForward.y = 0.0f;   //prevents characterJumps.
+            cameraRight.y = 0.0f;    //prevents characterJumps.
+            cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+            cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+
+            Vector3 relativeRightVector = PlayerNetworkedData.MoveDirection.x * cameraRight;
+            Vector3 relativeForwardVector = PlayerNetworkedData.MoveDirection.z * cameraForward;
+
+            m_relativeMoveVector = relativeRightVector + relativeForwardVector;
+
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
 
             //This if does not allow switching between FirstPerson and ThirdPerson in runtime.
@@ -282,17 +298,9 @@ namespace PlayerInputManagement
             }
         }
 
-        private void MoveRigidbodyLocked()
-        {
-            m_horizontalMovement = new Vector3(PlayerNetworkData.RightVector.x, 0.0f, PlayerNetworkData.ForwardVector.z);
-            m_horizontalMovement = m_rigidbodyTransform.TransformDirection(m_horizontalMovement);
-            //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation while being locked?
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_horizontalMovement.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
-        }
-
         private void Jumping()
         {
-            if (m_coyoteTimeCounter >= 0 && PlayerNetworkData.JumpButtonIsPressed && m_canJumpAgain && m_playerIsGrounded)
+            if (m_coyoteTimeCounter >= 0 && PlayerNetworkedData.JumpButtonIsPressed && m_canJumpAgain && m_playerIsGrounded)
             {
                 m_canJumpAgain = false;
                 m_rigidbody.AddForce(m_rigidbody.transform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
@@ -335,7 +343,7 @@ namespace PlayerInputManagement
 
                 SphereCastCheckAbove(); //Locks Player in 'crouch-mode', if obstacles are detected above.
 
-                switch (PlayerNetworkData.KneelButtonIsPressed) //fomor: m_kneelToCrouch.
+                switch (PlayerNetworkedData.KneelButtonIsPressed) //fomor: m_kneelToCrouch.
                 {
                     case false:
                     {
@@ -382,7 +390,7 @@ namespace PlayerInputManagement
                 #region While Movement Buttons are not pressed (WASD, Left Stick).
                 case false: //When no Movement button is pressed.
                 {
-                    switch (PlayerNetworkData.KneelButtonIsPressed) //In case the character shall slow down from Walking or Running.
+                    switch (PlayerNetworkedData.KneelButtonIsPressed) //In case the character shall slow down from Walking or Running.
                     {
                         case false:
                         {
@@ -411,7 +419,7 @@ namespace PlayerInputManagement
                     {
                         case false:             //Shift IS NOT pressed.
                         {
-                            switch (PlayerNetworkData.KneelButtonIsPressed)
+                            switch (PlayerNetworkedData.KneelButtonIsPressed)
                             {
                                 case false: //Shift is not pressed and character shall walk.
                                 {
@@ -443,7 +451,7 @@ namespace PlayerInputManagement
                         }
                         case true:  //Shift IS pressed! <---
                         {
-                            switch (PlayerNetworkData.KneelButtonIsPressed)
+                            switch (PlayerNetworkedData.KneelButtonIsPressed)
                             {
                                 case false: //If Shift IS pressed and the character shall not kneel down, but run.
                                 {
@@ -602,7 +610,7 @@ namespace PlayerInputManagement
         /// <param name="data"></param>
         internal void SetInputData(PlayerNetworkData data)
         {
-            PlayerNetworkData = data;
+            PlayerNetworkedData = data;
         }
     }
 }

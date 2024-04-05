@@ -5,10 +5,7 @@ using UnityEngine;
 [Serializable]
 public struct PlayerNetworkData : INetworkInput
 {
-    //public NetworkButtons NetworkButtons;
-    public Vector3 ForwardVector;
-    public Vector3 RightVector;
-    public Vector3 RotationVector;
+    public Vector3 MoveDirection;
     public bool JumpButtonIsPressed;
     public bool KneelButtonIsPressed;
 }

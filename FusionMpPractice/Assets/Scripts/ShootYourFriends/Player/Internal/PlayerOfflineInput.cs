@@ -91,7 +91,7 @@ namespace PlayerInputManagement
                 }
                 case PlayerPersPective.FirstPerson:
                 {
-                    m_playerOfflineController.m_playerOfflineMovement.m_eMoveMethod = EmoveMethod.ADRotateY;   //TODO: Change to 'MouseRotateY'
+                    m_playerOfflineController.m_playerOfflineMovement.m_eMoveMethod = EmoveMethod.KbRotateY;   //TODO: Change to 'MouseRotateY'
                     break;
                 }
             }

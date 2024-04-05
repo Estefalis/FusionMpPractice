@@ -13,14 +13,10 @@ namespace PlayerInputManagement
     {
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
-        private Vector3 m_horizontalMovement, m_characterRotation;
+        private Vector3 m_rightVector, m_rotationVector, m_forwardVector;   //Building new MoveVector(s) in combination.
 
         #region Network
-        internal Vector3 SidewardMovement;
-        internal Vector3 ForwardMovement;
-        internal Vector3 RotationMovement;
         internal bool JumpButtonGotPressed;
-        internal bool JumpButtonGotReleased;
         internal bool KneelButtonGotPressed;
         #endregion
 
@@ -83,11 +79,11 @@ namespace PlayerInputManagement
         private void Update()
         {
             SubmitInputToPhoton();  //Sends Input to Photon via the 'SetNetworkVectors()' method.
-            SubmitCameraRotation();
+            CameraRotation();
         }
 
         #region Custom Methods
-        private void SubmitCameraRotation()
+        private void CameraRotation()
         {
             m_playerNetworkController.m_cameraNetworkController.m_playerInputRotationVector =
                 new Vector3(-m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().y, 0.0f);
@@ -99,62 +95,41 @@ namespace PlayerInputManagement
             {
                 case EmoveMethod.Basic:
                 {
-                    Vector3 forwardVector = new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-                    Vector3 rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, 0.0f);
-                    SetNetworkVectors(rightVector, Vector3.zero, forwardVector);
+                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, 0.0f);
+                    m_rotationVector = Vector3.zero;
+                    m_forwardVector = new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
                     break;
                 }
-                case EmoveMethod.ADRotateY:
+                case EmoveMethod.KbRotateY:
                 {
-                    m_horizontalMovement =
+                    m_rightVector = Vector3.zero;
+                    m_rotationVector =
+                        new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f); //A & D
+                    m_forwardVector =
                             new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);    //W & S
-                    m_characterRotation =
-                        new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f);
-                    //A & D
-                    SetNetworkVectors(Vector3.zero, m_characterRotation, m_horizontalMovement);
                     break;
                 }
                 case EmoveMethod.MouseRotateY:
                 {
-                    //Alternate 'm_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x' with 0.0f, if Player shall not move sideways without a mouseClick here and in 'PlayerNetworkMovement.cs MoveRigidBodyMouseY'.
-                    m_horizontalMovement =
-                            new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);     //W & S
-                    m_characterRotation =
-                        new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0.0f);
-                    //MouseX Rot Y
-                    SetNetworkVectors(Vector3.zero, m_characterRotation, m_horizontalMovement);
-                    break;
-                }
-                case EmoveMethod.Relative:
-                {
-                    #region Use of custom RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-                    //Vector3 fakecameraForward = m_playerNetworkController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
-                    //Vector3 cameraRight = m_playerNetworkController.m_cameraOfflineBehaviour.m_camera.transform.right;
-                    ////cameraForward = cameraForward.normalized;
-                    //cameraRight.y = 0;    //prevents characterJumps.
-                    //cameraRight = cameraRight.normalized;
-                    //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
-                    #endregion
-
-                    Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkController.m_camera.transform.forward;
-                    Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkController.m_camera.transform.right;
-                    cameraForward.y = 0.0f;   //prevents characterJumps.
-                    cameraRight.y = 0.0f;    //prevents characterJumps.
-                    cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-                    cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-                    Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * cameraForward;
-
-                    Vector3 relativeRight = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
-                    SetNetworkVectors(relativeRight, Vector3.zero, relativeForward);
+                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, 0.0f); //A & D
+                    m_rotationVector =
+                        new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0.0f);//MouseX Rot Y
+                    m_forwardVector =
+                            new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y); //W & S
                     break;
                 }
                 case EmoveMethod.Locked:
                 {
-                    m_horizontalMovement = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-
-                    Vector3 forwardVector = new(0, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
-                    Vector3 rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, 0);
-                    SetNetworkVectors(rightVector, Vector3.zero, forwardVector);
+                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, 0);
+                    m_rotationVector = Vector3.zero;
+                    m_forwardVector = new(0, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+                    break;
+                }
+                case EmoveMethod.Relative:
+                {
+                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, 0);
+                    m_rotationVector = Vector3.zero;
+                    m_forwardVector = new(0, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
                     break;
                 }
                 default:
@@ -254,15 +229,6 @@ namespace PlayerInputManagement
         #endregion        
         #endregion
 
-        #region Sets OnInput Variables in PlayerNetworkDataInput for Fusion's NetworkRunner.
-        private void SetNetworkVectors(Vector3 _rightVector, Vector3 _rotationVector, Vector3 _forwardVector)
-        {
-            SidewardMovement = _rightVector;
-            RotationMovement = _rotationVector;
-            ForwardMovement = _forwardVector;
-        }
-        #endregion
-
         #region INetworkRunnerCallbacks
         public override void Spawned()
         {
@@ -276,9 +242,7 @@ namespace PlayerInputManagement
         {
             var inputData = new PlayerNetworkData()
             {
-                ForwardVector = ForwardMovement,
-                RightVector = SidewardMovement,
-                RotationVector = RotationMovement,
+                MoveDirection = new Vector3(m_rightVector.x, m_rotationVector.y, m_forwardVector.z),
                 JumpButtonIsPressed = JumpButtonGotPressed,
                 KneelButtonIsPressed = KneelButtonGotPressed,
             };

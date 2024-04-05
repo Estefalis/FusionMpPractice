@@ -71,6 +71,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    #region Currently unused INetworkRunnerCallbacks
     public void OnConnectedToServer(NetworkRunner runner)
     {
 
@@ -150,4 +151,5 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
 
     }
+    #endregion
 }
