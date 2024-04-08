@@ -1002,8 +1002,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4843338617716511900}
-  m_RootOrder: 0
+  m_Father: {fileID: 8921811409624605843}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4843338617716511896
 GameObject:
@@ -1036,7 +1036,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4843338617071141842}
   - {fileID: 8921811409624605843}
   m_Father: {fileID: 1834837076352606268}
   m_RootOrder: 0
@@ -1998,8 +1997,9 @@ Transform:
   m_Children:
   - {fileID: 3912682720213279601}
   - {fileID: 3926483898514407577}
+  - {fileID: 4843338617071141842}
   m_Father: {fileID: 4843338617716511900}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8921811409882401506
 GameObject:
@@ -2384,7 +2384,6 @@ MonoBehaviour:
   _interpolationDataSource: 0
   m_playerNetworkController: {fileID: 0}
   m_capsuleCollider: {fileID: 4843338617716511901}
-  m_rigidbodyParent: {fileID: 1834837076352606268}
   m_walkSpeed: 5
   m_runSpeed: 7.5
   m_crouchSpeed: 2.5

@@ -21,7 +21,7 @@ namespace PlayerInputManagement
         [SerializeField] internal float m_jumpForce = 3.0f;
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
-        internal bool m_canJumpAgain; //m_canJumpAgain must be true, to enable jump on first JumpButtonPress.
+        internal bool m_canJumpAgain;
         internal bool m_switchMoveMethod = false;
         private Transform m_rigidbodyTransform;
         #endregion
@@ -118,23 +118,29 @@ namespace PlayerInputManagement
 
         private void OnDisable()
         {
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Disable();
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed -= CharacterDuck;
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled -= StopDucking;
+            if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
+            {
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Disable();
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed -= CharacterDuck;
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled -= StopDucking;
+            }
         }
 
         private void Start()
         {
-            m_playerNetworkController.m_playerInputActions = InputManager.m_InputManagerActions;
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Enable();
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed += CharacterDuck;
-            m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled += StopDucking;
+            if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
+            {
+                m_playerNetworkController.m_playerInputActions = InputManager.m_InputManagerActions;
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Enable();
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed += CharacterDuck;
+                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled += StopDucking;
 
-            m_setRunTimeMaxSpeed = 0.0f;
-            m_maxDistanceAbove = m_colliderWalkHeight;
-            m_canJumpAgain = true;
+                m_setRunTimeMaxSpeed = 0.0f;
+                m_maxDistanceAbove = m_colliderWalkHeight;
+                m_canJumpAgain = true;  //Enable local Jump Variable to enable Jump on first Button press. 
+            }
         }
 
         private void Update()
@@ -162,8 +168,10 @@ namespace PlayerInputManagement
                 m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
                 //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
 
+                //Switches between Rigidbody moveMethods.
                 switch (m_playerNetworkController.m_eMoveMethod)
                 {
+                    //Runner.DeltaTime instead of Time.fixedDeltaTime in Movement_Methods.
                     case EmoveMethod.Basic:
                     {
                         MoveRigidbodyBasic();
@@ -203,6 +211,11 @@ namespace PlayerInputManagement
                     case true:
                     {
                         FallDamageCalculationEnd();
+
+                        if (!PlayerNetworkedData.JumpButtonIsPressed && !m_canJumpAgain)
+                        {
+                            m_canJumpAgain = true;
+                        }
                         break;
                     }
                 }
@@ -218,17 +231,25 @@ namespace PlayerInputManagement
             Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereRadius);
         }
 #endif
+        private void Jumping()
+        {
+            if (m_coyoteTimeCounter >= 0 && PlayerNetworkedData.JumpButtonIsPressed && m_canJumpAgain && m_playerIsGrounded)
+            {
+                m_canJumpAgain = false; //local Jump Variable to just apply Addforce ONCE.
+                m_rigidbody.AddForce(m_rigidbody.transform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
+            }
+        }
 
         #region MoveRigidbody Alternatives
         private void MoveRigidbodyBasic()
         {
             m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);       //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             if (m_moveDirection != Vector3.zero)
             {
                 m_targetRotation = Quaternion.LookRotation(m_moveDirection, Vector3.up);
-                m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+                m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);
                 m_rigidbody.MoveRotation(m_targetRotation);
             }
         }
@@ -237,20 +258,21 @@ namespace PlayerInputManagement
         {
             m_moveDirection = new Vector3(0.0f, 0.0f, PlayerNetworkedData.MoveDirection.z);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
-            m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_quatDeltaRot =
+                Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
         }
 
         private void MoveRigidBodyMouseY()
         {
-            //ForwardVector twice, to just send m_moveDirection once in 'PlayerNetworkInput EmoveMethod.MouseRotateY'.
             m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
-            m_quatDeltaRot = Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_quatDeltaRot =
+                Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
         }
 
@@ -259,7 +281,7 @@ namespace PlayerInputManagement
             m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
             //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation while being locked?
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
         }
 
         private void MoveRigidbodyRelative()
@@ -285,7 +307,7 @@ namespace PlayerInputManagement
 
             m_relativeMoveVector = relativeRightVector + relativeForwardVector;
 
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);        //Runner.DeltaTime instead of Time.fixedDeltaTime.
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);
 
             //This if does not allow switching between FirstPerson and ThirdPerson in runtime.
             if (m_relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkController.m_playerPerspective == PlayerPersPective.ThirdPerson ||
@@ -295,15 +317,6 @@ namespace PlayerInputManagement
                 float smoothRotation =
                     Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
                 m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
-            }
-        }
-
-        private void Jumping()
-        {
-            if (m_coyoteTimeCounter >= 0 && PlayerNetworkedData.JumpButtonIsPressed && m_canJumpAgain && m_playerIsGrounded)
-            {
-                m_canJumpAgain = false;
-                m_rigidbody.AddForce(m_rigidbody.transform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
             }
         }
         #endregion
@@ -352,8 +365,7 @@ namespace PlayerInputManagement
                             if (m_crouchTimer < m_kneelTime)
                             {
                                 //Lerp getting up.
-                                m_capsuleCollider.height =
-                                    Mathf.Lerp(m_capsuleCollider.height, m_colliderWalkHeight, countingUp);
+                                m_capsuleCollider.height = Mathf.Lerp(m_capsuleCollider.height, m_colliderWalkHeight, countingUp);
                                 m_crouchTimer += Time.deltaTime;
                             }
                             else
@@ -370,8 +382,7 @@ namespace PlayerInputManagement
                         if (m_crouchTimer < m_kneelTime)
                         {
                             //Lerp kneeling down.
-                            m_capsuleCollider.height =
-                                Mathf.Lerp(m_capsuleCollider.height, m_colliderCrouchHeight, countingUp);
+                            m_capsuleCollider.height = Mathf.Lerp(m_capsuleCollider.height, m_colliderCrouchHeight, countingUp);
                             m_crouchTimer += Time.deltaTime;
                         }
                         else
@@ -579,7 +590,6 @@ namespace PlayerInputManagement
         #region Character Jump
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
-            m_canJumpAgain = true;  //Move to Network on not?
             m_coyoteTimeCounter = 0.0f; //Prevents the player from 'double jumping' on pressing the JumpButton multiple times.
         }
         #endregion
@@ -597,7 +607,7 @@ namespace PlayerInputManagement
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
+            if (Runner.ProvideInput && Object.HasInputAuthority)
                 //Whenever the m_groundCheckTransform.position gets ReSetted, it has to be the same position as the moving Rigidbody!
                 m_groundCheckTransform.position = m_rigidbody.position;
         }

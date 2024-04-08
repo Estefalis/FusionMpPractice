@@ -27,12 +27,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1029575951730720892}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.2}
+  m_LocalPosition: {x: 0, y: 1.215, z: -0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7568545809449321150}
-  m_RootOrder: 1
+  m_Father: {fileID: 3088835047279314435}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &1029575951730720888
 Camera:
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_playerNetworkInteractions: {fileID: 6746356036668741803}
   m_playerNetworkHealth: {fileID: 6746356036668741796}
   m_cameraNetworkController: {fileID: 5310624280472473936}
-  m_eCurrentMoveMode: 0
+  m_eRuntimeMoveMode: 0
   m_eMoveMethod: 1
   m_repopPosition: {x: 0, y: 0, z: 0}
   m_fallLimit: -100
@@ -230,7 +230,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 1.215, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1029575951730720893}
   m_Father: {fileID: 6506880062028815023}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

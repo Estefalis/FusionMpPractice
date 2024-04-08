@@ -105,7 +105,6 @@ namespace CameraManagement
                 }
                 case PlayerPersPective.FirstPerson:
                 {
-                    m_cameraRotateController.position = m_headSetParent.position;
                     break;
                 }
                 default:
@@ -129,7 +128,6 @@ namespace CameraManagement
                 }
                 case PlayerPersPective.FirstPerson:
                 {
-                    //FirstPersonCameraLerp();
                     break;
                 }
                 default:
@@ -156,6 +154,8 @@ namespace CameraManagement
                 }
                 case PlayerPersPective.FirstPerson:
                 {
+                    if (m_camera.transform.parent != transform)
+                        m_camera.gameObject.SetActive(false);
                     //m_camera.transform.SetParent(m_headSetParent, m_keepWorldPos);
                     //min & max - ZoomVariables get switched within the CameraZoom - Method itself.
                     break;
@@ -361,14 +361,6 @@ namespace CameraManagement
 
             m_camera.transform.LookAt(_lookAtTarget);
         }
-
-        //private void FirstPersonCameraLerp()
-        //{
-        //    if (!m_disableCameraRotation)
-        //    {
-        //        //TODO: HeadRotationY with Rigidbody, HeadRotationX with runtimeRotationVector.x from UpdateRotation(). Look at Targeting from YBot?
-        //    }
-        //}
 
         private void ThirdPersonCameraLerp()
         {

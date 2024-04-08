@@ -1,11 +1,11 @@
 using CameraManagement;
 using Fusion;
 using Fusion.Sockets;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Users;        //For InputDeviceChange from the new InputSystem.
+//using UnityEngine.InputSystem.Users;        //For InputDeviceChange from the new InputSystem.
 
 namespace PlayerInputManagement
 {
@@ -13,9 +13,9 @@ namespace PlayerInputManagement
     {
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
-        private Vector3 m_rightVector, m_rotationVector, m_forwardVector;   //Building new MoveVector(s) in combination.
-
+        private float m_rightLocalInput, m_rotationLocalInput, m_forwardLocalInput;   //Building new MoveVector(s) in combination.
         #region Network
+        private Vector3 m_localMoveVector;
         internal bool JumpButtonGotPressed;
         internal bool KneelButtonGotPressed;
         #endregion
@@ -44,7 +44,7 @@ namespace PlayerInputManagement
                 m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed -= OpenMenu;
                 #endregion
 
-                InputUser.onChange -= OnInputDeviceChange;
+                //InputUser.onChange -= OnInputDeviceChange;
             }
         }
 
@@ -52,7 +52,6 @@ namespace PlayerInputManagement
         {
             if (transform.gameObject.activeInHierarchy)
             {
-
                 m_playerNetworkController.m_playerInputActions = InputManager.m_InputManagerActions;
                 m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Enable();
                 #region InputAction-Subscriptions
@@ -72,7 +71,7 @@ namespace PlayerInputManagement
                 m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed += OpenMenu;
                 #endregion
 
-                InputUser.onChange += OnInputDeviceChange;
+                //InputUser.onChange += OnInputDeviceChange; 
             }
         }
 
@@ -95,46 +94,44 @@ namespace PlayerInputManagement
             {
                 case EmoveMethod.Basic:
                 {
-                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, 0.0f);
-                    m_rotationVector = Vector3.zero;
-                    m_forwardVector = new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+                    m_rightLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x;
+                    m_rotationLocalInput = 0.0f;
+                    m_forwardLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y;
                     break;
                 }
                 case EmoveMethod.KbRotateY:
                 {
-                    m_rightVector = Vector3.zero;
-                    m_rotationVector =
-                        new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f); //A & D
-                    m_forwardVector =
-                            new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);    //W & S
+                    m_rightLocalInput = 0.0f;
+                    m_rotationLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x;    //A & D
+                    m_forwardLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y;     //W & S
                     break;
                 }
                 case EmoveMethod.MouseRotateY:
                 {
-                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, 0.0f); //A & D
-                    m_rotationVector =
-                        new Vector3(0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0.0f);//MouseX Rot Y
-                    m_forwardVector =
-                            new(0.0f, 0.0f, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y); //W & S
+                    m_rightLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x;       //A & D
+                    m_rotationLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x;    //MouseX Rot Y
+                    m_forwardLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y;     //W & S
                     break;
                 }
                 case EmoveMethod.Locked:
                 {
-                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, 0);
-                    m_rotationVector = Vector3.zero;
-                    m_forwardVector = new(0, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+                    m_rightLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x;
+                    m_rotationLocalInput = 0.0f;
+                    m_forwardLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y;
                     break;
                 }
                 case EmoveMethod.Relative:
                 {
-                    m_rightVector = new(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0, 0);
-                    m_rotationVector = Vector3.zero;
-                    m_forwardVector = new(0, 0, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+                    m_rightLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x;
+                    m_rotationLocalInput = 0.0f;
+                    m_forwardLocalInput = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y;
                     break;
                 }
                 default:
                     break;
             }
+
+            m_localMoveVector = new Vector3(m_rightLocalInput, m_rotationLocalInput, m_forwardLocalInput);
         }
         #endregion
 
@@ -203,12 +200,12 @@ namespace PlayerInputManagement
 
         }
         #endregion
-        #region InputDeviceChange
-        private void OnInputDeviceChange(InputUser _inputUser, InputUserChange _inputUserChange, InputDevice _inputDevice)
-        {
-            //TODO: Possible Notifications on changing the inpunt device.
-        }
-        #endregion
+        //#region InputDeviceChange
+        //private void OnInputDeviceChange(InputUser _inputUser, InputUserChange _inputUserChange, InputDevice _inputDevice)
+        //{
+        //    //TODO: Possible Notifications on changing the inpunt device.
+        //}
+        //#endregion
         #region Camera Zoom
         private void ZoomCamera(InputAction.CallbackContext _callbackContext)
         {
@@ -240,14 +237,18 @@ namespace PlayerInputManagement
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
+            //if (runner.LocalPlayer.IsValid)
+            //{
             var inputData = new PlayerNetworkData()
             {
-                MoveDirection = new Vector3(m_rightVector.x, m_rotationVector.y, m_forwardVector.z),
+                MoveDirection = m_localMoveVector,
+                //MoveDirection = new Vector3(m_rightLocalInput.x, m_rotationLocalInput.y, m_forwardLocalInput.z),
                 JumpButtonIsPressed = JumpButtonGotPressed,
                 KneelButtonIsPressed = KneelButtonGotPressed,
             };
 
             input.Set(inputData);
+            //}
         }
 
         #region Currently unused INetworkRunnerCallbacks

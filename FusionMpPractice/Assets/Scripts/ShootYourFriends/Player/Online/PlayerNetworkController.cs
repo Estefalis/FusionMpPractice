@@ -45,7 +45,6 @@ namespace PlayerInputManagement
             else
             {
                 m_localInputParent.SetActive(false);
-                m_cameraNetworkController.m_camera.gameObject.SetActive(false);
             }
         }
 
