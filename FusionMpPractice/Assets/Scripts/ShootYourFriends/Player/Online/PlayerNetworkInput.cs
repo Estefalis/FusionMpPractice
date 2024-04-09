@@ -242,7 +242,7 @@ namespace PlayerInputManagement
             var inputData = new PlayerNetworkData()
             {
                 MoveDirection = m_localMoveVector,
-                //MoveDirection = new Vector3(m_rightLocalInput.x, m_rotationLocalInput.y, m_forwardLocalInput.z),
+                //MoveDirection = new Vector3(m_rightLocalInput, m_rotationLocalInput, m_forwardLocalInput),
                 JumpButtonIsPressed = JumpButtonGotPressed,
                 KneelButtonIsPressed = KneelButtonGotPressed,
             };
