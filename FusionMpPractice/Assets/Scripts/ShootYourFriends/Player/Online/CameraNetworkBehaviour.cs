@@ -1,7 +1,7 @@
-using PlayerInputManagement;
 using UnityEngine;
 
-namespace CameraManagement
+namespace PlayerInputManagement
+
 {
     public class CameraNetworkBehaviour : MonoBehaviour
     {

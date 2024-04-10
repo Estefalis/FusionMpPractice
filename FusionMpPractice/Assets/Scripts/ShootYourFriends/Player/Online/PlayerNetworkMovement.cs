@@ -147,6 +147,10 @@ namespace PlayerInputManagement
         {
             if (!m_playerNetworkController.m_isDead)
             {
+                //simple Groundcheck without Arrays of hitted objects or memory allocation.
+                m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
+                //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
+                
                 CoyoteTimerReSet();
                 Crouching();
                 MoveAcceleration();
@@ -164,10 +168,6 @@ namespace PlayerInputManagement
 
             if (!m_playerNetworkController.m_isDead)
             {
-                //simple Groundcheck without Arrays of hitted objects or memory allocation.
-                m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
-                //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
-
                 //Switches between Rigidbody moveMethods.
                 switch (m_playerNetworkController.m_eMoveMethod)
                 {
@@ -596,7 +596,7 @@ namespace PlayerInputManagement
         #region Ducking
         private void CharacterDuck(InputAction.CallbackContext _callbackContext)
         {
-            if (Runner.ProvideInput && Object.HasInputAuthority)
+            if (/*Runner.ProvideInput && */Object.HasInputAuthority)
             {
                 m_crouchTimer = 0;
 

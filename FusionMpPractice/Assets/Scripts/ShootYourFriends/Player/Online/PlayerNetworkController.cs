@@ -1,4 +1,3 @@
-using CameraManagement;
 using Fusion;
 using UnityEngine;
 
@@ -9,7 +8,7 @@ namespace PlayerInputManagement
         internal PlayerInputActions m_playerInputActions;
 
         [SerializeField] private GameObject m_localInputParent;
-        
+
         [SerializeField] internal PlayerNetworkInput m_playerNetworkInput;
         [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;        //Equals SimpleCarController in Guide.
         [SerializeField] internal PlayerNetworkInteractions m_playerNetworkInteractions;
@@ -52,9 +51,6 @@ namespace PlayerInputManagement
         {
             if (GetInput(out PlayerNetworkData networkedInputData))      //Equals Player.cs CarInputData in Guide.
             {
-                //var PlayerRefStruct = Runner.LocalPlayer;
-                //var PlayerRefId = PlayerRefStruct.PlayerId;
-                //var isPlayerIndexValid = PlayerRefStruct.IsValid; //Runner.LocalPlayer.IsValid.
                 PlayerNetworkedData = networkedInputData;
             }
 
@@ -62,3 +58,6 @@ namespace PlayerInputManagement
         }
     }
 }
+//var PlayerRefStruct = Runner.LocalPlayer;
+//var PlayerRefId = PlayerRefStruct.PlayerId;
+//var isPlayerIndexValid = PlayerRefStruct.IsValid; //Runner.LocalPlayer.IsValid.

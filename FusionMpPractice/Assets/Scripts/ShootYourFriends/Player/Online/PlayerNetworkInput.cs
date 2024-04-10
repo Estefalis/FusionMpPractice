@@ -14,6 +14,7 @@ namespace PlayerInputManagement
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
         private float m_rightLocalInput, m_rotationLocalInput, m_forwardLocalInput;   //Building new MoveVector(s) in combination.
+        //private float m_onInputRight, m_onInputRotation, m_onInputForward;
         #region Network
         private Vector3 m_localMoveVector;
         internal bool JumpButtonGotPressed;
@@ -77,7 +78,7 @@ namespace PlayerInputManagement
 
         private void Update()
         {
-            SubmitInputToPhoton();  //Sends Input to Photon via the 'SetNetworkVectors()' method.
+            RetrieveUserInput();  //Sends Input to Photon via the 'SetNetworkVectors()' method.
             CameraRotation();
         }
 
@@ -88,7 +89,7 @@ namespace PlayerInputManagement
                 new Vector3(-m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().y, 0.0f);
         }
 
-        private void SubmitInputToPhoton()
+        private void RetrieveUserInput()
         {
             switch (m_playerNetworkController.m_eMoveMethod)
             {
@@ -237,12 +238,17 @@ namespace PlayerInputManagement
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
+            //m_onInputRight = m_rightLocalInput;
+            //m_onInputRotation = m_rotationLocalInput;
+            //m_onInputForward = m_forwardLocalInput;
+
             //if (runner.LocalPlayer.IsValid)
             //{
             var inputData = new PlayerNetworkData()
             {
                 MoveDirection = m_localMoveVector,
                 //MoveDirection = new Vector3(m_rightLocalInput, m_rotationLocalInput, m_forwardLocalInput),
+                //MoveDirection = new Vector3(m_onInputRight, m_onInputRotation, m_onInputForward),
                 JumpButtonIsPressed = JumpButtonGotPressed,
                 KneelButtonIsPressed = KneelButtonGotPressed,
             };
