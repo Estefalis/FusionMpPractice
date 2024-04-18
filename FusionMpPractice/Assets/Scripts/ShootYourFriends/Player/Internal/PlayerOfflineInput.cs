@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
     public class PlayerOfflineInput : MonoBehaviour
     {
@@ -11,18 +11,18 @@ namespace PlayerInputManagement
         private void Start()
         {
             m_playerOfflineController.m_playerInputActions = InputManager.m_InputManagerActions;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Enable();
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Enable();
             #region InputAction-Subscriptions
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.performed += MoveCharacter;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.canceled += StopMovement;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed += OnRightMouseButtonDown;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled += OnRightMouseButtonUp;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.performed += AccelerateMovespeed;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.canceled += DecelerateMovespeed;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed += SwitchCursorLockMode;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CameraZoom.performed += ZoomCamera;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CameraZoom.canceled += StopCameraZoom;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed += OpenMenu;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.performed += MoveCharacter;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.canceled += StopMovement;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.SwitchMoveMode.performed += OnRightMouseButtonDown;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.SwitchMoveMode.canceled += OnRightMouseButtonUp;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Acceleration.performed += AccelerateMovespeed;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Acceleration.canceled += DecelerateMovespeed;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CursorLockMode.performed += SwitchCursorLockMode;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.OpenMenu.performed += OpenMenu;
             #endregion
 
             InputUser.onChange += OnInputDeviceChange;
@@ -30,18 +30,18 @@ namespace PlayerInputManagement
 
         private void OnDisable()
         {
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Disable();
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Disable();
             #region InputAction-UnSubscriptions
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.performed -= MoveCharacter;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.canceled -= StopMovement;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.performed -= OnRightMouseButtonDown;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.SwitchMoveMode.canceled -= OnRightMouseButtonUp;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.performed -= AccelerateMovespeed;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Acceleration.canceled -= DecelerateMovespeed;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CursorLockMode.performed -= SwitchCursorLockMode;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CameraZoom.performed -= ZoomCamera;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.CameraZoom.canceled -= StopCameraZoom;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.OpenMenu.performed -= OpenMenu;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.performed -= MoveCharacter;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.canceled -= StopMovement;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.SwitchMoveMode.performed -= OnRightMouseButtonDown;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.SwitchMoveMode.canceled -= OnRightMouseButtonUp;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Acceleration.performed -= AccelerateMovespeed;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Acceleration.canceled -= DecelerateMovespeed;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CursorLockMode.performed -= SwitchCursorLockMode;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.OpenMenu.performed -= OpenMenu;
             #endregion
 
             InputUser.onChange -= OnInputDeviceChange;
@@ -58,7 +58,7 @@ namespace PlayerInputManagement
         {
             //if(m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.inProgress)
             m_playerOfflineController.m_cameraOfflineBehaviour.m_playerInputRotationVector =
-                new Vector3(-m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().y, 0.0f);
+                new Vector3(-m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().x, m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().y, 0.0f);
         }
 
         #region CallbackContexts        
@@ -89,11 +89,8 @@ namespace PlayerInputManagement
                     m_playerOfflineController.m_playerOfflineMovement.m_eMoveMethod = EmoveMethod.Relative;
                     break;
                 }
-                case PlayerPersPective.FirstPerson:
-                {
-                    m_playerOfflineController.m_playerOfflineMovement.m_eMoveMethod = EmoveMethod.KbRotateY;   //TODO: Change to 'MouseRotateY'
+                default:
                     break;
-                }
             }
         }
         #endregion        

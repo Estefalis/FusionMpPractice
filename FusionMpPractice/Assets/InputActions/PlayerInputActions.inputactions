@@ -2,7 +2,7 @@
     "name": "PlayerInputActions",
     "maps": [
         {
-            "name": "PlayerOnFootRH",
+            "name": "PlayerOnFoot",
             "id": "87a4940e-19dd-4b33-af22-4770d81f8cf4",
             "actions": [
                 {
@@ -24,13 +24,22 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "SwitchMoveMode",
-                    "type": "Button",
-                    "id": "d27bd797-7532-422b-9cc2-b9bcb7d56439",
-                    "expectedControlType": "Button",
+                    "name": "CameraRotation",
+                    "type": "Value",
+                    "id": "609f6b9c-896b-484e-b839-5adfe784b544",
+                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "CameraZoom",
+                    "type": "Value",
+                    "id": "5e95e7aa-5003-43d6-9486-b875ef4aaa9e",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Jump",
@@ -60,6 +69,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "SwitchMoveMode",
+                    "type": "Button",
+                    "id": "d27bd797-7532-422b-9cc2-b9bcb7d56439",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "OpenMenu",
                     "type": "Button",
                     "id": "c3069b14-60b6-4fcc-bb46-c1d80ca04829",
@@ -76,24 +94,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "CameraZoom",
-                    "type": "Value",
-                    "id": "5e95e7aa-5003-43d6-9486-b875ef4aaa9e",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "CameraRotation",
-                    "type": "Value",
-                    "id": "609f6b9c-896b-484e-b839-5adfe784b544",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -153,37 +153,59 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "247dee5d-afb3-474c-85ff-d452fb31eac7",
-                    "path": "<Gamepad>/leftStick",
+                    "name": "LeftStick",
+                    "id": "fb9f2fec-d05c-4a7f-99b0-669e844e9482",
+                    "path": "2DVector(mode=2)",
                     "interactions": "",
-                    "processors": "StickDeadzone",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "291e372e-f43e-4b9b-9d32-f01fac9f2359",
+                    "path": "<Gamepad>/leftStick/up",
+                    "interactions": "",
+                    "processors": "",
                     "groups": "UniversalController",
                     "action": "Movement",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "f10a55c0-6e68-4260-b74f-307c5ecad8ee",
-                    "path": "<DualShockGamepad>/leftStick",
+                    "name": "down",
+                    "id": "b198e59c-447a-4354-b7bc-2e30805a6728",
+                    "path": "<Gamepad>/leftStick/down",
                     "interactions": "",
                     "processors": "",
-                    "groups": "PlaystationController",
+                    "groups": "UniversalController",
                     "action": "Movement",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "9b2189e4-5c57-4f0d-999e-c390787d7977",
-                    "path": "<XInputController>/leftStick",
+                    "name": "left",
+                    "id": "6b738156-479f-452a-9d2b-2741c7ce4850",
+                    "path": "<Gamepad>/leftStick/left",
                     "interactions": "",
                     "processors": "",
-                    "groups": "XBoxController",
+                    "groups": "UniversalController",
                     "action": "Movement",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "a65c2869-b5d9-4913-8e9a-681528d452e5",
+                    "path": "<Gamepad>/leftStick/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "UniversalController",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
@@ -203,28 +225,6 @@
                     "interactions": "",
                     "processors": "StickDeadzone",
                     "groups": "UniversalController",
-                    "action": "Rotation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "301c624e-7664-4d22-a3f7-075de986e950",
-                    "path": "<DualShockGamepad>/rightStick",
-                    "interactions": "",
-                    "processors": "StickDeadzone",
-                    "groups": "PlaystationController",
-                    "action": "Rotation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f4879f2d-1acb-402c-a7d3-aa5258660f71",
-                    "path": "<XInputController>/rightStick",
-                    "interactions": "",
-                    "processors": "StickDeadzone",
-                    "groups": "XBoxController",
                     "action": "Rotation",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -253,28 +253,6 @@
                 },
                 {
                     "name": "",
-                    "id": "e0284984-473a-494b-b72b-58bf45bdc2b1",
-                    "path": "<DualShockGamepad>/rightTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "PlaystationController",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e118a08c-ad7b-4f0b-8094-db84efa53388",
-                    "path": "<XInputController>/rightTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XBoxController",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "63e977fc-8082-48a7-b4aa-bc6510bd0280",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
@@ -297,28 +275,6 @@
                 },
                 {
                     "name": "",
-                    "id": "2e8d353a-ee19-4d55-ada5-f25709c3dcc6",
-                    "path": "<DualShockGamepad>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "PlaystationController",
-                    "action": "Acceleration",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0308bc56-9d2b-469b-9135-820e680b7149",
-                    "path": "<XInputController>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XBoxController",
-                    "action": "Acceleration",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "f3fdb655-a315-4ab8-8e94-17fa2e73d6b0",
                     "path": "<Keyboard>/ctrl",
                     "interactions": "",
@@ -335,28 +291,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "UniversalController",
-                    "action": "Duck",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "c58f2c63-e5fe-4609-9e03-4fcd4709934b",
-                    "path": "<DualShockGamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "PlaystationController",
-                    "action": "Duck",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "71332ec0-3614-47c1-88ed-24c6769689d8",
-                    "path": "<XInputController>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XBoxController",
                     "action": "Duck",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -389,7 +323,7 @@
                     "path": "<DualShockGamepad>/start",
                     "interactions": "",
                     "processors": "",
-                    "groups": "PlaystationController",
+                    "groups": "UniversalController",
                     "action": "OpenMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -400,7 +334,7 @@
                     "path": "<XInputController>/start",
                     "interactions": "",
                     "processors": "",
-                    "groups": "XBoxController",
+                    "groups": "UniversalController",
                     "action": "OpenMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -433,7 +367,7 @@
                     "path": "<DualShockGamepad>/leftStickPress",
                     "interactions": "",
                     "processors": "",
-                    "groups": "PlaystationController",
+                    "groups": "UniversalController",
                     "action": "CursorLockMode",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -444,52 +378,30 @@
                     "path": "<XInputController>/leftStickPress",
                     "interactions": "",
                     "processors": "",
-                    "groups": "XBoxController",
+                    "groups": "UniversalController",
                     "action": "CursorLockMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "f5e1e91e-41cb-447f-bfc9-b41b72dbcb8f",
-                    "path": "<Mouse>/rightButton",
+                    "id": "19c74f23-8ab0-4a1b-bc36-9e3ef64bcacf",
+                    "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardAndMouse",
-                    "action": "SwitchMoveMode",
+                    "action": "CameraRotation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "0779ecb4-f0fc-497e-8c0b-f03045fd174a",
-                    "path": "<Gamepad>/rightStickPress",
+                    "id": "138e7191-aeb0-4712-b668-1eff375e341b",
+                    "path": "<Gamepad>/rightStick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "StickDeadzone,ScaleVector2(x=8,y=8)",
                     "groups": "UniversalController",
-                    "action": "SwitchMoveMode",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "98c4feb5-2b70-49fa-b50c-d2613e95b15d",
-                    "path": "<DualShockGamepad>/rightStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "PlaystationController",
-                    "action": "SwitchMoveMode",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "54f25ade-9931-43bf-92e7-a945708ed0ae",
-                    "path": "<XInputController>/rightStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XBoxController",
-                    "action": "SwitchMoveMode",
+                    "action": "CameraRotation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -509,7 +421,7 @@
                     "id": "adf19dda-53b6-45ff-9e4f-185e7f1833c4",
                     "path": "OneModifier",
                     "interactions": "Press",
-                    "processors": "NormalizeVector2,ScaleVector2(x=0.1,y=0.1)",
+                    "processors": "NormalizeVector2,ScaleVector2(x=8,y=8)",
                     "groups": "",
                     "action": "CameraZoom",
                     "isComposite": true,
@@ -539,12 +451,23 @@
                 },
                 {
                     "name": "",
-                    "id": "19c74f23-8ab0-4a1b-bc36-9e3ef64bcacf",
-                    "path": "<Mouse>/delta",
+                    "id": "f5e1e91e-41cb-447f-bfc9-b41b72dbcb8f",
+                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "CameraRotation",
+                    "groups": "KeyboardAndMouse",
+                    "action": "SwitchMoveMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0779ecb4-f0fc-497e-8c0b-f03045fd174a",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "UniversalController",
+                    "action": "SwitchMoveMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -1097,36 +1020,9 @@
                     "devicePath": "<Keyboard>",
                     "isOptional": true,
                     "isOR": false
-                }
-            ]
-        },
-        {
-            "name": "PlaystationController",
-            "bindingGroup": "PlaystationController",
-            "devices": [
-                {
-                    "devicePath": "<DualShockGamepad>",
-                    "isOptional": false,
-                    "isOR": false
                 },
                 {
-                    "devicePath": "<Keyboard>",
-                    "isOptional": true,
-                    "isOR": false
-                }
-            ]
-        },
-        {
-            "name": "XBoxController",
-            "bindingGroup": "XBoxController",
-            "devices": [
-                {
-                    "devicePath": "<XInputController>",
-                    "isOptional": false,
-                    "isOR": false
-                },
-                {
-                    "devicePath": "<Keyboard>",
+                    "devicePath": "<Mouse>",
                     "isOptional": true,
                     "isOR": false
                 }

@@ -1,11 +1,17 @@
 using Fusion;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
-    public class PlayerNetworkMovement : NetworkBehaviour       //Equals Simple Car Controller in Guide.
+    public class PlayerNetworkMovement : NetworkBehaviour
     {
+        [SerializeField] private TextMeshProUGUI m_hasInputAuthorityText;
+        [SerializeField] private TextMeshProUGUI m_networkObjectId;
+        [SerializeField] private TextMeshProUGUI m_rigidbodyPos;
+
+        private PlayerInputActions m_playerInputActions;
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
         /*[SerializeField] */
         internal Rigidbody m_rigidbody;
@@ -120,31 +126,37 @@ namespace PlayerInputManagement
         {
             if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
             {
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Disable();
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed -= CharacterDuck;
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled -= StopDucking;
+                m_playerInputActions.PlayerOnFoot.Disable();
+                m_playerInputActions.PlayerOnFoot.Jump.canceled -= OnJumpButtonRelease;
+                m_playerInputActions.PlayerOnFoot.Duck.performed -= CharacterDuck;
+                m_playerInputActions.PlayerOnFoot.Duck.canceled -= StopDucking;
             }
         }
 
         private void Start()
         {
+            m_hasInputAuthorityText.text = $"{Object.HasInputAuthority}";
+            m_networkObjectId.text = $"{Object.Id}";
+            
             if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
             {
-                m_playerNetworkController.m_playerInputActions = InputManager.m_InputManagerActions;
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Enable();
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.performed += CharacterDuck;
-                m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Duck.canceled += StopDucking;
+                m_playerInputActions = InputManager.m_InputManagerActions;
+                m_playerInputActions.PlayerOnFoot.Enable();
+                m_playerInputActions.PlayerOnFoot.Jump.canceled += OnJumpButtonRelease;
+                m_playerInputActions.PlayerOnFoot.Duck.performed += CharacterDuck;
+                m_playerInputActions.PlayerOnFoot.Duck.canceled += StopDucking;
 
                 m_setRunTimeMaxSpeed = 0.0f;
                 m_maxDistanceAbove = m_colliderWalkHeight;
                 m_canJumpAgain = true;  //Enable local Jump Variable to enable Jump on first Button press. 
+                m_playerNetworkController.m_rePopPosition = m_rigidbodyTransform.position;
             }
         }
 
         private void Update()
         {
+            m_rigidbodyPos.text = $"{m_rigidbodyTransform.position}";
+
             if (!m_playerNetworkController.m_isDead)
             {
                 //simple Groundcheck without Arrays of hitted objects or memory allocation.
@@ -156,19 +168,20 @@ namespace PlayerInputManagement
                 MoveAcceleration();
             }
 
-            if (transform.position.y < m_playerNetworkController.m_fallLimit)
+            if (m_rigidbodyTransform.position.y < m_playerNetworkController.m_fallLimit)
             {
-                m_rigidbodyTransform.position = m_playerNetworkController.m_repopPosition; //AreaFallOffReset
+                m_rigidbodyTransform.position = m_playerNetworkController.m_rePopPosition; //AreaFallOffReset
             }
         }
 
         public override void FixedUpdateNetwork()
         {
-            base.FixedUpdateNetwork();
+            //base.FixedUpdateNetwork();
 
             if (!m_playerNetworkController.m_isDead)
             {
-                //Switches between Rigidbody moveMethods.
+                m_playerNetworkController.m_cameraNetworkController.m_eMoveMethod = m_playerNetworkController.m_eMoveMethod;
+                
                 switch (m_playerNetworkController.m_eMoveMethod)
                 {
                     //Runner.DeltaTime instead of Time.fixedDeltaTime in Movement_Methods.
@@ -212,7 +225,7 @@ namespace PlayerInputManagement
                     {
                         FallDamageCalculationEnd();
 
-                        if (!PlayerNetworkedData.JumpButtonIsPressed && !m_canJumpAgain)
+                        if (!PlayerNetworkedData.JumpButtonGotPressed && !m_canJumpAgain)
                         {
                             m_canJumpAgain = true;
                         }
@@ -233,7 +246,7 @@ namespace PlayerInputManagement
 #endif
         private void Jumping()
         {
-            if (m_coyoteTimeCounter >= 0 && PlayerNetworkedData.JumpButtonIsPressed && m_canJumpAgain && m_playerIsGrounded)
+            if (m_coyoteTimeCounter >= 0 && PlayerNetworkedData.JumpButtonGotPressed && m_canJumpAgain && m_playerIsGrounded)
             {
                 m_canJumpAgain = false; //local Jump Variable to just apply Addforce ONCE.
                 m_rigidbody.AddForce(m_rigidbody.transform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
@@ -309,9 +322,7 @@ namespace PlayerInputManagement
 
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);
 
-            //This if does not allow switching between FirstPerson and ThirdPerson in runtime.
-            if (m_relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkController.m_playerPerspective == PlayerPersPective.ThirdPerson ||
-                m_relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkController.m_playerPerspective == PlayerPersPective.FirstPerson && m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y >= 0.0f)
+            if (m_relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkController.m_playerPerspective == PlayerPersPective.ThirdPerson && m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
             {
                 float angle = Mathf.Atan2(m_relativeMoveVector.x, m_relativeMoveVector.z) * Mathf.Rad2Deg;
                 float smoothRotation =
@@ -356,7 +367,7 @@ namespace PlayerInputManagement
 
                 SphereCastCheckAbove(); //Locks Player in 'crouch-mode', if obstacles are detected above.
 
-                switch (PlayerNetworkedData.KneelButtonIsPressed) //fomor: m_kneelToCrouch.
+                switch (PlayerNetworkedData.KneelButtonGotPressed) //fomor: m_kneelToCrouch.
                 {
                     case false:
                     {
@@ -401,22 +412,22 @@ namespace PlayerInputManagement
                 #region While Movement Buttons are not pressed (WASD, Left Stick).
                 case false: //When no Movement button is pressed.
                 {
-                    switch (PlayerNetworkedData.KneelButtonIsPressed) //In case the character shall slow down from Walking or Running.
+                    switch (PlayerNetworkedData.KneelButtonGotPressed) //In case the character shall slow down from Walking or Running.
                     {
                         case false:
                         {
                             m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Idle;
-                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                             m_setRunTimeMaxSpeed = m_stopMovementValue;
-                            Acceleration(m_deceleRatePerSec);
+                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                            AccelerationRate(m_deceleRatePerSec);
                             break;
                         }
                         case true:
                         {
                             m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
-                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                             m_setRunTimeMaxSpeed = m_crouchSpeed;
-                            Acceleration(m_deceleRatePerSec);
+                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                            AccelerationRate(m_deceleRatePerSec);
                             break;
                         }
                     }
@@ -430,7 +441,7 @@ namespace PlayerInputManagement
                     {
                         case false:             //Shift IS NOT pressed.
                         {
-                            switch (PlayerNetworkedData.KneelButtonIsPressed)
+                            switch (PlayerNetworkedData.KneelButtonGotPressed)
                             {
                                 case false: //Shift is not pressed and character shall walk.
                                 {
@@ -440,21 +451,21 @@ namespace PlayerInputManagement
                                     if (m_individualMaxSpeed < m_setRunTimeMaxSpeed)    //current vs. set speed.
                                     {
                                         m_acceleRatePerSec = m_walkSpeed / m_durationToZeroSpeed;
-                                        Acceleration(m_acceleRatePerSec);
+                                        AccelerationRate(m_acceleRatePerSec);
                                     }
                                     else
                                     {
                                         m_deceleRatePerSec = -m_walkSpeed / m_durationToZeroSpeed;
-                                        Acceleration(m_deceleRatePerSec);
+                                        AccelerationRate(m_deceleRatePerSec);
                                     }
                                     break;
                                 }
                                 case true:  //Shift is not pressed and character shall kneel down from Walking or Running.
                                 {
                                     m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
-                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
-                                    Acceleration(m_deceleRatePerSec);
+                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                    AccelerationRate(m_deceleRatePerSec);
                                     break;
                                 }
                             }
@@ -462,22 +473,22 @@ namespace PlayerInputManagement
                         }
                         case true:  //Shift IS pressed! <---
                         {
-                            switch (PlayerNetworkedData.KneelButtonIsPressed)
+                            switch (PlayerNetworkedData.KneelButtonGotPressed)
                             {
                                 case false: //If Shift IS pressed and the character shall not kneel down, but run.
                                 {
                                     m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Running;
-                                    m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
                                     m_setRunTimeMaxSpeed = m_runSpeed;
-                                    Acceleration(m_acceleRatePerSec);
+                                    m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
+                                    AccelerationRate(m_acceleRatePerSec);
                                     break;
                                 }
                                 case true:  //If Shift IS pressed and the character shall kneel down.
                                 {
                                     m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
-                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
-                                    Acceleration(m_deceleRatePerSec);
+                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                    AccelerationRate(m_deceleRatePerSec);
                                     break;
                                 }
                             }
@@ -490,7 +501,7 @@ namespace PlayerInputManagement
             }
         }
 
-        private void Acceleration(float _sentDeAccelerationRate)
+        private void AccelerationRate(float _sentDeAccelerationRate)
         {
             switch (m_playerNetworkController.m_eRuntimeMoveMode)
             {

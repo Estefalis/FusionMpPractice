@@ -1,7 +1,7 @@
 using CameraManagement;
 using UnityEngine;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
     public class PlayerOfflineController : MonoBehaviour
     {

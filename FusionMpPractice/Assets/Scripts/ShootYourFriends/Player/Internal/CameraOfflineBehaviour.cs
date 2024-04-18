@@ -1,4 +1,4 @@
-using PlayerInputManagement;
+using PlayerManagement;
 using UnityEngine;
 
 namespace CameraManagement
@@ -7,7 +7,6 @@ namespace CameraManagement
     {
         [SerializeField] internal PlayerPersPective m_playerPerspective;
 
-        //TODO: Script an FirstPerson enum anpassen!
         [SerializeField] private PlayerOfflineController m_playerOfflineController;
 
         #region SetParent and LookAtTarget
@@ -52,6 +51,7 @@ namespace CameraManagement
         internal bool m_runtimePitchSwitch;
         internal Vector3 m_playerInputRotationVector;
         internal Vector2 m_mousePosition;
+        internal EmoveMethod m_eMoveMethod;
         #endregion
 
         #region Camera-Zoom
@@ -96,10 +96,6 @@ namespace CameraManagement
                     MinCameraPosSphereCast();
                     break;
                 }
-                case PlayerPersPective.FirstPerson:
-                {
-                    break;
-                }
                 default:
                     break;
             }
@@ -117,11 +113,6 @@ namespace CameraManagement
                 case PlayerPersPective.ThirdPerson:
                 {
                     ThirdPersonCameraLerp();
-                    break;
-                }
-                case PlayerPersPective.FirstPerson:
-                {
-                    //FirstPersonCameraLerp();
                     break;
                 }
                 default:
@@ -146,12 +137,6 @@ namespace CameraManagement
                     SetLookAtParent(m_lookAtTarget, m_keepWorldPos);
                     break;
                 }
-                case PlayerPersPective.FirstPerson:
-                {
-                    m_camera.transform.SetParent(m_setParentTransform, m_keepWorldPos);
-                    //min & max - ZoomVariables get switched within the CameraZoom - Method itself.
-                    break;
-                }
                 default:
                     break;
             }
@@ -167,7 +152,7 @@ namespace CameraManagement
         private void GetMousePosition()
         {
 #if ENABLE_INPUT_SYSTEM
-            m_mousePosition = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>();
+            m_mousePosition = m_playerOfflineController.m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>();
             //or Mouse.current.position.ReadValue();
 #else
             m_mousePosition = Input.mousePosition;
@@ -194,18 +179,21 @@ namespace CameraManagement
                                 break;
                         }
 
-                        switch (m_invertYRotation)
+                        if (m_eMoveMethod != EmoveMethod.MouseRotateY)
                         {
-                            case false:
+                            switch (m_invertYRotation)
                             {
-                                runtimeRotationVector.y -= m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
-                                break;
-                            }
-                            case true:
-                            {
-                                runtimeRotationVector.y += m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
-                                break;
-                            }
+                                case false:
+                                {
+                                    runtimeRotationVector.y -= m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
+                                    break;
+                                }
+                                case true:
+                                {
+                                    runtimeRotationVector.y += m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
+                                    break;
+                                }
+                            } 
                         }
                     }
                     break;
@@ -255,18 +243,13 @@ namespace CameraManagement
 
                     switch (m_playerPerspective)
                     {
-                        //Switches CameraZoom-Direction, if not disabled in FirstPerson.
                         case PlayerPersPective.ThirdPerson:
                         {
                             m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
                             break;
                         }
-                        //If a different Clamping method is needed.
-                        case PlayerPersPective.FirstPerson:
-                        {
-                            m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
+                        default:
                             break;
-                        }
                     }
                 }
 
@@ -353,14 +336,6 @@ namespace CameraManagement
 
             m_camera.transform.LookAt(_lookAtTarget);
         }
-
-        //private void FirstPersonCameraLerp()
-        //{
-        //    if (!m_disableCameraRotation)
-        //    {
-        //        //TODO: HeadRotationY with Rigidbody, HeadRotationX with runtimeRotationVector.x from UpdateRotation(). Look at Targeting from YBot?
-        //    }
-        //}
 
         private void ThirdPersonCameraLerp()
         {

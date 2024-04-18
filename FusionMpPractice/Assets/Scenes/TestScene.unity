@@ -1239,7 +1239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b425730b2a06b174aaee858e09bdcad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerPerspective: 1
+  m_playerPerspective: 0
   m_playerOfflineController: {fileID: 1617490929}
   m_camera: {fileID: 877053081}
   m_setParentTransform: {fileID: 1597012888}

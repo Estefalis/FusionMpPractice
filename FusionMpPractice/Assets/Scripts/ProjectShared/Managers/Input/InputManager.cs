@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 internal enum PlayerPersPective
 {
-    FirstPerson,
+    //FirstPerson,
     ThirdPerson,
     //whatever comes next into my mind.
 }
@@ -27,7 +27,7 @@ internal enum EmoveMethod
     Relative,
 }
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
     public class InputManager : MonoBehaviour
     {
@@ -50,7 +50,7 @@ namespace PlayerInputManagement
 
         private void Start()
         {
-            ToggleActionMaps(m_InputManagerActions.PlayerOnFootRH);
+            ToggleActionMaps(m_InputManagerActions.PlayerOnFoot);
         }
 
         private void OnSceneFinishedLoading(Scene _scene, LoadSceneMode _mode)
@@ -65,7 +65,7 @@ namespace PlayerInputManagement
                 case 1:
                 case 2:
                 {
-                    ToggleActionMaps(m_InputManagerActions.PlayerOnFootRH);
+                    ToggleActionMaps(m_InputManagerActions.PlayerOnFoot);
                     break;
                 }
                 default:

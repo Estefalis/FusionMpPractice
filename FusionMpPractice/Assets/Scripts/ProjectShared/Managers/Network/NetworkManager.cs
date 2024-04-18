@@ -10,9 +10,8 @@ using UnityEngine;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    internal  string DevRoomCode { get => roomCode; }
-    [SerializeField] private string roomCode;
-    
+    internal string DevRoomCode { get => roomCode; }
+    [SerializeField] private string roomCode;    
 
     [SerializeField] private NetworkRunner m_networkRunnerPrefab;
     private NetworkRunner m_networkRunner;

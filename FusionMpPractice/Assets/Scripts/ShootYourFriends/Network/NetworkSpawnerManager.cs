@@ -10,7 +10,7 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
     [SerializeField] private Transform[] m_spawnPointsArray;
     private List<Transform> m_spawnPointsList;
 
-    private Dictionary<PlayerRef, NetworkObject> m_players = new();   //Version 2
+    //private Dictionary<PlayerRef, NetworkObject> m_players = new();   //Version 2
 
     private NetworkManager m_networkManager;
 
@@ -46,10 +46,12 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
             }
 
             //_playerRef sets (Has)InputAuthority over the spawned Object.
-            var playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
-            //Add the used/randomed Position to the runtime SpawnPointList.
-            m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
-            m_players.Add(_playerRef, playerObject);     //Version 2
+            NetworkObject playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
+
+            Runner.SetPlayerObject(_playerRef, playerObject);           //sets IsLocalPlayerObject.
+            ////Add the used/randomed Position to the runtime SpawnPointList.
+            //m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
+            //m_players.Add(_playerRef, playerObject);     //Version 2
         }
     }
 
@@ -62,19 +64,19 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
     {
         if (Runner.IsServer)
         {
-            //if (Runner.TryGetPlayerObject(_playerRef, out var playerNetworkObject))
-            //{
-            //    Runner.Despawn(playerNetworkObject);
-            //}
-
-            //Runner.SetPlayerObject(_playerRef, null);           //resets IsLocalPlayerObject.
-
-            //Version 2
-            if (m_players.TryGetValue(_playerRef, out var playerNetworkObject))
+            if (Runner.TryGetPlayerObject(_playerRef, out var playerObject))
             {
-                Runner.Despawn(playerNetworkObject);
-                m_players.Remove(_playerRef);
+                Runner.Despawn(playerObject);
             }
+
+            Runner.SetPlayerObject(_playerRef, null);           //resets IsLocalPlayerObject.
+
+            ////Version 2
+            //if (m_players.TryGetValue(_playerRef, out var playerObject))
+            //{
+            //    Runner.Despawn(playerObject);
+            //    m_players.Remove(_playerRef);
+            //}
         }
     }
 }

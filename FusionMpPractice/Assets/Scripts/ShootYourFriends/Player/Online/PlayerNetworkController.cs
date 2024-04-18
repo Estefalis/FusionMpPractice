@@ -1,16 +1,14 @@
 using Fusion;
 using UnityEngine;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
-    public class PlayerNetworkController : NetworkBehaviour                             //Equals Player.cs in Guide.
+    public class PlayerNetworkController : NetworkBehaviour
     {
-        internal PlayerInputActions m_playerInputActions;
-
         [SerializeField] private GameObject m_localInputParent;
 
         [SerializeField] internal PlayerNetworkInput m_playerNetworkInput;
-        [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;        //Equals SimpleCarController in Guide.
+        [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;
         [SerializeField] internal PlayerNetworkInteractions m_playerNetworkInteractions;
         [SerializeField] internal PlayerNetworkHealth m_playerNetworkHealth;
         [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkController;
@@ -20,7 +18,7 @@ namespace PlayerInputManagement
         #region Runtime-Values
         #region Reset on falling off the area
         [Header("Area Fall Off Reset")]
-        [SerializeField] internal Vector3 m_repopPosition;
+        [SerializeField] internal Vector3 m_rePopPosition;
         [SerializeField] internal float m_fallLimit = -100f;
         #endregion
         internal bool m_isDead = false;
@@ -49,7 +47,7 @@ namespace PlayerInputManagement
 
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out PlayerNetworkData networkedInputData))      //Equals Player.cs CarInputData in Guide.
+            if (GetInput(out PlayerNetworkData networkedInputData))
             {
                 PlayerNetworkedData = networkedInputData;
             }
@@ -58,6 +56,6 @@ namespace PlayerInputManagement
         }
     }
 }
-//var PlayerRefStruct = Runner.LocalPlayer;
+//var PlayerRefStruct = Runner.LocalPlayer.PlayerId;
 //var PlayerRefId = PlayerRefStruct.PlayerId;
 //var isPlayerIndexValid = PlayerRefStruct.IsValid; //Runner.LocalPlayer.IsValid.

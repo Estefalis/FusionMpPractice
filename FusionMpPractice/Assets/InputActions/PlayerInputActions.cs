@@ -24,7 +24,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     ""name"": ""PlayerInputActions"",
     ""maps"": [
         {
-            ""name"": ""PlayerOnFootRH"",
+            ""name"": ""PlayerOnFoot"",
             ""id"": ""87a4940e-19dd-4b33-af22-4770d81f8cf4"",
             ""actions"": [
                 {
@@ -46,13 +46,22 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""SwitchMoveMode"",
-                    ""type"": ""Button"",
-                    ""id"": ""d27bd797-7532-422b-9cc2-b9bcb7d56439"",
-                    ""expectedControlType"": ""Button"",
+                    ""name"": ""CameraRotation"",
+                    ""type"": ""Value"",
+                    ""id"": ""609f6b9c-896b-484e-b839-5adfe784b544"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CameraZoom"",
+                    ""type"": ""Value"",
+                    ""id"": ""5e95e7aa-5003-43d6-9486-b875ef4aaa9e"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Jump"",
@@ -82,6 +91,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""SwitchMoveMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""d27bd797-7532-422b-9cc2-b9bcb7d56439"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""OpenMenu"",
                     ""type"": ""Button"",
                     ""id"": ""c3069b14-60b6-4fcc-bb46-c1d80ca04829"",
@@ -98,24 +116,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""CameraZoom"",
-                    ""type"": ""Value"",
-                    ""id"": ""5e95e7aa-5003-43d6-9486-b875ef4aaa9e"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""CameraRotation"",
-                    ""type"": ""Value"",
-                    ""id"": ""609f6b9c-896b-484e-b839-5adfe784b544"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -175,37 +175,59 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""247dee5d-afb3-474c-85ff-d452fb31eac7"",
-                    ""path"": ""<Gamepad>/leftStick"",
+                    ""name"": ""LeftStick"",
+                    ""id"": ""fb9f2fec-d05c-4a7f-99b0-669e844e9482"",
+                    ""path"": ""2DVector(mode=2)"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""291e372e-f43e-4b9b-9d32-f01fac9f2359"",
+                    ""path"": ""<Gamepad>/leftStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
                     ""groups"": ""UniversalController"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""f10a55c0-6e68-4260-b74f-307c5ecad8ee"",
-                    ""path"": ""<DualShockGamepad>/leftStick"",
+                    ""name"": ""down"",
+                    ""id"": ""b198e59c-447a-4354-b7bc-2e30805a6728"",
+                    ""path"": ""<Gamepad>/leftStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""PlaystationController"",
+                    ""groups"": ""UniversalController"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""9b2189e4-5c57-4f0d-999e-c390787d7977"",
-                    ""path"": ""<XInputController>/leftStick"",
+                    ""name"": ""left"",
+                    ""id"": ""6b738156-479f-452a-9d2b-2741c7ce4850"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""XBoxController"",
+                    ""groups"": ""UniversalController"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""a65c2869-b5d9-4913-8e9a-681528d452e5"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""UniversalController"",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
@@ -225,28 +247,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": ""StickDeadzone"",
                     ""groups"": ""UniversalController"",
-                    ""action"": ""Rotation"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""301c624e-7664-4d22-a3f7-075de986e950"",
-                    ""path"": ""<DualShockGamepad>/rightStick"",
-                    ""interactions"": """",
-                    ""processors"": ""StickDeadzone"",
-                    ""groups"": ""PlaystationController"",
-                    ""action"": ""Rotation"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""f4879f2d-1acb-402c-a7d3-aa5258660f71"",
-                    ""path"": ""<XInputController>/rightStick"",
-                    ""interactions"": """",
-                    ""processors"": ""StickDeadzone"",
-                    ""groups"": ""XBoxController"",
                     ""action"": ""Rotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -275,28 +275,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e0284984-473a-494b-b72b-58bf45bdc2b1"",
-                    ""path"": ""<DualShockGamepad>/rightTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""PlaystationController"",
-                    ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""e118a08c-ad7b-4f0b-8094-db84efa53388"",
-                    ""path"": ""<XInputController>/rightTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XBoxController"",
-                    ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""63e977fc-8082-48a7-b4aa-bc6510bd0280"",
                     ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
@@ -319,28 +297,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""2e8d353a-ee19-4d55-ada5-f25709c3dcc6"",
-                    ""path"": ""<DualShockGamepad>/leftTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""PlaystationController"",
-                    ""action"": ""Acceleration"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""0308bc56-9d2b-469b-9135-820e680b7149"",
-                    ""path"": ""<XInputController>/leftTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XBoxController"",
-                    ""action"": ""Acceleration"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""f3fdb655-a315-4ab8-8e94-17fa2e73d6b0"",
                     ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
@@ -357,28 +313,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""UniversalController"",
-                    ""action"": ""Duck"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""c58f2c63-e5fe-4609-9e03-4fcd4709934b"",
-                    ""path"": ""<DualShockGamepad>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""PlaystationController"",
-                    ""action"": ""Duck"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""71332ec0-3614-47c1-88ed-24c6769689d8"",
-                    ""path"": ""<XInputController>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XBoxController"",
                     ""action"": ""Duck"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -411,7 +345,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<DualShockGamepad>/start"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""PlaystationController"",
+                    ""groups"": ""UniversalController"",
                     ""action"": ""OpenMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -422,7 +356,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<XInputController>/start"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""XBoxController"",
+                    ""groups"": ""UniversalController"",
                     ""action"": ""OpenMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -455,7 +389,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<DualShockGamepad>/leftStickPress"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""PlaystationController"",
+                    ""groups"": ""UniversalController"",
                     ""action"": ""CursorLockMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -466,52 +400,30 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<XInputController>/leftStickPress"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""XBoxController"",
+                    ""groups"": ""UniversalController"",
                     ""action"": ""CursorLockMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""f5e1e91e-41cb-447f-bfc9-b41b72dbcb8f"",
-                    ""path"": ""<Mouse>/rightButton"",
+                    ""id"": ""19c74f23-8ab0-4a1b-bc36-9e3ef64bcacf"",
+                    ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardAndMouse"",
-                    ""action"": ""SwitchMoveMode"",
+                    ""action"": ""CameraRotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0779ecb4-f0fc-497e-8c0b-f03045fd174a"",
-                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""id"": ""138e7191-aeb0-4712-b668-1eff375e341b"",
+                    ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone,ScaleVector2(x=8,y=8)"",
                     ""groups"": ""UniversalController"",
-                    ""action"": ""SwitchMoveMode"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""98c4feb5-2b70-49fa-b50c-d2613e95b15d"",
-                    ""path"": ""<DualShockGamepad>/rightStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""PlaystationController"",
-                    ""action"": ""SwitchMoveMode"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""54f25ade-9931-43bf-92e7-a945708ed0ae"",
-                    ""path"": ""<XInputController>/rightStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XBoxController"",
-                    ""action"": ""SwitchMoveMode"",
+                    ""action"": ""CameraRotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -531,7 +443,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""id"": ""adf19dda-53b6-45ff-9e4f-185e7f1833c4"",
                     ""path"": ""OneModifier"",
                     ""interactions"": ""Press"",
-                    ""processors"": ""NormalizeVector2,ScaleVector2(x=0.1,y=0.1)"",
+                    ""processors"": ""NormalizeVector2,ScaleVector2(x=8,y=8)"",
                     ""groups"": """",
                     ""action"": ""CameraZoom"",
                     ""isComposite"": true,
@@ -561,12 +473,23 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""19c74f23-8ab0-4a1b-bc36-9e3ef64bcacf"",
-                    ""path"": ""<Mouse>/delta"",
+                    ""id"": ""f5e1e91e-41cb-447f-bfc9-b41b72dbcb8f"",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""CameraRotation"",
+                    ""groups"": ""KeyboardAndMouse"",
+                    ""action"": ""SwitchMoveMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0779ecb4-f0fc-497e-8c0b-f03045fd174a"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""UniversalController"",
+                    ""action"": ""SwitchMoveMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1119,36 +1042,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""devicePath"": ""<Keyboard>"",
                     ""isOptional"": true,
                     ""isOR"": false
-                }
-            ]
-        },
-        {
-            ""name"": ""PlaystationController"",
-            ""bindingGroup"": ""PlaystationController"",
-            ""devices"": [
-                {
-                    ""devicePath"": ""<DualShockGamepad>"",
-                    ""isOptional"": false,
-                    ""isOR"": false
                 },
                 {
-                    ""devicePath"": ""<Keyboard>"",
-                    ""isOptional"": true,
-                    ""isOR"": false
-                }
-            ]
-        },
-        {
-            ""name"": ""XBoxController"",
-            ""bindingGroup"": ""XBoxController"",
-            ""devices"": [
-                {
-                    ""devicePath"": ""<XInputController>"",
-                    ""isOptional"": false,
-                    ""isOR"": false
-                },
-                {
-                    ""devicePath"": ""<Keyboard>"",
+                    ""devicePath"": ""<Mouse>"",
                     ""isOptional"": true,
                     ""isOR"": false
                 }
@@ -1156,18 +1052,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     ]
 }");
-        // PlayerOnFootRH
-        m_PlayerOnFootRH = asset.FindActionMap("PlayerOnFootRH", throwIfNotFound: true);
-        m_PlayerOnFootRH_Movement = m_PlayerOnFootRH.FindAction("Movement", throwIfNotFound: true);
-        m_PlayerOnFootRH_Rotation = m_PlayerOnFootRH.FindAction("Rotation", throwIfNotFound: true);
-        m_PlayerOnFootRH_SwitchMoveMode = m_PlayerOnFootRH.FindAction("SwitchMoveMode", throwIfNotFound: true);
-        m_PlayerOnFootRH_Jump = m_PlayerOnFootRH.FindAction("Jump", throwIfNotFound: true);
-        m_PlayerOnFootRH_Duck = m_PlayerOnFootRH.FindAction("Duck", throwIfNotFound: true);
-        m_PlayerOnFootRH_Acceleration = m_PlayerOnFootRH.FindAction("Acceleration", throwIfNotFound: true);
-        m_PlayerOnFootRH_OpenMenu = m_PlayerOnFootRH.FindAction("OpenMenu", throwIfNotFound: true);
-        m_PlayerOnFootRH_CursorLockMode = m_PlayerOnFootRH.FindAction("CursorLockMode", throwIfNotFound: true);
-        m_PlayerOnFootRH_CameraZoom = m_PlayerOnFootRH.FindAction("CameraZoom", throwIfNotFound: true);
-        m_PlayerOnFootRH_CameraRotation = m_PlayerOnFootRH.FindAction("CameraRotation", throwIfNotFound: true);
+        // PlayerOnFoot
+        m_PlayerOnFoot = asset.FindActionMap("PlayerOnFoot", throwIfNotFound: true);
+        m_PlayerOnFoot_Movement = m_PlayerOnFoot.FindAction("Movement", throwIfNotFound: true);
+        m_PlayerOnFoot_Rotation = m_PlayerOnFoot.FindAction("Rotation", throwIfNotFound: true);
+        m_PlayerOnFoot_CameraRotation = m_PlayerOnFoot.FindAction("CameraRotation", throwIfNotFound: true);
+        m_PlayerOnFoot_CameraZoom = m_PlayerOnFoot.FindAction("CameraZoom", throwIfNotFound: true);
+        m_PlayerOnFoot_Jump = m_PlayerOnFoot.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerOnFoot_Duck = m_PlayerOnFoot.FindAction("Duck", throwIfNotFound: true);
+        m_PlayerOnFoot_Acceleration = m_PlayerOnFoot.FindAction("Acceleration", throwIfNotFound: true);
+        m_PlayerOnFoot_SwitchMoveMode = m_PlayerOnFoot.FindAction("SwitchMoveMode", throwIfNotFound: true);
+        m_PlayerOnFoot_OpenMenu = m_PlayerOnFoot.FindAction("OpenMenu", throwIfNotFound: true);
+        m_PlayerOnFoot_CursorLockMode = m_PlayerOnFoot.FindAction("CursorLockMode", throwIfNotFound: true);
         // DefaultUI
         m_DefaultUI = asset.FindActionMap("DefaultUI", throwIfNotFound: true);
         m_DefaultUI_Navigate = m_DefaultUI.FindAction("Navigate", throwIfNotFound: true);
@@ -1238,51 +1134,54 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // PlayerOnFootRH
-    private readonly InputActionMap m_PlayerOnFootRH;
-    private List<IPlayerOnFootRHActions> m_PlayerOnFootRHActionsCallbackInterfaces = new List<IPlayerOnFootRHActions>();
-    private readonly InputAction m_PlayerOnFootRH_Movement;
-    private readonly InputAction m_PlayerOnFootRH_Rotation;
-    private readonly InputAction m_PlayerOnFootRH_SwitchMoveMode;
-    private readonly InputAction m_PlayerOnFootRH_Jump;
-    private readonly InputAction m_PlayerOnFootRH_Duck;
-    private readonly InputAction m_PlayerOnFootRH_Acceleration;
-    private readonly InputAction m_PlayerOnFootRH_OpenMenu;
-    private readonly InputAction m_PlayerOnFootRH_CursorLockMode;
-    private readonly InputAction m_PlayerOnFootRH_CameraZoom;
-    private readonly InputAction m_PlayerOnFootRH_CameraRotation;
-    public struct PlayerOnFootRHActions
+    // PlayerOnFoot
+    private readonly InputActionMap m_PlayerOnFoot;
+    private List<IPlayerOnFootActions> m_PlayerOnFootActionsCallbackInterfaces = new List<IPlayerOnFootActions>();
+    private readonly InputAction m_PlayerOnFoot_Movement;
+    private readonly InputAction m_PlayerOnFoot_Rotation;
+    private readonly InputAction m_PlayerOnFoot_CameraRotation;
+    private readonly InputAction m_PlayerOnFoot_CameraZoom;
+    private readonly InputAction m_PlayerOnFoot_Jump;
+    private readonly InputAction m_PlayerOnFoot_Duck;
+    private readonly InputAction m_PlayerOnFoot_Acceleration;
+    private readonly InputAction m_PlayerOnFoot_SwitchMoveMode;
+    private readonly InputAction m_PlayerOnFoot_OpenMenu;
+    private readonly InputAction m_PlayerOnFoot_CursorLockMode;
+    public struct PlayerOnFootActions
     {
         private @PlayerInputActions m_Wrapper;
-        public PlayerOnFootRHActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Movement => m_Wrapper.m_PlayerOnFootRH_Movement;
-        public InputAction @Rotation => m_Wrapper.m_PlayerOnFootRH_Rotation;
-        public InputAction @SwitchMoveMode => m_Wrapper.m_PlayerOnFootRH_SwitchMoveMode;
-        public InputAction @Jump => m_Wrapper.m_PlayerOnFootRH_Jump;
-        public InputAction @Duck => m_Wrapper.m_PlayerOnFootRH_Duck;
-        public InputAction @Acceleration => m_Wrapper.m_PlayerOnFootRH_Acceleration;
-        public InputAction @OpenMenu => m_Wrapper.m_PlayerOnFootRH_OpenMenu;
-        public InputAction @CursorLockMode => m_Wrapper.m_PlayerOnFootRH_CursorLockMode;
-        public InputAction @CameraZoom => m_Wrapper.m_PlayerOnFootRH_CameraZoom;
-        public InputAction @CameraRotation => m_Wrapper.m_PlayerOnFootRH_CameraRotation;
-        public InputActionMap Get() { return m_Wrapper.m_PlayerOnFootRH; }
+        public PlayerOnFootActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Movement => m_Wrapper.m_PlayerOnFoot_Movement;
+        public InputAction @Rotation => m_Wrapper.m_PlayerOnFoot_Rotation;
+        public InputAction @CameraRotation => m_Wrapper.m_PlayerOnFoot_CameraRotation;
+        public InputAction @CameraZoom => m_Wrapper.m_PlayerOnFoot_CameraZoom;
+        public InputAction @Jump => m_Wrapper.m_PlayerOnFoot_Jump;
+        public InputAction @Duck => m_Wrapper.m_PlayerOnFoot_Duck;
+        public InputAction @Acceleration => m_Wrapper.m_PlayerOnFoot_Acceleration;
+        public InputAction @SwitchMoveMode => m_Wrapper.m_PlayerOnFoot_SwitchMoveMode;
+        public InputAction @OpenMenu => m_Wrapper.m_PlayerOnFoot_OpenMenu;
+        public InputAction @CursorLockMode => m_Wrapper.m_PlayerOnFoot_CursorLockMode;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerOnFoot; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PlayerOnFootRHActions set) { return set.Get(); }
-        public void AddCallbacks(IPlayerOnFootRHActions instance)
+        public static implicit operator InputActionMap(PlayerOnFootActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerOnFootActions instance)
         {
-            if (instance == null || m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Add(instance);
             @Movement.started += instance.OnMovement;
             @Movement.performed += instance.OnMovement;
             @Movement.canceled += instance.OnMovement;
             @Rotation.started += instance.OnRotation;
             @Rotation.performed += instance.OnRotation;
             @Rotation.canceled += instance.OnRotation;
-            @SwitchMoveMode.started += instance.OnSwitchMoveMode;
-            @SwitchMoveMode.performed += instance.OnSwitchMoveMode;
-            @SwitchMoveMode.canceled += instance.OnSwitchMoveMode;
+            @CameraRotation.started += instance.OnCameraRotation;
+            @CameraRotation.performed += instance.OnCameraRotation;
+            @CameraRotation.canceled += instance.OnCameraRotation;
+            @CameraZoom.started += instance.OnCameraZoom;
+            @CameraZoom.performed += instance.OnCameraZoom;
+            @CameraZoom.canceled += instance.OnCameraZoom;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
@@ -1292,21 +1191,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Acceleration.started += instance.OnAcceleration;
             @Acceleration.performed += instance.OnAcceleration;
             @Acceleration.canceled += instance.OnAcceleration;
+            @SwitchMoveMode.started += instance.OnSwitchMoveMode;
+            @SwitchMoveMode.performed += instance.OnSwitchMoveMode;
+            @SwitchMoveMode.canceled += instance.OnSwitchMoveMode;
             @OpenMenu.started += instance.OnOpenMenu;
             @OpenMenu.performed += instance.OnOpenMenu;
             @OpenMenu.canceled += instance.OnOpenMenu;
             @CursorLockMode.started += instance.OnCursorLockMode;
             @CursorLockMode.performed += instance.OnCursorLockMode;
             @CursorLockMode.canceled += instance.OnCursorLockMode;
-            @CameraZoom.started += instance.OnCameraZoom;
-            @CameraZoom.performed += instance.OnCameraZoom;
-            @CameraZoom.canceled += instance.OnCameraZoom;
-            @CameraRotation.started += instance.OnCameraRotation;
-            @CameraRotation.performed += instance.OnCameraRotation;
-            @CameraRotation.canceled += instance.OnCameraRotation;
         }
 
-        private void UnregisterCallbacks(IPlayerOnFootRHActions instance)
+        private void UnregisterCallbacks(IPlayerOnFootActions instance)
         {
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
@@ -1314,9 +1210,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Rotation.started -= instance.OnRotation;
             @Rotation.performed -= instance.OnRotation;
             @Rotation.canceled -= instance.OnRotation;
-            @SwitchMoveMode.started -= instance.OnSwitchMoveMode;
-            @SwitchMoveMode.performed -= instance.OnSwitchMoveMode;
-            @SwitchMoveMode.canceled -= instance.OnSwitchMoveMode;
+            @CameraRotation.started -= instance.OnCameraRotation;
+            @CameraRotation.performed -= instance.OnCameraRotation;
+            @CameraRotation.canceled -= instance.OnCameraRotation;
+            @CameraZoom.started -= instance.OnCameraZoom;
+            @CameraZoom.performed -= instance.OnCameraZoom;
+            @CameraZoom.canceled -= instance.OnCameraZoom;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
@@ -1326,35 +1225,32 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Acceleration.started -= instance.OnAcceleration;
             @Acceleration.performed -= instance.OnAcceleration;
             @Acceleration.canceled -= instance.OnAcceleration;
+            @SwitchMoveMode.started -= instance.OnSwitchMoveMode;
+            @SwitchMoveMode.performed -= instance.OnSwitchMoveMode;
+            @SwitchMoveMode.canceled -= instance.OnSwitchMoveMode;
             @OpenMenu.started -= instance.OnOpenMenu;
             @OpenMenu.performed -= instance.OnOpenMenu;
             @OpenMenu.canceled -= instance.OnOpenMenu;
             @CursorLockMode.started -= instance.OnCursorLockMode;
             @CursorLockMode.performed -= instance.OnCursorLockMode;
             @CursorLockMode.canceled -= instance.OnCursorLockMode;
-            @CameraZoom.started -= instance.OnCameraZoom;
-            @CameraZoom.performed -= instance.OnCameraZoom;
-            @CameraZoom.canceled -= instance.OnCameraZoom;
-            @CameraRotation.started -= instance.OnCameraRotation;
-            @CameraRotation.performed -= instance.OnCameraRotation;
-            @CameraRotation.canceled -= instance.OnCameraRotation;
         }
 
-        public void RemoveCallbacks(IPlayerOnFootRHActions instance)
+        public void RemoveCallbacks(IPlayerOnFootActions instance)
         {
-            if (m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IPlayerOnFootRHActions instance)
+        public void SetCallbacks(IPlayerOnFootActions instance)
         {
-            foreach (var item in m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_PlayerOnFootRHActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_PlayerOnFootActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public PlayerOnFootRHActions @PlayerOnFootRH => new PlayerOnFootRHActions(this);
+    public PlayerOnFootActions @PlayerOnFoot => new PlayerOnFootActions(this);
 
     // DefaultUI
     private readonly InputActionMap m_DefaultUI;
@@ -1491,36 +1387,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_UniversalControllerSchemeIndex];
         }
     }
-    private int m_PlaystationControllerSchemeIndex = -1;
-    public InputControlScheme PlaystationControllerScheme
-    {
-        get
-        {
-            if (m_PlaystationControllerSchemeIndex == -1) m_PlaystationControllerSchemeIndex = asset.FindControlSchemeIndex("PlaystationController");
-            return asset.controlSchemes[m_PlaystationControllerSchemeIndex];
-        }
-    }
-    private int m_XBoxControllerSchemeIndex = -1;
-    public InputControlScheme XBoxControllerScheme
-    {
-        get
-        {
-            if (m_XBoxControllerSchemeIndex == -1) m_XBoxControllerSchemeIndex = asset.FindControlSchemeIndex("XBoxController");
-            return asset.controlSchemes[m_XBoxControllerSchemeIndex];
-        }
-    }
-    public interface IPlayerOnFootRHActions
+    public interface IPlayerOnFootActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnRotation(InputAction.CallbackContext context);
-        void OnSwitchMoveMode(InputAction.CallbackContext context);
+        void OnCameraRotation(InputAction.CallbackContext context);
+        void OnCameraZoom(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnDuck(InputAction.CallbackContext context);
         void OnAcceleration(InputAction.CallbackContext context);
+        void OnSwitchMoveMode(InputAction.CallbackContext context);
         void OnOpenMenu(InputAction.CallbackContext context);
         void OnCursorLockMode(InputAction.CallbackContext context);
-        void OnCameraZoom(InputAction.CallbackContext context);
-        void OnCameraRotation(InputAction.CallbackContext context);
     }
     public interface IDefaultUIActions
     {

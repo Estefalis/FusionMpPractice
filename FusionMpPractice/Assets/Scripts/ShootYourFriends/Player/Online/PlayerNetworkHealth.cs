@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
     public class PlayerNetworkHealth : MonoBehaviour
     {
@@ -32,6 +30,7 @@ namespace PlayerInputManagement
 
             //UpdateHealthUI(m_currentHP);
         }
+
         internal void TakeDamage(float _damage)
         {
             m_currentHP = Mathf.Max(m_currentHP - _damage, 0);

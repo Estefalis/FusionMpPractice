@@ -1,21 +1,20 @@
 using UnityEngine;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 
 {
     public class CameraNetworkBehaviour : MonoBehaviour
     {
+        private PlayerInputActions m_playerInputActions;
         [SerializeField] internal PlayerPersPective m_playerPerspective;
 
-        //TODO: Script an FirstPerson enum anpassen!
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
         #region SetParent and LookAtTarget
         [Header("SetParent and LookAtTarget")]
         [SerializeField] internal Camera m_camera;
-        [SerializeField] private Transform m_headSetParent;
-        [SerializeField] internal Transform m_cameraRotateController;
-        //[SerializeField] internal Transform m_relativeHelperTransform;    //HelperTransform before knowing the need of cameraForward/cameraRight.normalize. 
+        [SerializeField] private Transform m_setParent;
+        [SerializeField] internal Transform m_cameraHolder;
         [SerializeField] internal Transform m_lookAtTarget;
         [SerializeField] private bool m_keepWorldPos = true;
         [SerializeField] private bool m_differentChildHeight;
@@ -59,11 +58,11 @@ namespace PlayerInputManagement
         [Header("Camera-Zoom")]
         [SerializeField] internal float m_zoomSpeed;
         [SerializeField] private float m_zoomDampening;
-        [SerializeField] private float m_startZoomDistance = 8.0f;
         [SerializeField] private float m_minZoomDistance;
         [SerializeField] private float m_maxZoomDistance;
         internal float m_clampedCameraDistance;                                         //Clamped in private void CameraZoom().
         internal float m_zoomScrollValue;
+        internal EmoveMethod m_eMoveMethod;
         #endregion
 
         #region Debug.Drawline & DrawWireSphere
@@ -82,12 +81,6 @@ namespace PlayerInputManagement
             ResetCameraByPerspective();
         }
 
-        private void Start()
-        {
-            if (gameObject.activeInHierarchy)
-                m_camera.transform.parent = m_headSetParent;
-        }
-
         private void Update()
         {
             //GetMousePosition();
@@ -96,15 +89,8 @@ namespace PlayerInputManagement
             {
                 case PlayerPersPective.ThirdPerson:
                 {
-                    if (m_headSetParent != null)
-                        m_cameraRotateController.position = m_headSetParent.position;
-                    //RelativeHelperPositioning();
                     SetLookAtParent(m_lookAtTarget, true);
                     MinCameraPosSphereCast();
-                    break;
-                }
-                case PlayerPersPective.FirstPerson:
-                {
                     break;
                 }
                 default:
@@ -126,10 +112,6 @@ namespace PlayerInputManagement
                     ThirdPersonCameraLerp();
                     break;
                 }
-                case PlayerPersPective.FirstPerson:
-                {
-                    break;
-                }
                 default:
                     break;
             }
@@ -141,23 +123,15 @@ namespace PlayerInputManagement
         {
             m_runtimeMinMousePitch = m_minMousePitch;
             Cursor.lockState = m_cursorLockMode;
-            m_cameraRotateController.rotation = m_headSetParent.rotation;
 
             switch (m_playerPerspective)
             {
                 case PlayerPersPective.ThirdPerson:
                 {
                     //m_mousePosition = Vector2.zero;
-                    m_clampedCameraDistance = m_startZoomDistance;          //m_clampedCameraDistance -= variable to adjust the cameraPos by the player?
+                    m_clampedCameraDistance = m_maxZoomDistance;
+                    m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
                     SetLookAtParent(m_lookAtTarget, m_keepWorldPos);
-                    break;
-                }
-                case PlayerPersPective.FirstPerson:
-                {
-                    if (m_camera.transform.parent != transform)
-                        m_camera.gameObject.SetActive(false);
-                    //m_camera.transform.SetParent(m_headSetParent, m_keepWorldPos);
-                    //min & max - ZoomVariables get switched within the CameraZoom - Method itself.
                     break;
                 }
                 default:
@@ -165,17 +139,11 @@ namespace PlayerInputManagement
             }
         }
 
-        //private void RelativeHelperPositioning()
-        //{
-        //    m_relativeHelperTransform.position = new Vector3(m_camera.transform.position.x, m_playerNetworkController/*.m_rigidbody*/.transform.position.y, m_camera.transform.position.z);
-        //    m_relativeHelperTransform.LookAt(m_playerNetworkController.transform.position);
-        //}
-
         #region Custom Methods
         private void GetMousePosition()
         {
 #if ENABLE_INPUT_SYSTEM
-            m_mousePosition = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>();
+            m_mousePosition = m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>();
             //or Mouse.current.position.ReadValue();
 #else
             m_mousePosition = Input.mousePosition;
@@ -202,17 +170,20 @@ namespace PlayerInputManagement
                                 break;
                         }
 
-                        switch (m_invertYRotation)
+                        if (m_eMoveMethod != EmoveMethod.MouseRotateY)
                         {
-                            case false:
+                            switch (m_invertYRotation)
                             {
-                                runtimeRotationVector.y -= m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
-                                break;
-                            }
-                            case true:
-                            {
-                                runtimeRotationVector.y += m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
-                                break;
+                                case false:
+                                {
+                                    runtimeRotationVector.y -= m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
+                                    break;
+                                }
+                                case true:
+                                {
+                                    runtimeRotationVector.y += m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -254,12 +225,13 @@ namespace PlayerInputManagement
             if (!m_disableCameraZoom)
             {
                 if (m_zoomScrollValue != 0.0f)
-                //if (m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.CameraZoom.ReadValue<Vector2>().y != 0.0f)
                 {
                     float scrollAmount = m_zoomScrollValue * m_zoomSpeed;
                     scrollAmount *= m_clampedCameraDistance * m_zoomDampening;
                     m_clampedCameraDistance += scrollAmount * -1f;
+#if UNITY_EDITOR
                     //Debug.Log($"ScrollAmount{scrollAmount} - ClampCamDis {m_clampedCameraDistance} - ZoomDamp {m_zoomDampening}");
+#endif
 
                     switch (m_playerPerspective)
                     {
@@ -269,12 +241,8 @@ namespace PlayerInputManagement
                             m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
                             break;
                         }
-                        //If a different Clamping method is needed.
-                        case PlayerPersPective.FirstPerson:
-                        {
-                            m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
+                        default:
                             break;
-                        }
                     }
                 }
 
@@ -302,7 +270,7 @@ namespace PlayerInputManagement
         private void MinCameraPosSphereCast()
         {
             m_lineOrigin = m_camera.transform.position;
-            m_sphereCastDirection = -m_cameraRotateController.up;
+            m_sphereCastDirection = -m_cameraHolder.up;
 
             m_obstacleIsBelow =
             Physics.SphereCast(m_lineOrigin, m_sphereCheckRadius, m_sphereCastDirection, out RaycastHit hitObject, m_sphereCastLength, m_sphereCheckLayerMask, QueryTriggerInteraction.UseGlobal);
@@ -348,15 +316,16 @@ namespace PlayerInputManagement
 
         private void SetLookAtParent(Transform _lookAtTarget = null, bool _keepWorldPosition = true)
         {
-            if (m_currentLookAtTarget != _lookAtTarget || m_currentLookAtTarget == null)
+            if ((m_currentLookAtTarget != _lookAtTarget || m_currentLookAtTarget == null) && m_setParent != null)
             {
-                m_headSetParent.SetParent(_lookAtTarget, _keepWorldPosition);
+                m_setParent.SetParent(_lookAtTarget, _keepWorldPosition);
                 if (m_differentChildHeight)
-                    m_headSetParent.position = new Vector3(_lookAtTarget.position.x + m_childPosOffset.x, _lookAtTarget.position.y + m_childPosOffset.y, _lookAtTarget.position.z + m_childPosOffset.z);
+                    m_setParent.position = new Vector3(_lookAtTarget.position.x + m_childPosOffset.x, _lookAtTarget.position.y + m_childPosOffset.y, _lookAtTarget.position.z + m_childPosOffset.z);
                 else if (_lookAtTarget != null)
-                    m_headSetParent.position = _lookAtTarget.position;
+                    m_setParent.position = _lookAtTarget.position;
 
                 m_currentLookAtTarget = _lookAtTarget;
+                m_cameraHolder.rotation = m_setParent.rotation;
             }
 
             m_camera.transform.LookAt(_lookAtTarget);
@@ -367,7 +336,7 @@ namespace PlayerInputManagement
             if (!m_disableCameraRotation)
             {
                 Quaternion runtimeCameraOrientation = Quaternion.Euler(runtimeRotationVector.x, runtimeRotationVector.y, 0.0f);
-                m_cameraRotateController.rotation = Quaternion.Lerp(m_cameraRotateController.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));  //(x * y) * 0.5f prevents rotationHickUps on unsynchronous values.
+                m_cameraHolder.rotation = Quaternion.Lerp(m_cameraHolder.rotation, runtimeCameraOrientation, Time.deltaTime * (m_xAxisRotationSpeed * m_yAxisRotationSpeed * 0.5f));  //(x * y) * 0.5f prevents rotationHickUps on unsynchronous values.
             }
         }
         #endregion

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
     public class PlayerOfflineMovement : MonoBehaviour
     {
@@ -95,11 +95,11 @@ namespace PlayerInputManagement
 
         private void OnDisable()
         {
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Disable();
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Jump.performed -= CharacterJump;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Jump.canceled -= OnJumpButtonRelease;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Duck.performed -= CharacterDuck;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Duck.canceled -= StopDucking;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Disable();
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Jump.performed -= CharacterJump;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Jump.canceled -= OnJumpButtonRelease;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Duck.performed -= CharacterDuck;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Duck.canceled -= StopDucking;
 
             m_jumpButtonGotPressed -= SwitchJumpButtonState;
 
@@ -109,11 +109,11 @@ namespace PlayerInputManagement
         private void Start()
         {
             m_playerOfflineController.m_playerInputActions = InputManager.m_InputManagerActions;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Enable();
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Jump.performed += CharacterJump;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Jump.canceled += OnJumpButtonRelease;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Duck.performed += CharacterDuck;
-            m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Duck.canceled += StopDucking;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Enable();
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Jump.performed += CharacterJump;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Jump.canceled += OnJumpButtonRelease;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Duck.performed += CharacterDuck;
+            m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Duck.canceled += StopDucking;
 
             m_jumpButtonGotPressed += SwitchJumpButtonState;
 
@@ -173,6 +173,8 @@ namespace PlayerInputManagement
                     }
                 }
 
+                m_playerOfflineController.m_cameraOfflineBehaviour.m_eMoveMethod = m_eMoveMethod;
+
                 switch (m_playerIsGrounded) //Calculate FallDamage.
                 {
                     case false:
@@ -211,7 +213,7 @@ namespace PlayerInputManagement
         #region MoveRigidbody Alternatives
         private void MoveRigidbodyBasic()
         {
-            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y);
 
             m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
 
@@ -226,9 +228,9 @@ namespace PlayerInputManagement
         private void MoveRigidbodyADY()
         {
             m_horizontalMovement =
-                new(0.0f, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);        //W & S
+                new(0.0f, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y);        //W & S
             m_characterRotation =
-                new Vector3(0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f); //A & D
+                new Vector3(0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x, 0.0f); //A & D
 
             m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
             m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
@@ -240,9 +242,9 @@ namespace PlayerInputManagement
         private void MoveRigidBodyMouseY()
         {
             m_horizontalMovement =
-                new(0.0f, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);    //W & S
+                new(0.0f, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y);    //W & S
             m_characterRotation =
-                new Vector3(0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Rotation.ReadValue<Vector2>().x, 0.0f); //MouseX Rot Y
+                new Vector3(0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Rotation.ReadValue<Vector2>().x, 0.0f); //MouseX Rot Y
 
             m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
             m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_horizontalMovement.normalized);
@@ -269,16 +271,14 @@ namespace PlayerInputManagement
             cameraRight.y = 0.0f;    //prevents characterJumps.
             cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
             cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-            Vector3 relativeForward = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * cameraForward;
+            Vector3 relativeForward = m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y * cameraForward;
 
-            Vector3 relativeRight = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x * cameraRight;
+            Vector3 relativeRight = m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x * cameraRight;
             Vector3 relativeMoveVector = relativeRight + relativeForward;
 
             m_playerOfflineController.m_rigidbody.MovePosition(m_playerOfflineController.m_rigidbody.transform.position + m_individualMaxSpeed * Time.fixedDeltaTime * relativeMoveVector.normalized);
 
-            //This if does not allow switching between FirstPerson and ThirdPerson in runtime.
-            if (relativeMoveVector != Vector3.zero && m_playerOfflineController.m_cameraOfflineBehaviour.m_playerPerspective == PlayerPersPective.ThirdPerson ||
-                relativeMoveVector != Vector3.zero && m_playerOfflineController.m_cameraOfflineBehaviour.m_playerPerspective == PlayerPersPective.FirstPerson && m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y >= 0.0f)
+            if (relativeMoveVector != Vector3.zero && m_playerOfflineController.m_cameraOfflineBehaviour.m_playerPerspective == PlayerPersPective.ThirdPerson && m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
             {
                 float angle = Mathf.Atan2(relativeMoveVector.x, relativeMoveVector.z) * Mathf.Rad2Deg;
                 float smoothRotation = Mathf.SmoothDampAngle(m_playerOfflineController.m_rigidbody.transform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
@@ -292,7 +292,7 @@ namespace PlayerInputManagement
 
         private void MoveRigidbodyLocked()
         {
-            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().x, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y);
+            m_horizontalMovement = new(m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x, 0.0f, m_playerOfflineController.m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y);
 
             m_horizontalMovement = m_playerOfflineController.m_rigidbody.transform.TransformDirection(m_horizontalMovement);
 

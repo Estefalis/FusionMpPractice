@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PlayerInputManagement
+namespace PlayerManagement
 {
     public class PlayerOfflineInteractions : MonoBehaviour
     {
