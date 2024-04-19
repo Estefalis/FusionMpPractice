@@ -292,32 +292,14 @@ namespace PlayerManagement
 
         private void MoveRigidbodyRelative()
         {
-            #region Use of custom RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-            //Vector3 fakecameraForward = m_playerOfflineController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
-            //Vector3 cameraRight = m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.right;
-            ////cameraForward = cameraForward.normalized;
-            //cameraRight.y = 0;    //prevents characterJumps.
-            //cameraRight = cameraRight.normalized;
-            //Vector3 relativeForward = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
-            #endregion
+            m_moveDirection = m_moveVector.x * m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.right;
+            m_moveDirection += m_moveVector.z * m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.forward;
+            m_moveDirection.y = 0.0f;
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_moveDirection.normalized);
 
-            Vector3 cameraForward = m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.forward;
-            Vector3 cameraRight = m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.right;
-            cameraForward.y = 0.0f;   //prevents characterJumps.
-            cameraRight.y = 0.0f;    //prevents characterJumps.
-            cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-            cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-
-            Vector3 relativeRightVector = m_moveVector.x * cameraRight;
-            Vector3 relativeForwardVector = m_moveVector.z * cameraForward;
-
-            m_relativeMoveVector = relativeRightVector + relativeForwardVector;
-
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_relativeMoveVector.normalized);
-
-            if (m_relativeMoveVector != Vector3.zero && m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
+            if (m_moveDirection != Vector3.zero)
             {
-                float angle = Mathf.Atan2(m_relativeMoveVector.x, m_relativeMoveVector.z) * Mathf.Rad2Deg;
+                float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;
                 float smoothRotation =
                     Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
                 m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
