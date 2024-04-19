@@ -11,9 +11,9 @@ namespace PlayerManagement
         [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;
         [SerializeField] internal PlayerNetworkInteractions m_playerNetworkInteractions;
         [SerializeField] internal PlayerNetworkHealth m_playerNetworkHealth;
-        [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkController;
-        [SerializeField] internal EOnFootTargetMoveModi m_eRuntimeMoveMode;
-        [SerializeField] internal EmoveMethod m_eMoveMethod;
+        [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkBehaviour;
+        [SerializeField] internal EAvatarMoveState m_eAvatarMoveState;
+        [SerializeField] internal ERigidbodyMoveMethod m_eRigidbodyMoveMethod;
 
         #region Runtime-Values
         #region Reset on falling off the area
@@ -27,11 +27,6 @@ namespace PlayerManagement
         #region Network
         [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote player receive the correct input data to move their avatars.
         #endregion
-
-        private void Awake()
-        {
-            m_eRuntimeMoveMode = EOnFootTargetMoveModi.Walking;
-        }
 
         public override void Spawned()
         {

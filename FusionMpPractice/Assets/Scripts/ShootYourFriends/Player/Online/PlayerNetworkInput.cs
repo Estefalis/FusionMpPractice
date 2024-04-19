@@ -30,7 +30,7 @@ namespace PlayerManagement
         internal bool KneelButtonIsPressed;
         #endregion
 
-        private EmoveMethod m_ePreviousMoveMethod;
+        private ERigidbodyMoveMethod m_ePreviousMoveMethod;
 
         private void OnDisable()
         {
@@ -54,8 +54,8 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed -= AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled -= DecelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.CursorLockMode.performed -= SwitchCursorLockMode;
-                m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
-                m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
+                //m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
+                //m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed -= OpenMenu;
                 #endregion
 
@@ -88,8 +88,8 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed += AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled += DecelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.CursorLockMode.performed += SwitchCursorLockMode;
-                m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
-                m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
+                //m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
+                //m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed += OpenMenu;
                 #endregion
 
@@ -106,43 +106,43 @@ namespace PlayerManagement
         #region Custom Methods
         private void CameraRotation()
         {
-            m_playerNetworkController.m_cameraNetworkController.m_playerInputRotationVector =
+            m_playerNetworkController.m_cameraNetworkBehaviour.m_playerInputRotationVector =
                 new Vector3(-m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().y, 0.0f);
         }
 
         private void RetrieveUserInput()
         {
-            switch (m_playerNetworkController.m_eMoveMethod)
+            switch (m_playerNetworkController.m_eRigidbodyMoveMethod)
             {
-                case EmoveMethod.Basic:
+                case ERigidbodyMoveMethod.Basic:
                 {
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;
                     m_rotationInputLocal = 0.0f;
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;
                     break;
                 }
-                case EmoveMethod.KbRotateY:
+                case ERigidbodyMoveMethod.KbRotateY:
                 {
                     m_rightInputLocal = 0.0f;
                     m_rotationInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;           //A & D
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
                     break;
                 }
-                case EmoveMethod.MouseRotateY:
+                case ERigidbodyMoveMethod.MouseRotateY:
                 {
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;              //A & D
                     m_rotationInputLocal = m_playerInputActions.PlayerOnFoot.Rotation.ReadValue<Vector2>().x;           //MouseX Rot Y
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
                     break;
                 }
-                case EmoveMethod.Locked:
+                case ERigidbodyMoveMethod.Locked:
                 {
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;              //A & D
                     m_rotationInputLocal = 0.0f;
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
                     break;
                 }
-                case EmoveMethod.Relative:
+                case ERigidbodyMoveMethod.Relative:
                 {
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;              //A & D
                     m_rotationInputLocal = 0.0f;
@@ -153,7 +153,7 @@ namespace PlayerManagement
                     break;
             }
 
-            //m_localMoveVector = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
+            //m_localMoveVector = new Vector3(m_rightInput, m_rotationInput, m_forwardInput);
         }
         #endregion
 
@@ -194,13 +194,13 @@ namespace PlayerManagement
         #region Rotation
         private void OnRightMouseButtonDown(InputAction.CallbackContext _callbackContext)
         {
-            m_ePreviousMoveMethod = m_playerNetworkController.m_eMoveMethod;
-            m_playerNetworkController.m_eMoveMethod = EmoveMethod.Locked;
+            m_ePreviousMoveMethod = m_playerNetworkController.m_eRigidbodyMoveMethod;
+            m_playerNetworkController.m_eRigidbodyMoveMethod = ERigidbodyMoveMethod.Locked;
         }
 
         private void OnRightMouseButtonUp(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_eMoveMethod = m_ePreviousMoveMethod;
+            m_playerNetworkController.m_eRigidbodyMoveMethod = m_ePreviousMoveMethod;
         }
         #endregion
         #region Increasing Acceleration
@@ -221,23 +221,25 @@ namespace PlayerManagement
 
         }
         #endregion
-        //#region InputDeviceChange
+
+        #region InputDeviceChange
         //private void OnInputDeviceChange(InputUser _inputUser, InputUserChange _inputUserChange, InputDevice _inputDevice)
         //{
         //    //TODO: Possible Notifications on changing the input device.
         //}
-        //#endregion
-        #region Camera Zoom
-        private void ZoomCamera(InputAction.CallbackContext _callbackContext)
-        {
-            m_playerNetworkController.m_cameraNetworkController.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerNetworkController.m_cameraNetworkController.m_zoomSpeed;
-        }
-
-        private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
-        {
-            m_playerNetworkController.m_cameraNetworkController.m_zoomScrollValue = 0.0f;
-        }
         #endregion
+        #region Camera Zoom
+        //private void ZoomCamera(InputAction.CallbackContext _callbackContext)
+        //{
+        //    m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomSpeed;
+        //}
+
+        //private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
+        //{
+        //    m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
+        //}
+        #endregion
+
         #region Menu
         private void OpenMenu(InputAction.CallbackContext _callbackContext)
         {
@@ -262,10 +264,10 @@ namespace PlayerManagement
             #region Version 2
             //var playerInput = new PlayerNetworkData()
             //{
-            //    MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    MoveDirection = new Vector3(m_rightInput, m_rotationInput, m_forwardInput),
             //    //MoveDirection = m_localMoveVector,
-            //    JumpButtonGotPressed = JumpButtonIsPressed,
-            //    KneelButtonGotPressed = KneelButtonIsPressed,
+            //    JumpButtonGotPressed = m_JumpButtonIsPressed,
+            //    KneelButtonGotPressed = m_KneelButtonIsPressed,
             //};
             #endregion
 

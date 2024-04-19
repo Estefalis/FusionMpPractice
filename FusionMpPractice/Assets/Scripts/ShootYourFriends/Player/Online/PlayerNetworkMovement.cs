@@ -50,7 +50,7 @@ namespace PlayerManagement
         [SerializeField] internal float m_brakeToZeroSpeed = 1.0f;
         internal float m_acceleRatePerSec, m_deceleRatePerSec, m_brakeRatePerSec;
         internal float m_individualMaxSpeed, m_setRunTimeMaxSpeed;
-        internal EOnFootTargetMoveModi m_lastMoveMode;
+        internal EAvatarMoveState m_lastMoveMode;
         #endregion
 
         #region Gravity-Variables
@@ -120,6 +120,7 @@ namespace PlayerManagement
             m_rigidbody = GetComponentInChildren<Rigidbody>();
             m_rigidbodyTransform = m_rigidbody.transform;
             m_startPosition = transform.position;
+            m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Walking;
         }
 
         private void OnDisable()
@@ -137,7 +138,7 @@ namespace PlayerManagement
         {
             m_hasInputAuthorityText.text = $"{Object.HasInputAuthority}";
             m_networkObjectId.text = $"{Object.Id}";
-            
+
             if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
             {
                 m_playerInputActions = InputManager.m_InputManagerActions;
@@ -161,8 +162,8 @@ namespace PlayerManagement
             {
                 //simple Groundcheck without Arrays of hitted objects or memory allocation.
                 m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
-                //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
-                
+                //m_playerOfflineController.m_playerIsGrounded = Physics.Raycast(m_playerOfflineController.m_groundCheckTransform.position, Vector3.down, m_playerOfflineController.m_groundCheckDistance, m_playerOfflineController.m_groundCheckLayerMask);
+
                 CoyoteTimerReSet();
                 Crouching();
                 MoveAcceleration();
@@ -180,32 +181,30 @@ namespace PlayerManagement
 
             if (!m_playerNetworkController.m_isDead)
             {
-                m_playerNetworkController.m_cameraNetworkController.m_eMoveMethod = m_playerNetworkController.m_eMoveMethod;
-                
-                switch (m_playerNetworkController.m_eMoveMethod)
+                switch (m_playerNetworkController.m_eRigidbodyMoveMethod)
                 {
                     //Runner.DeltaTime instead of Time.fixedDeltaTime in Movement_Methods.
-                    case EmoveMethod.Basic:
+                    case ERigidbodyMoveMethod.Basic:
                     {
                         MoveRigidbodyBasic();
                         break;
                     }
-                    case EmoveMethod.KbRotateY:
+                    case ERigidbodyMoveMethod.KbRotateY:
                     {
                         MoveRigidbodyKbY();
                         break;
                     }
-                    case EmoveMethod.MouseRotateY:
+                    case ERigidbodyMoveMethod.MouseRotateY:
                     {
                         MoveRigidBodyMouseY();
                         break;
                     }
-                    case EmoveMethod.Locked:
+                    case ERigidbodyMoveMethod.Locked:
                     {
                         MoveRigidbodyLocked();
                         break;
                     }
-                    case EmoveMethod.Relative:
+                    case ERigidbodyMoveMethod.Relative:
                     {
                         MoveRigidbodyRelative();
                         break;
@@ -300,16 +299,16 @@ namespace PlayerManagement
         private void MoveRigidbodyRelative()
         {
             #region Use of custom RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-            //Vector3 fakecameraForward = m_playerNetworkController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
-            //Vector3 cameraRight = m_playerNetworkController.m_cameraOfflineBehaviour.m_camera.transform.right;
+            //Vector3 fakecameraForward = m_playerOfflineController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
+            //Vector3 cameraRight = m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.right;
             ////cameraForward = cameraForward.normalized;
             //cameraRight.y = 0;    //prevents characterJumps.
             //cameraRight = cameraRight.normalized;
-            //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            //Vector3 relativeForward = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
             #endregion
 
-            Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkController.m_camera.transform.forward;
-            Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkController.m_camera.transform.right;
+            Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
+            Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
             cameraForward.y = 0.0f;   //prevents characterJumps.
             cameraRight.y = 0.0f;    //prevents characterJumps.
             cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
@@ -322,7 +321,7 @@ namespace PlayerManagement
 
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);
 
-            if (m_relativeMoveVector != Vector3.zero && m_playerNetworkController.m_cameraNetworkController.m_playerPerspective == PlayerPersPective.ThirdPerson && m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
+            if (m_relativeMoveVector != Vector3.zero && m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
             {
                 float angle = Mathf.Atan2(m_relativeMoveVector.x, m_relativeMoveVector.z) * Mathf.Rad2Deg;
                 float smoothRotation =
@@ -416,7 +415,7 @@ namespace PlayerManagement
                     {
                         case false:
                         {
-                            m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Idle;
+                            m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Idle;
                             m_setRunTimeMaxSpeed = m_stopMovementValue;
                             m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                             AccelerationRate(m_deceleRatePerSec);
@@ -424,7 +423,7 @@ namespace PlayerManagement
                         }
                         case true:
                         {
-                            m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
+                            m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Crouching;
                             m_setRunTimeMaxSpeed = m_crouchSpeed;
                             m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                             AccelerationRate(m_deceleRatePerSec);
@@ -446,7 +445,7 @@ namespace PlayerManagement
                                 case false: //Shift is not pressed and character shall walk.
                                 {
                                     //In case the character shall speed up from walking.
-                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Walking;
+                                    m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Walking;
                                     m_setRunTimeMaxSpeed = m_walkSpeed;
                                     if (m_individualMaxSpeed < m_setRunTimeMaxSpeed)    //current vs. set speed.
                                     {
@@ -462,7 +461,7 @@ namespace PlayerManagement
                                 }
                                 case true:  //Shift is not pressed and character shall kneel down from Walking or Running.
                                 {
-                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Crouching;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
                                     m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     AccelerationRate(m_deceleRatePerSec);
@@ -477,7 +476,7 @@ namespace PlayerManagement
                             {
                                 case false: //If Shift IS pressed and the character shall not kneel down, but run.
                                 {
-                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Running;
+                                    m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Running;
                                     m_setRunTimeMaxSpeed = m_runSpeed;
                                     m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
                                     AccelerationRate(m_acceleRatePerSec);
@@ -485,7 +484,7 @@ namespace PlayerManagement
                                 }
                                 case true:  //If Shift IS pressed and the character shall kneel down.
                                 {
-                                    m_playerNetworkController.m_eRuntimeMoveMode = EOnFootTargetMoveModi.Crouching;
+                                    m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Crouching;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
                                     m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
                                     AccelerationRate(m_deceleRatePerSec);
@@ -503,27 +502,27 @@ namespace PlayerManagement
 
         private void AccelerationRate(float _sentDeAccelerationRate)
         {
-            switch (m_playerNetworkController.m_eRuntimeMoveMode)
+            switch (m_playerNetworkController.m_eAvatarMoveState)
             {
-                case EOnFootTargetMoveModi.Walking:
+                case EAvatarMoveState.Walking:
                 {
                     m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
-                case EOnFootTargetMoveModi.Running:
+                case EAvatarMoveState.Running:
                 {
                     m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
-                case EOnFootTargetMoveModi.Crouching:
+                case EAvatarMoveState.Crouching:
                 {
                     m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
-                case EOnFootTargetMoveModi.Idle:
+                case EAvatarMoveState.Idle:
                 {
                     m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);

@@ -131,10 +131,10 @@ MonoBehaviour:
   m_playerNetworkMovement: {fileID: 0}
   m_playerNetworkInteractions: {fileID: 0}
   m_playerNetworkHealth: {fileID: 0}
-  m_cameraNetworkController: {fileID: 2242850098891348956}
+  m_cameraNetworkBehaviour: {fileID: 0}
   m_eRuntimeMoveMode: 0
   m_eMoveMethod: 1
-  m_repopPosition: {x: 0, y: 0, z: 0}
+  m_rePopPosition: {x: 0, y: 0, z: 0}
   m_fallLimit: -100
 --- !u!114 &4947469223355027126
 MonoBehaviour:
@@ -321,34 +321,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8957285762527808654}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c1f6aa7b186eab4bb812e5431383545, type: 3}
+  m_Script: {fileID: 11500000, guid: af9cbccb59681e6448756c6181b52e65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerPerspective: 0
-  m_playerNetworkController: {fileID: 26374642313623608}
   m_camera: {fileID: 6402673030330305268}
-  m_headSetParent: {fileID: 0}
-  m_cameraRotateController: {fileID: 8957285762527808655}
-  m_lookAtTarget: {fileID: 0}
-  m_keepWorldPos: 1
-  m_differentChildHeight: 0
-  m_childPosOffset: {x: 0, y: 0, z: 0}
-  m_cursorLockMode: 0
-  m_sphereCheckRadius: 0.5
-  m_sphereCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 897
-  m_minMousePitch: -75
-  m_maxMousePitch: 75
-  m_xAxisRotationSpeed: 30
-  m_yAxisRotationSpeed: 40
-  m_invertXRotation: 0
-  m_invertYRotation: 0
-  m_disableCameraRotation: 0
-  m_disableCameraZoom: 0
-  m_zoomSpeed: 5
-  m_zoomDampening: 1
-  m_startZoomDistance: 8
-  m_minZoomDistance: 0.1
-  m_maxZoomDistance: 8
-  m_sphereCastLength: 1.25

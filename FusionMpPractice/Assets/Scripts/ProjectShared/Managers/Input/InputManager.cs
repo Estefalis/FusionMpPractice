@@ -3,14 +3,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-internal enum PlayerPersPective
-{
-    //FirstPerson,
-    ThirdPerson,
-    //whatever comes next into my mind.
-}
+//internal enum PlayerPersPective
+//{
+//    FirstPerson,
+//    ThirdPerson,
+//    //whatever comes next into my mind.
+//}
 
-internal enum EOnFootTargetMoveModi
+internal enum EAvatarMoveState
 {
     Idle,
     Walking,
@@ -18,7 +18,7 @@ internal enum EOnFootTargetMoveModi
     Crouching,
 }
 
-internal enum EmoveMethod
+internal enum ERigidbodyMoveMethod
 {
     Basic,
     KbRotateY,
