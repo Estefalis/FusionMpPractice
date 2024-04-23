@@ -91,7 +91,7 @@ public class CameraControlOIS : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Y))
             m_invertYAxis = !m_invertYAxis;
 
-        //Toggle CameraMovement On/Off.
+        //Toggle CameraMovementSettings On/Off.
         if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.C))
             m_disableCameraRotation = !m_disableCameraRotation;
 

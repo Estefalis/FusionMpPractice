@@ -107,7 +107,7 @@ namespace PlayerManagement
         private void CameraRotation()
         {
             m_playerNetworkController.m_cameraNetworkBehaviour.m_playerInputRotationVector =
-                new Vector3(-m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().y, 0.0f);
+                new Vector3(-m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().y, 0.0f);
         }
 
         private void RetrieveUserInput()

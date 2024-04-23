@@ -283,6 +283,18 @@ namespace PlayerManagement
             }
         }
 
+        //Alternative SetParent Version with 'LookAtCurrentTarget(m_lookAtTarget);' from CameraOfflineBehaviour Save.
+        private void LookAtCurrentTarget(Transform _lookAtTarget)
+        {
+            if (m_currentLookAtTarget != _lookAtTarget || m_currentLookAtTarget == null)
+            {
+                m_currentLookAtTarget = _lookAtTarget;
+                m_cameraHolder.SetParent(_lookAtTarget, m_keepWorldPos);
+            }
+
+            m_camera.transform.LookAt(m_currentLookAtTarget);
+        }
+
         private void SetLookAtParent(Transform _lookAtTarget = null, bool _keepWorldPosition = true)
         {
             if (m_setParent != null)

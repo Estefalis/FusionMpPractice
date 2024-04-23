@@ -33,8 +33,8 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed -= AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled -= DecelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.CursorLockMode.performed -= SwitchCursorLockMode;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed -= OpenMenu;
                 #endregion
 
@@ -63,8 +63,8 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed += AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled += DecelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.CursorLockMode.performed += SwitchCursorLockMode;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed += OpenMenu;
                 #endregion
 
@@ -82,7 +82,7 @@ namespace PlayerManagement
         private void CameraRotation()
         {
             m_playerOfflineController.m_cameraOfflineBehaviour.m_playerInputRotationVector =
-                new Vector3(-m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraRotation.ReadValue<Vector2>().y, 0.0f);
+                new Vector3(-m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().y, 0.0f);
         }
 
         private void RetrieveUserInput()
@@ -204,15 +204,15 @@ namespace PlayerManagement
         //}
         #endregion
         #region Camera Zoom
-        //private void ZoomCamera(InputAction.CallbackContext _callbackContext)
-        //{
-        //    m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomSpeed;
-        //}
+        private void ZoomCamera(InputAction.CallbackContext _callbackContext)
+        {
+            m_playerOfflineController.m_cameraOfflineBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerOfflineController.m_cameraOfflineBehaviour.m_zoomSpeed;
+        }
 
-        //private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
-        //{
-        //    m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
-        //}
+        private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
+        {
+            m_playerOfflineController.m_cameraOfflineBehaviour.m_zoomScrollValue = 0.0f;
+        }
         #endregion
 
         #region Menu
