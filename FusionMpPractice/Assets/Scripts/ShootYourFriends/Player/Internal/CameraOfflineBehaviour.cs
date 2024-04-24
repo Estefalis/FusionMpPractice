@@ -45,6 +45,7 @@ namespace PlayerManagement
         [SerializeField] private float m_lerpTime = 0.2f;
         [SerializeField] private LayerMask m_collisionCheckLayers;
         private Vector3 m_currentCameraPosition;
+        private bool m_camCollision;
         #endregion
 
         #region Camera-Zoom
@@ -78,13 +79,13 @@ namespace PlayerManagement
         {
             FollowTarget();
             ProcessPlayerCameraInputs();
-            CameraCollision();
+            //CameraCollision();
         }
 
         private void LateUpdate()
         {
             CameraRotation();
-            //CameraZoom();
+            CameraZoom();
         }
 
         private void SetCursorRestrictions()
@@ -163,7 +164,9 @@ namespace PlayerManagement
 #endif
             cameraDirection.Normalize();
 
-            if (Physics.SphereCast(m_cameraPivot.transform.position, m_collisionCheckRadius, cameraDirection, out RaycastHit hitObject, Mathf.Abs(targetPosition), m_collisionCheckLayers, QueryTriggerInteraction.UseGlobal))
+            m_camCollision = Physics.SphereCast(m_cameraPivot.transform.position, m_collisionCheckRadius, cameraDirection, out RaycastHit hitObject, Mathf.Abs(targetPosition), m_collisionCheckLayers, QueryTriggerInteraction.UseGlobal);
+
+            if (m_camCollision)
             {
                 float objectHitDistance = Vector3.Distance(m_cameraPivot.position, hitObject.point);
                 m_runtimeMaxZoomDistance = objectHitDistance;
@@ -191,14 +194,12 @@ namespace PlayerManagement
         {
             if (!m_disableCameraZoom)
             {
-                //if (m_cameraTransform.localPosition.z != m_cameraLocalZDistance * -1f)
-                //{
                 switch (m_zoomScrollValue)
                 {
                     case 0.0f:
                     {
                         //Camera stops.
-                        m_cameraTransform.localPosition = new Vector3(0.0f, 0.0f, m_cameraTransform.localPosition.z);
+                        m_cameraTransform.localPosition = new Vector3(m_cameraTransform.localPosition.x, m_cameraTransform.localPosition.y, m_cameraTransform.localPosition.z);
                         break;
                     }
                     default:
@@ -209,11 +210,11 @@ namespace PlayerManagement
 
                         m_cameraLocalZDistance = Mathf.Clamp(m_cameraLocalZDistance, m_minZoomDistance, m_runtimeMaxZoomDistance);
                         //m_cameraLocalZDistance Interpolation.
-                        m_cameraTransform.localPosition = new Vector3(0.0f, 0.0f, Mathf.Lerp(m_cameraTransform.localPosition.z, m_cameraLocalZDistance * -1f, Time.deltaTime * m_zoomSpeed));
+                        m_cameraTransform.localPosition = new Vector3(m_cameraTransform.localPosition.x, m_cameraTransform.localPosition.y,
+                            Mathf.Lerp(m_cameraTransform.localPosition.z, m_cameraLocalZDistance * -1f, Time.deltaTime * m_zoomSpeed));
                         break;
                     }
                 }
-                //}
             }
         }
 
