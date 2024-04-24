@@ -473,11 +473,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PCOfflineController
       objectReference: {fileID: 0}
-    - target: {fileID: 3917965877936963700, guid: 6eb8dfd77f13ee24ca81f4bd785f328d,
-        type: 3}
-      propertyPath: m_collisionCheckRadius
-      value: 0.2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6eb8dfd77f13ee24ca81f4bd785f328d, type: 3}
 --- !u!1 &591717427

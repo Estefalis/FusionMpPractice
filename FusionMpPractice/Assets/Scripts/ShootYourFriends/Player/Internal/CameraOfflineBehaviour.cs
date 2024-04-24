@@ -12,7 +12,7 @@ namespace PlayerManagement
         [SerializeField] internal Transform m_cameraPivot;
         [SerializeField] internal Transform m_lookAtTarget;
         //Increasing 'm_followTargetSpeed' with 'Relative Movement' results on Player moving out of Screen, while moving towards the Camera.
-        [SerializeField] private float m_followTargetSpeed = 0.125f;
+        [SerializeField, Range(0.0001f, 0.1f)] private float m_followTargetSpeed;
         private Transform m_cameraTransform;
         private Vector3 m_followTargetVelocity;
 
@@ -33,20 +33,18 @@ namespace PlayerManagement
         [SerializeField] private bool m_invertYRotation = false;
         [SerializeField] private bool m_disableCameraRotation = false;                  //Disabled CameraRotation
         [SerializeField] private bool m_disableCameraZoom = false;                      //Disabled CameraZoom
-        private Vector3 m_cameraMoveDirection;
         internal Vector3 m_playerInputRotationVector;
-        internal Vector2 m_mousePosition;
+        private Vector3 m_cameraMoveDirection;
+        //private Vector2 m_mousePosition;
         #endregion
 
         #region Camera Collision
         [Header("Camera Collision")]
         [SerializeField] private float m_cameraCollisionOffset = 0.2f;
-        [SerializeField] private float m_minCollisionOffset = 0.2f;
         [SerializeField] private float m_collisionCheckRadius = 0.2f;
         [SerializeField] private float m_lerpTime = 0.2f;
         [SerializeField] private LayerMask m_collisionCheckLayers;
         private Vector3 m_currentCameraPosition;
-        [SerializeField] private float m_defaultCameraPosition;
         #endregion
 
         #region Camera-Zoom
@@ -55,8 +53,8 @@ namespace PlayerManagement
         [SerializeField] private float m_zoomDampening;
         [SerializeField] private float m_minZoomDistance;
         [SerializeField] private float m_maxZoomDistance;
-        private float m_clampedCameraDistance, m_runtimeMaxZoomDistance;
         internal float m_zoomScrollValue;
+        private float m_cameraLocalZDistance, m_runtimeMaxZoomDistance;
         #endregion
 
         #region Camera-Position Limitations
@@ -71,22 +69,15 @@ namespace PlayerManagement
                 m_camera = GetComponentInChildren<Camera>();
 
             m_cameraTransform = m_camera.transform;
-            m_defaultCameraPosition = m_cameraTransform.localPosition.z;
-            m_clampedCameraDistance = m_cameraTransform.localPosition.z;
+            m_cameraLocalZDistance = m_cameraTransform.position.z - m_cameraPivot.position.z;
             m_runtimeMaxZoomDistance = m_maxZoomDistance;
-
-            SetCameraRestrictions();
-        }
-
-        private void Update()
-        {
-            //LookAtCurrentTarget(m_lookAtTarget);
+            SetCursorRestrictions();
         }
 
         private void FixedUpdate()
         {
             FollowTarget();
-            CameraMovementSettings();
+            ProcessPlayerCameraInputs();
             CameraCollision();
         }
 
@@ -96,16 +87,16 @@ namespace PlayerManagement
             //CameraZoom();
         }
 
+        private void SetCursorRestrictions()
+        {
+            Cursor.lockState = m_cursorLockMode;
+            Cursor.visible = m_cursorVisibility;
+        }
+
         private void FollowTarget()
         {
             Vector3 targetPosition = Vector3.SmoothDamp(m_cameraPivot.position, m_lookAtTarget.position, ref m_followTargetVelocity, m_followTargetSpeed);
             m_cameraPivot.position = targetPosition;
-        }
-
-        private void SetCameraRestrictions()
-        {
-            Cursor.lockState = m_cursorLockMode;
-            Cursor.visible = m_cursorVisibility;
         }
 
         #region Custom Methods
@@ -119,7 +110,7 @@ namespace PlayerManagement
         //#endif
         //        }
 
-        private void CameraMovementSettings()
+        private void ProcessPlayerCameraInputs()
         {
             if (!m_disableCameraRotation)
             {
@@ -165,8 +156,11 @@ namespace PlayerManagement
 
         private void CameraCollision()
         {
-            float targetPosition = m_defaultCameraPosition;
+            float targetPosition = m_cameraLocalZDistance;
             Vector3 cameraDirection = m_cameraTransform.position - m_cameraPivot.position;
+#if UNITY_EDITOR
+            Debug.DrawLine(m_cameraTransform.position, m_cameraPivot.position, Color.red);
+#endif
             cameraDirection.Normalize();
 
             if (Physics.SphereCast(m_cameraPivot.transform.position, m_collisionCheckRadius, cameraDirection, out RaycastHit hitObject, Mathf.Abs(targetPosition), m_collisionCheckLayers, QueryTriggerInteraction.UseGlobal))
@@ -184,10 +178,10 @@ namespace PlayerManagement
                 }
             }
 
-            if (Mathf.Abs(targetPosition) < m_minCollisionOffset)
-            {
-                targetPosition -= m_minCollisionOffset;
-            }
+            //if (targetPosition < m_cameraCollisionOffset)
+            //{
+            //    targetPosition -= m_cameraCollisionOffset;
+            //}
 
             m_currentCameraPosition.z = Mathf.Lerp(m_cameraTransform.localPosition.z, targetPosition, m_lerpTime);
             m_cameraTransform.localPosition = m_currentCameraPosition;
@@ -197,33 +191,29 @@ namespace PlayerManagement
         {
             if (!m_disableCameraZoom)
             {
-                if (m_zoomScrollValue != 0.0f)
+                //if (m_cameraTransform.localPosition.z != m_cameraLocalZDistance * -1f)
+                //{
+                switch (m_zoomScrollValue)
                 {
-                    float scrollAmount = m_zoomScrollValue * m_zoomSpeed;
-                    scrollAmount *= m_clampedCameraDistance * m_zoomDampening;
-                    m_clampedCameraDistance += scrollAmount * -1f;
-
-                    m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_runtimeMaxZoomDistance);
-                }
-
-                if (m_cameraTransform.localPosition.z != m_clampedCameraDistance * -1f)
-                {
-                    switch (m_zoomScrollValue)
+                    case 0.0f:
                     {
-                        case 0.0f:
-                        {
-                            //Camera gets stopped here!
-                            m_cameraTransform.localPosition = new Vector3(0f, 0f, m_cameraTransform.localPosition.z);
-                            break;
-                        }
-                        default:
-                        {
-                            //m_clampedCameraDistance Interpolation.
-                            m_cameraTransform.localPosition = new Vector3(0f, 0f, Mathf.Lerp(m_cameraTransform.localPosition.z, m_clampedCameraDistance * -1f, Time.deltaTime * m_zoomSpeed));
-                            break;
-                        }
+                        //Camera stops.
+                        m_cameraTransform.localPosition = new Vector3(0.0f, 0.0f, m_cameraTransform.localPosition.z);
+                        break;
+                    }
+                    default:
+                    {
+                        float scrollAmount = m_zoomScrollValue * m_zoomSpeed;
+                        scrollAmount *= m_cameraLocalZDistance * m_zoomDampening;
+                        m_cameraLocalZDistance += scrollAmount * -1f;
+
+                        m_cameraLocalZDistance = Mathf.Clamp(m_cameraLocalZDistance, m_minZoomDistance, m_runtimeMaxZoomDistance);
+                        //m_cameraLocalZDistance Interpolation.
+                        m_cameraTransform.localPosition = new Vector3(0.0f, 0.0f, Mathf.Lerp(m_cameraTransform.localPosition.z, m_cameraLocalZDistance * -1f, Time.deltaTime * m_zoomSpeed));
+                        break;
                     }
                 }
+                //}
             }
         }
 

@@ -1005,7 +1005,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1354211256900601352}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -3.25}
+  m_LocalPosition: {x: 0, y: 0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1814,7 +1814,7 @@ MonoBehaviour:
   m_camera: {fileID: 1354211256900601356}
   m_cameraPivot: {fileID: 1363800321658976509}
   m_lookAtTarget: {fileID: 1060936155000233000}
-  m_followTargetSpeed: 0.125
+  m_followTargetSpeed: 0.1
   m_minMousePitch: -60
   m_maxMousePitch: 60
   m_xAxisRotationSpeed: 30
@@ -1823,14 +1823,12 @@ MonoBehaviour:
   m_invertYRotation: 0
   m_disableCameraRotation: 0
   m_disableCameraZoom: 0
-  m_cameraCollisionOffset: 0.2
-  m_minCollisionOffset: 0.5
-  m_collisionCheckRadius: 0.2
+  m_cameraCollisionOffset: 0.25
+  m_collisionCheckRadius: 0.5
   m_lerpTime: 0.2
   m_collisionCheckLayers:
     serializedVersion: 2
     m_Bits: 905
-  m_defaultCameraPosition: 0
   m_zoomSpeed: 5
   m_zoomDampening: 1
   m_minZoomDistance: 0.5

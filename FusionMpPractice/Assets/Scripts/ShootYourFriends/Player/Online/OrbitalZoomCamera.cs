@@ -210,7 +210,7 @@ namespace PlayerManagement
                     scrollAmount *= m_clampedCameraDistance * m_zoomDampening;
                     m_clampedCameraDistance += scrollAmount * -1f;
 #if UNITY_EDITOR
-                    //Debug.Log($"ScrollAmount{scrollAmount} - ClampCamDis {m_clampedCameraDistance} - ZoomDamp {m_zoomDampening}");
+                    //Debug.Log($"ScrollAmount{scrollAmount} - ClampCamDis {m_cameraLocalZDistance} - ZoomDamp {m_zoomDampening}");
 #endif
                     m_clampedCameraDistance = Mathf.Clamp(m_clampedCameraDistance, m_minZoomDistance, m_maxZoomDistance);
                 }
@@ -227,7 +227,7 @@ namespace PlayerManagement
                         }
                         default:
                         {
-                            //m_clampedCameraDistance Interpolation.
+                            //m_cameraLocalZDistance Interpolation.
                             m_camera.transform.localPosition = new Vector3(0f, 0f, Mathf.Lerp(m_camera.transform.localPosition.z, m_clampedCameraDistance * -1f, Time.deltaTime * m_zoomSpeed));
                             break;
                         }

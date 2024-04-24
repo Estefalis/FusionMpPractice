@@ -91,7 +91,7 @@ public class CameraControlOIS : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Y))
             m_invertYAxis = !m_invertYAxis;
 
-        //Toggle CameraMovementSettings On/Off.
+        //Toggle ProcessPlayerCameraInputs On/Off.
         if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.C))
             m_disableCameraRotation = !m_disableCameraRotation;
 
@@ -146,7 +146,7 @@ public class CameraControlOIS : MonoBehaviour
         //Update nur, wenn ein Positionswechsel stattgefunden hat.
         if (m_camera.localPosition.z != this.m_cameraDistance * -1f)
         {
-            //Interpolierung zwischen aktuieller und Zielposition/m_clampedCameraDistance.
+            //Interpolierung zwischen aktuieller und Zielposition/m_cameraLocalZDistance.
             this.m_camera.localPosition = new Vector3(0f, 0f, Mathf.Lerp(this.m_camera.localPosition.z, this.m_cameraDistance * -1f,
                 Time.deltaTime * m_scrollSpeed));
         }
