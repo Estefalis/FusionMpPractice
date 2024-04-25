@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 226785590}
   m_Layer: 7
   m_Name: FallDamageTester
-  m_TagString: Untagged
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -323,7 +323,7 @@ GameObject:
   - component: {fileID: 418662646}
   m_Layer: 7
   m_Name: FloatingRamp3
-  m_TagString: Untagged
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -746,7 +746,7 @@ GameObject:
   - component: {fileID: 681648952}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -844,7 +844,7 @@ GameObject:
   - component: {fileID: 1357218930}
   m_Layer: 7
   m_Name: FloatingRamp2
-  m_TagString: Untagged
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -941,7 +941,7 @@ GameObject:
   - component: {fileID: 1361144340}
   m_Layer: 7
   m_Name: PossibleHeadache
-  m_TagString: Untagged
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1235,7 +1235,7 @@ GameObject:
   - component: {fileID: 2075818493}
   m_Layer: 0
   m_Name: Cylinder
-  m_TagString: Untagged
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1333,7 +1333,7 @@ GameObject:
   - component: {fileID: 2102786934}
   m_Layer: 7
   m_Name: FloatingRamp1
-  m_TagString: Untagged
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

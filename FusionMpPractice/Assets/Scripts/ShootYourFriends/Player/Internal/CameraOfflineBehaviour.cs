@@ -55,7 +55,7 @@ namespace PlayerManagement
         [SerializeField] private float m_minZoomDistance;
         [SerializeField] private float m_maxZoomDistance;
         internal float m_zoomScrollValue;
-        private float m_cameraLocalZDistance, m_runtimeMaxZoomDistance;
+        private float m_cameraLocalZDistance, m_resetDistance, m_runtimeMaxZoomDistance;
         #endregion
 
         #region Camera-Position Limitations
@@ -71,6 +71,7 @@ namespace PlayerManagement
 
             m_cameraTransform = m_camera.transform;
             m_cameraLocalZDistance = m_cameraTransform.position.z - m_cameraPivot.position.z;
+            m_resetDistance = m_cameraTransform.localPosition.z;
             m_runtimeMaxZoomDistance = m_maxZoomDistance;
             SetCursorRestrictions();
         }
@@ -79,7 +80,7 @@ namespace PlayerManagement
         {
             FollowTarget();
             ProcessPlayerCameraInputs();
-            //CameraCollision();
+            CameraCollision();
         }
 
         private void LateUpdate()
@@ -172,6 +173,8 @@ namespace PlayerManagement
                 m_runtimeMaxZoomDistance = objectHitDistance;
                 targetPosition = -(objectHitDistance - m_cameraCollisionOffset);    //direction towards the Player on CameraCollision.
                 //targetPosition -= objectHitDistance - m_cameraCollisionOffset;      //direction away from the Player on CameraCollision.
+                m_currentCameraPosition.z = Mathf.Lerp(m_cameraTransform.localPosition.z, targetPosition, m_lerpTime);
+                m_cameraTransform.localPosition = m_currentCameraPosition;
             }
             else
             {
@@ -179,15 +182,18 @@ namespace PlayerManagement
                 {
                     m_runtimeMaxZoomDistance = m_maxZoomDistance;
                 }
+
+                if (targetPosition != m_resetDistance)
+                {
+                    m_currentCameraPosition.z = Mathf.Lerp(m_cameraTransform.localPosition.z, m_resetDistance, m_lerpTime);
+                    m_cameraTransform.localPosition = m_currentCameraPosition;
+                }
             }
 
             //if (targetPosition < m_cameraCollisionOffset)
             //{
             //    targetPosition -= m_cameraCollisionOffset;
             //}
-
-            m_currentCameraPosition.z = Mathf.Lerp(m_cameraTransform.localPosition.z, targetPosition, m_lerpTime);
-            m_cameraTransform.localPosition = m_currentCameraPosition;
         }
 
         private void CameraZoom()
@@ -212,6 +218,8 @@ namespace PlayerManagement
                         //m_cameraLocalZDistance Interpolation.
                         m_cameraTransform.localPosition = new Vector3(m_cameraTransform.localPosition.x, m_cameraTransform.localPosition.y,
                             Mathf.Lerp(m_cameraTransform.localPosition.z, m_cameraLocalZDistance * -1f, Time.deltaTime * m_zoomSpeed));
+
+                        m_resetDistance = m_cameraTransform.localPosition.z;    //Unchanged reset float.
                         break;
                     }
                 }

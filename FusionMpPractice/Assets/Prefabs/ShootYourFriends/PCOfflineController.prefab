@@ -1824,13 +1824,13 @@ MonoBehaviour:
   m_disableCameraRotation: 0
   m_disableCameraZoom: 0
   m_cameraCollisionOffset: 0.25
-  m_collisionCheckRadius: 0.5
+  m_collisionCheckRadius: 0.75
   m_lerpTime: 0.2
   m_collisionCheckLayers:
     serializedVersion: 2
     m_Bits: 905
   m_zoomSpeed: 5
-  m_zoomDampening: 1
+  m_zoomDampening: 0.5
   m_minZoomDistance: 0.5
   m_maxZoomDistance: 8
   m_cursorLockMode: 1
@@ -1959,7 +1959,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5102511136257350875}
   m_Layer: 3
-  m_Name: InputCameraComponents
+  m_Name: LocalDisabledComponents
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
