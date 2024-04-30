@@ -113,6 +113,7 @@ namespace PlayerManagement
         private Vector3 m_moveDirection, m_relativeMoveVector;
         private Quaternion m_quatDeltaRot;
         [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }
+        private static bool m_kneelButtonGotPressed = false;
         #endregion
 
         private void Awake()
@@ -162,10 +163,9 @@ namespace PlayerManagement
             {
                 //simple Groundcheck without Arrays of hitted objects or memory allocation.
                 m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
-                //m_playerOfflineController.m_playerIsGrounded = Physics.Raycast(m_playerOfflineController.m_groundCheckTransform.position, Vector3.down, m_playerOfflineController.m_groundCheckDistance, m_playerOfflineController.m_groundCheckLayerMask);
+                //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
 
                 CoyoteTimerReSet();
-                Crouching();
                 MoveAcceleration();
             }
 
@@ -178,6 +178,9 @@ namespace PlayerManagement
         public override void FixedUpdateNetwork()
         {
             //base.FixedUpdateNetwork();
+
+            m_kneelButtonGotPressed = PlayerNetworkedData.KneelButtonGotPressed;
+            Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
 
             if (!m_playerNetworkController.m_isDead)
             {
@@ -299,12 +302,12 @@ namespace PlayerManagement
         private void MoveRigidbodyRelative()
         {
             #region Use of custom RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-            //Vector3 fakecameraForward = m_playerOfflineController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
-            //Vector3 cameraRight = m_playerOfflineController.m_cameraOfflineBehaviour.m_camera.transform.right;
+            //Vector3 fakecameraForward = m_playerNetworkController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
+            //Vector3 cameraRight = m_playerNetworkController.m_cameraOfflineBehaviour.m_camera.transform.right;
             ////cameraForward = cameraForward.normalized;
             //cameraRight.y = 0;    //prevents characterJumps.
             //cameraRight = cameraRight.normalized;
-            //Vector3 relativeForward = m_playerOfflineController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
+            //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
             #endregion
 
             Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
@@ -360,13 +363,13 @@ namespace PlayerManagement
         {
             if (m_permitCrouchLerp)
             {
-                m_crouchTimer += Time.deltaTime;
+                m_crouchTimer += Time.fixedDeltaTime;
                 float countingUp = m_crouchTimer / m_kneelTime;
                 m_crouchTimer *= m_crouchTimer;
 
                 SphereCastCheckAbove(); //Locks Player in 'crouch-mode', if obstacles are detected above.
 
-                switch (PlayerNetworkedData.KneelButtonGotPressed) //fomor: m_kneelToCrouch.
+                switch (m_kneelButtonGotPressed) //fomor: m_kneelToCrouch.
                 {
                     case false:
                     {
@@ -376,7 +379,7 @@ namespace PlayerManagement
                             {
                                 //Lerp getting up.
                                 m_capsuleCollider.height = Mathf.Lerp(m_capsuleCollider.height, m_colliderWalkHeight, countingUp);
-                                m_crouchTimer += Time.deltaTime;
+                                m_crouchTimer += Time.fixedDeltaTime;
                             }
                             else
                             {
@@ -393,7 +396,7 @@ namespace PlayerManagement
                         {
                             //Lerp kneeling down.
                             m_capsuleCollider.height = Mathf.Lerp(m_capsuleCollider.height, m_colliderCrouchHeight, countingUp);
-                            m_crouchTimer += Time.deltaTime;
+                            m_crouchTimer += Time.fixedDeltaTime;
                         }
                         else
                             m_capsuleCollider.height = m_colliderCrouchHeight;
@@ -411,7 +414,7 @@ namespace PlayerManagement
                 #region While Movement Buttons are not pressed (WASD, Left Stick).
                 case false: //When no Movement button is pressed.
                 {
-                    switch (PlayerNetworkedData.KneelButtonGotPressed) //In case the character shall slow down from Walking or Running.
+                    switch (m_kneelButtonGotPressed) //In case the character shall slow down from Walking or Running.
                     {
                         case false:
                         {
@@ -440,7 +443,7 @@ namespace PlayerManagement
                     {
                         case false:             //Shift IS NOT pressed.
                         {
-                            switch (PlayerNetworkedData.KneelButtonGotPressed)
+                            switch (m_kneelButtonGotPressed)
                             {
                                 case false: //Shift is not pressed and character shall walk.
                                 {
@@ -472,7 +475,7 @@ namespace PlayerManagement
                         }
                         case true:  //Shift IS pressed! <---
                         {
-                            switch (PlayerNetworkedData.KneelButtonGotPressed)
+                            switch (m_kneelButtonGotPressed)
                             {
                                 case false: //If Shift IS pressed and the character shall not kneel down, but run.
                                 {

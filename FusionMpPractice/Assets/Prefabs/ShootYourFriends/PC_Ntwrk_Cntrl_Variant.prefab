@@ -7,21 +7,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2140142383620873114, guid: f087d486672249d4e898e5b05876a32b,
-        type: 3}
-      propertyPath: Flags
-      value: 3073
-      objectReference: {fileID: 0}
-    - target: {fileID: 2140142383620873114, guid: f087d486672249d4e898e5b05876a32b,
-        type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2140142383620873114, guid: f087d486672249d4e898e5b05876a32b,
-        type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3996989401446623059, guid: f087d486672249d4e898e5b05876a32b,
         type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]

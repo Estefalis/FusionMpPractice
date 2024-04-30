@@ -24,6 +24,7 @@ namespace PlayerManagement
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
         #region Network
+        //[Networked] private NetworkButtons m_previousButtonState { get; set; }
         private float m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal;   //Building new MoveVector(s) in combination.
         //private Vector3 m_localMoveVector;
         internal bool JumpButtonIsPressed;
@@ -54,8 +55,8 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed -= AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled -= DecelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.CursorLockMode.performed -= SwitchCursorLockMode;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed -= OpenMenu;
                 #endregion
 
@@ -88,8 +89,8 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed += AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled += DecelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.CursorLockMode.performed += SwitchCursorLockMode;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
-                //m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
+                m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed += OpenMenu;
                 #endregion
 
@@ -229,15 +230,15 @@ namespace PlayerManagement
         //}
         #endregion
         #region Camera Zoom
-        //private void ZoomCamera(InputAction.CallbackContext _callbackContext)
-        //{
-        //    m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomSpeed;
-        //}
+        private void ZoomCamera(InputAction.CallbackContext _callbackContext)
+        {
+            m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomSpeed;
+        }
 
-        //private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
-        //{
-        //    m_playerOfflineController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
-        //}
+        private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
+        {
+            m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
+        }
         #endregion
 
         #region Menu
@@ -257,6 +258,7 @@ namespace PlayerManagement
             playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
             //playerInput.MoveDirection = m_localMoveVector;
 
+            //playerInput.InputButtons.Set(EInputButtons.Forward, m_playerInputActions.PlayerOnFoot.Movement.);
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
             playerInput.KneelButtonGotPressed = KneelButtonIsPressed;
             #endregion

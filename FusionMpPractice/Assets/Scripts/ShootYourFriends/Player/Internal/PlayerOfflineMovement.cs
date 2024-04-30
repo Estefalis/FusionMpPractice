@@ -158,7 +158,7 @@ namespace PlayerManagement
             {
                 //simple Groundcheck without Arrays of hitted objects or memory allocation.
                 m_playerIsGrounded = Physics.CheckSphere(m_groundCheckTransform.position, m_groundCheckDistance, m_groundCheckLayerMask);
-                //m_playerOfflineController.m_playerIsGrounded = Physics.Raycast(m_playerOfflineController.m_groundCheckTransform.position, Vector3.down, m_playerOfflineController.m_groundCheckDistance, m_playerOfflineController.m_groundCheckLayerMask);
+                //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
 
                 CoyoteTimerReSet();
                 Crouching();
