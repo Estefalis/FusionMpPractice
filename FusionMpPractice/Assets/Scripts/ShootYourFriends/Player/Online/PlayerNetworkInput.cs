@@ -24,7 +24,7 @@ namespace PlayerManagement
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
         #region Network
-        //[Networked] private NetworkButtons m_previousButtonState { get; set; }
+        [Networked] private NetworkButtons m_previousButtonState { get; set; }
         private float m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal;   //Building new MoveVector(s) in combination.
         //private Vector3 m_localMoveVector;
         internal bool JumpButtonIsPressed;
@@ -76,6 +76,23 @@ namespace PlayerManagement
                     m_playerInputActions.PlayerOnFoot.Enable();
                     Runner.AddCallbacks(this);
                 }
+
+                #region List isComposite/isPartOfComposite from Actions in Console
+                //for (int i = 0; i < m_playerInputActions.PlayerOnFoot.Movement.bindings.Count; i++)
+                //{
+                //    if (m_playerInputActions.PlayerOnFoot.Movement.bindings[i].isComposite)
+                //    {
+                //        var bindings = m_playerInputActions.PlayerOnFoot.Movement.bindings[i];
+                //        Debug.Log($"isComposite: {bindings.effectivePath}");   //.path/.name/.effectivePath.
+                //    }
+
+                //    if (m_playerInputActions.PlayerOnFoot.Movement.bindings[i].isPartOfComposite)
+                //    {
+                //        var bindings = m_playerInputActions.PlayerOnFoot.Movement.bindings[i];
+                //        Debug.Log($"isPartOfComposite: {bindings.effectivePath}");   //.path/.name/.effectivePath.
+                //    }
+                //}
+                #endregion
 
                 #region InputAction-Subscriptions
                 m_playerInputActions.PlayerOnFoot.Movement.performed += MoveCharacter;
@@ -258,7 +275,11 @@ namespace PlayerManagement
             playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
             //playerInput.MoveDirection = m_localMoveVector;
 
-            //playerInput.InputButtons.Set(EInputButtons.Forward, m_playerInputActions.PlayerOnFoot.Movement.);
+            playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
+            playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
+            playerInput.InputButtons.Set(EInputButtons.Left, m_rightInputLocal < 0);
+            playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
+
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
             playerInput.KneelButtonGotPressed = KneelButtonIsPressed;
             #endregion
