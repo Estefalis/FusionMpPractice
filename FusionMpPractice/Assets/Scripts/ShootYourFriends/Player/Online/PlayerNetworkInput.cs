@@ -24,7 +24,7 @@ namespace PlayerManagement
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
         #region Network
-        [Networked] private NetworkButtons m_previousButtonState { get; set; }
+        //[Networked] private NetworkButtons m_previousButtonState { get; set; }
         private float m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal;   //Building new MoveVector(s) in combination.
         //private Vector3 m_localMoveVector;
         internal bool JumpButtonIsPressed;
@@ -275,10 +275,10 @@ namespace PlayerManagement
             playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
             //playerInput.MoveDirection = m_localMoveVector;
 
-            playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
-            playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
-            playerInput.InputButtons.Set(EInputButtons.Left, m_rightInputLocal < 0);
-            playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
+            //playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
+            //playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
+            //playerInput.InputButtons.Set(EInputButtons.Left, m_rightInputLocal < 0);
+            //playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
 
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
             playerInput.KneelButtonGotPressed = KneelButtonIsPressed;
@@ -295,6 +295,8 @@ namespace PlayerManagement
             #endregion
 
             input.Set(playerInput);
+
+            //input = default;
         }
 
         #region Currently unused INetworkRunnerCallbacks

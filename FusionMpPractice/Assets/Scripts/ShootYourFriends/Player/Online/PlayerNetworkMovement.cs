@@ -309,24 +309,38 @@ namespace PlayerManagement
             //cameraRight = cameraRight.normalized;
             //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
             #endregion
+            #region Old Relative Movement with Bug on running towards the camera.
+            //Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
+            //Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
+            //cameraForward.y = 0.0f;   //prevents characterJumps.
+            //cameraRight.y = 0.0f;    //prevents characterJumps.
+            //cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+            //cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
 
-            Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
-            Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
-            cameraForward.y = 0.0f;   //prevents characterJumps.
-            cameraRight.y = 0.0f;    //prevents characterJumps.
-            cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-            cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
+            //Vector3 relativeRightVector = PlayerNetworkedData.MoveDirection.x * cameraRight;
+            //Vector3 relativeForwardVector = PlayerNetworkedData.MoveDirection.z * cameraForward;
 
-            Vector3 relativeRightVector = PlayerNetworkedData.MoveDirection.x * cameraRight;
-            Vector3 relativeForwardVector = PlayerNetworkedData.MoveDirection.z * cameraForward;
+            //m_relativeMoveVector = relativeRightVector + relativeForwardVector;
 
-            m_relativeMoveVector = relativeRightVector + relativeForwardVector;
+            //m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);
 
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);
+            //if (m_relativeMoveVector != Vector3.zero && m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
+            //{
+            //    float angle = Mathf.Atan2(m_relativeMoveVector.x, m_relativeMoveVector.z) * Mathf.Rad2Deg;
+            //    float smoothRotation =
+            //        Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
+            //    m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
+            //}
+            #endregion
 
-            if (m_relativeMoveVector != Vector3.zero && m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
+            m_moveDirection = PlayerNetworkedData.MoveDirection.x * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
+            m_moveDirection += PlayerNetworkedData.MoveDirection.z * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
+            m_moveDirection.y = 0.0f;
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_moveDirection.normalized);
+
+            if (m_moveDirection != Vector3.zero)
             {
-                float angle = Mathf.Atan2(m_relativeMoveVector.x, m_relativeMoveVector.z) * Mathf.Rad2Deg;
+                float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;
                 float smoothRotation =
                     Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
                 m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
