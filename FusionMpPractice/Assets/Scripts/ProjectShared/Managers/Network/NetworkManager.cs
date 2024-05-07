@@ -30,13 +30,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             var tryingHost = mode == GameMode.Host;
-            Debug.Log($"Starting with {roomCode}.");
+            Debug.Log($"Starting with {_sessionCode}.");
             //Debug.Log(tryingHost ? $"Starting as host with {roomCode}." : $"Starting as client with {roomCode}.");
 
             var result = await m_networkRunner.StartGame(new StartGameArgs()
             {
                 GameMode = mode,
-                SessionName = roomCode,
+                SessionName = _sessionCode,
                 Scene = (int)EGameScene.MainGame,
                 SceneManager = m_networkRunner.GetComponent<NetworkSceneManagerDefault>()
             }).WithCancellation(_cancellationToken);

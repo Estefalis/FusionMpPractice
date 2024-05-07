@@ -1,4 +1,3 @@
-using ExitGames.Client.Photon.StructWrapping;
 using Fusion;
 using Fusion.Sockets;
 using System;
@@ -272,7 +271,7 @@ namespace PlayerManagement
         {
             #region Version 1
             PlayerNetworkData playerInput = new();
-            var InputActions = m_playerInputActions.PlayerOnFoot;
+            //var InputActions = m_playerInputActions.PlayerOnFoot;
 
             playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
             //playerInput.MoveDirection = m_localMoveVector;
@@ -281,8 +280,9 @@ namespace PlayerManagement
             //playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
             //playerInput.InputButtons.Set(EInputButtons.Left, m_rightInputLocal < 0);
             //playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
+            //Debug.Log($"Forward: {m_forwardInputLocal > 0} - Backward: {m_forwardInputLocal < 0} - Left: {m_rightInputLocal < 0} - Right: {m_rightInputLocal > 0} - ");
 
-            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed());
+            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed()); //m_playerInputActions
             //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Duck.IsPressed());
 
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
@@ -301,7 +301,7 @@ namespace PlayerManagement
 
             input.Set(playerInput);
 
-            //input = default;
+            //playerInput = default;
         }
 
         #region Currently unused INetworkRunnerCallbacks

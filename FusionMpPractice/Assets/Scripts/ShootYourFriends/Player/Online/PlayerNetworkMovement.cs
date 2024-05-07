@@ -2,6 +2,7 @@ using Fusion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+//using UnityEngine.SceneManagement;
 
 namespace PlayerManagement
 {
@@ -110,10 +111,11 @@ namespace PlayerManagement
         #endregion
 
         #region Network
-        private Vector3 m_moveDirection, m_relativeMoveVector;
+        private Vector3 m_moveDirection;
+        private float m_rightVector, m_forwardVector, m_rotationVector;
         private Quaternion m_quatDeltaRot;
         [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }
-        private static bool m_kneelButtonGotPressed = false;
+        private static bool m_jumpButtonGotPressed = false, m_kneelButtonGotPressed = false;
         #endregion
 
         private void Awake()
@@ -122,17 +124,21 @@ namespace PlayerManagement
             m_rigidbodyTransform = m_rigidbody.transform;
             m_startPosition = transform.position;
             m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Walking;
+            //SceneManager.sceneLoaded += OnSceneFinishedLoading;
         }
 
         private void OnDisable()
         {
             if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
             {
+                m_playerInputActions = InputManager.m_InputManagerActions;
                 m_playerInputActions.PlayerOnFoot.Disable();
                 m_playerInputActions.PlayerOnFoot.Jump.canceled -= OnJumpButtonRelease;
                 m_playerInputActions.PlayerOnFoot.Duck.performed -= CharacterDuck;
                 m_playerInputActions.PlayerOnFoot.Duck.canceled -= StopDucking;
             }
+
+            //SceneManager.sceneLoaded -= OnSceneFinishedLoading;
         }
 
         private void Start()
@@ -140,7 +146,7 @@ namespace PlayerManagement
             m_hasInputAuthorityText.text = $"{Object.HasInputAuthority}";
             m_networkObjectId.text = $"{Object.Id}";
 
-            if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
+            if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy /*&& Object.HasInputAuthority*/)
             {
                 m_playerInputActions = InputManager.m_InputManagerActions;
                 m_playerInputActions.PlayerOnFoot.Enable();
@@ -179,7 +185,12 @@ namespace PlayerManagement
         {
             //base.FixedUpdateNetwork();
 
+            m_rightVector = PlayerNetworkedData.MoveDirection.x;
+            m_rotationVector = PlayerNetworkedData.MoveDirection.y;
+            m_forwardVector = PlayerNetworkedData.MoveDirection.z;
+            m_jumpButtonGotPressed = PlayerNetworkedData.JumpButtonGotPressed;
             m_kneelButtonGotPressed = PlayerNetworkedData.KneelButtonGotPressed;
+
             Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
 
             if (!m_playerNetworkController.m_isDead)
@@ -227,7 +238,7 @@ namespace PlayerManagement
                     {
                         FallDamageCalculationEnd();
 
-                        if (!PlayerNetworkedData.JumpButtonGotPressed && !m_canJumpAgain)
+                        if (!m_jumpButtonGotPressed && !m_canJumpAgain)
                         {
                             m_canJumpAgain = true;
                         }
@@ -246,9 +257,25 @@ namespace PlayerManagement
             Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereRadius);
         }
 #endif
+        //private void OnSceneFinishedLoading(Scene _scene, LoadSceneMode _mode)
+        //{
+        //    switch (_scene.buildIndex)
+        //    {
+        //        case 1:
+        //        {
+        //            m_playerInputActions = InputManager.m_InputManagerActions;
+        //            m_playerInputActions.PlayerOnFoot.Enable();
+        //            m_playerInputActions.PlayerOnFoot.Jump.canceled += OnJumpButtonRelease;
+        //            m_playerInputActions.PlayerOnFoot.Duck.performed += CharacterDuck;
+        //            m_playerInputActions.PlayerOnFoot.Duck.canceled += StopDucking;
+        //            break;
+        //        }
+        //    }
+        //}
+
         private void Jumping()
         {
-            if (m_coyoteTimeCounter >= 0 && PlayerNetworkedData.JumpButtonGotPressed && m_canJumpAgain && m_playerIsGrounded)
+            if (m_coyoteTimeCounter >= 0 && m_jumpButtonGotPressed && m_canJumpAgain && m_playerIsGrounded)
             {
                 m_canJumpAgain = false; //local Jump Variable to just apply Addforce ONCE.
                 m_rigidbody.AddForce(m_rigidbody.transform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
@@ -258,7 +285,7 @@ namespace PlayerManagement
         #region MoveRigidbody Alternatives
         private void MoveRigidbodyBasic()
         {
-            m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_moveDirection = new Vector3(m_rightVector, 0.0f, m_forwardVector);
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             if (m_moveDirection != Vector3.zero)
@@ -271,29 +298,29 @@ namespace PlayerManagement
 
         private void MoveRigidbodyKbY()
         {
-            m_moveDirection = new Vector3(0.0f, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_moveDirection = new Vector3(0.0f, 0.0f, m_forwardVector);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             m_quatDeltaRot =
-                Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);
+                Quaternion.Euler(0.0f, m_rotationVector * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
         }
 
         private void MoveRigidBodyMouseY()
         {
-            m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_moveDirection = new Vector3(m_rightVector, 0.0f, m_forwardVector);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             m_quatDeltaRot =
-                Quaternion.Euler(0.0f, PlayerNetworkedData.MoveDirection.y * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);
+                Quaternion.Euler(0.0f, m_rotationVector * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);
             m_rigidbody.MoveRotation(m_rigidbody.rotation * m_quatDeltaRot);
         }
 
         private void MoveRigidbodyLocked()
         {
-            m_moveDirection = new Vector3(PlayerNetworkedData.MoveDirection.x, 0.0f, PlayerNetworkedData.MoveDirection.z);
+            m_moveDirection = new Vector3(m_rightVector, 0.0f, m_forwardVector);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
             //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation while being locked?
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
@@ -301,40 +328,8 @@ namespace PlayerManagement
 
         private void MoveRigidbodyRelative()
         {
-            #region Use of custom RelativeHelperPositioning(){} HelperConstruct in CameraBehaviour.cs
-            //Vector3 fakecameraForward = m_playerNetworkController.m_cameraOfflineBehaviour.m_relativeHelperTransform.forward;
-            //Vector3 cameraRight = m_playerNetworkController.m_cameraOfflineBehaviour.m_camera.transform.right;
-            ////cameraForward = cameraForward.normalized;
-            //cameraRight.y = 0;    //prevents characterJumps.
-            //cameraRight = cameraRight.normalized;
-            //Vector3 relativeForward = m_playerNetworkController.m_playerInputActions.PlayerOnFootRH.Movement.ReadValue<Vector2>().y * fakecameraForward;
-            #endregion
-            #region Old Relative Movement with Bug on running towards the camera.
-            //Vector3 cameraForward = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
-            //Vector3 cameraRight = m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
-            //cameraForward.y = 0.0f;   //prevents characterJumps.
-            //cameraRight.y = 0.0f;    //prevents characterJumps.
-            //cameraForward = cameraForward.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-            //cameraRight = cameraRight.normalized;   //Rotating the camera up or down does not influence the movementSpeed anymore.
-
-            //Vector3 relativeRightVector = PlayerNetworkedData.MoveDirection.x * cameraRight;
-            //Vector3 relativeForwardVector = PlayerNetworkedData.MoveDirection.z * cameraForward;
-
-            //m_relativeMoveVector = relativeRightVector + relativeForwardVector;
-
-            //m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_relativeMoveVector.normalized);
-
-            //if (m_relativeMoveVector != Vector3.zero && m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y >= 0.0f)
-            //{
-            //    float angle = Mathf.Atan2(m_relativeMoveVector.x, m_relativeMoveVector.z) * Mathf.Rad2Deg;
-            //    float smoothRotation =
-            //        Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
-            //    m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
-            //}
-            #endregion
-
-            m_moveDirection = PlayerNetworkedData.MoveDirection.x * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
-            m_moveDirection += PlayerNetworkedData.MoveDirection.z * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
+            m_moveDirection = m_rightVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
+            m_moveDirection += m_forwardVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
             m_moveDirection.y = 0.0f;
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_moveDirection.normalized);
 
