@@ -7,6 +7,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1125462669581182315, guid: f087d486672249d4e898e5b05876a32b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3996989401446623059, guid: f087d486672249d4e898e5b05876a32b,
         type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]

@@ -29,8 +29,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
                 m_networkRunner.ProvideInput = true;
             }
 
-            var tryingHost = mode == GameMode.Host;
-            Debug.Log($"Starting with {_sessionCode}.");
+            var tryingHost = mode == GameMode.Host;            
             //Debug.Log(tryingHost ? $"Starting as host with {roomCode}." : $"Starting as client with {roomCode}.");
 
             var result = await m_networkRunner.StartGame(new StartGameArgs()
@@ -43,6 +42,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
             if (result.Ok)
             {
+                Debug.Log($"Starting with {_sessionCode}.");
                 Debug.Log(tryingHost ? "Game started successfully by the NetworkManager." : "Game joined successfully by the NetworkManager.");
             }
             else

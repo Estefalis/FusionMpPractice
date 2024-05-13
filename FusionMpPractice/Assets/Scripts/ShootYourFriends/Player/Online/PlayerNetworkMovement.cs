@@ -183,7 +183,7 @@ namespace PlayerManagement
 
         public override void FixedUpdateNetwork()
         {
-            //base.FixedUpdateNetwork();
+            base.FixedUpdateNetwork();
 
             m_rightVector = PlayerNetworkedData.MoveDirection.x;
             m_rotationVector = PlayerNetworkedData.MoveDirection.y;

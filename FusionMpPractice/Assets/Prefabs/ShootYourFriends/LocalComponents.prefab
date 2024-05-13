@@ -265,7 +265,7 @@ MonoBehaviour:
   m_zoomDampening: 0.5
   m_minZoomDistance: 0.5
   m_maxZoomDistance: 8
-  m_cursorLockMode: 0
+  m_cursorLockMode: 2
   m_cursorVisibility: 0
 --- !u!1 &8462920830725319433
 GameObject:

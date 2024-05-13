@@ -18,7 +18,7 @@ namespace PlayerManagement
         Duck = 5,
     }
 
-    public class PlayerNetworkInput : NetworkBehaviour, INetworkRunnerCallbacks
+    public class PlayerNetworkInput : NetworkBehaviour, INetworkRunnerCallbacks, IBeforeUpdate
     {
         private PlayerInputActions m_playerInputActions;
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
@@ -26,7 +26,7 @@ namespace PlayerManagement
         #region Network
         //[Networked] private NetworkButtons m_previousButtonState { get; set; }
         private float m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal;   //Building new MoveVector(s) in combination.
-        //private Vector3 m_localMoveVector;
+        private Vector3 m_localMoveVector;
         internal bool JumpButtonIsPressed;
         internal bool KneelButtonIsPressed;
         #endregion
@@ -66,8 +66,6 @@ namespace PlayerManagement
 
         private void Start()
         {
-            //m_objectId = Object.Id;
-
             if (transform.gameObject.activeInHierarchy)
             {
                 if (Runner != null)
@@ -117,7 +115,7 @@ namespace PlayerManagement
 
         private void Update()
         {
-            RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
+            //RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
             CameraRotation();
         }
 
@@ -171,7 +169,7 @@ namespace PlayerManagement
                     break;
             }
 
-            //m_localMoveVector = new Vector3(m_rightInput, m_rotationInput, m_forwardInput);
+            //m_localMoveVector = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
         }
         #endregion
 
@@ -263,18 +261,23 @@ namespace PlayerManagement
         {
 
         }
-        #endregion        
         #endregion
+        #endregion
+
+        public void BeforeUpdate()
+        {
+            RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
+        }
 
         #region INetworkRunnerCallbacks
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
             #region Version 1
-            PlayerNetworkData playerInput = new();
+            //PlayerNetworkData playerInput = new();
             //var InputActions = m_playerInputActions.PlayerOnFoot;
 
-            playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
-            //playerInput.MoveDirection = m_localMoveVector;
+            #region OnInput Tests
+            //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
 
             //playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
             //playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
@@ -282,21 +285,24 @@ namespace PlayerManagement
             //playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
             //Debug.Log($"Forward: {m_forwardInputLocal > 0} - Backward: {m_forwardInputLocal < 0} - Left: {m_rightInputLocal < 0} - Right: {m_rightInputLocal > 0} - ");
 
-            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed()); //m_playerInputActions
+            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed()); //m_playerInputActions.PlayerOnFoot;
             //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Duck.IsPressed());
+            #endregion
 
-            playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
-            playerInput.KneelButtonGotPressed = KneelButtonIsPressed;
+            //playerInput.MoveDirection = m_localMoveVector;
+
+            //playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
+            //playerInput.KneelButtonGotPressed = KneelButtonIsPressed;
             #endregion
 
             #region Version 2
-            //var playerInput = new PlayerNetworkData()
-            //{
-            //    MoveDirection = new Vector3(m_rightInput, m_rotationInput, m_forwardInput),
-            //    //MoveDirection = m_localMoveVector,
-            //    JumpButtonGotPressed = m_JumpButtonIsPressed,
-            //    KneelButtonGotPressed = m_KneelButtonIsPressed,
-            //};
+            var playerInput = new PlayerNetworkData()   //or PlayerNetworkData playerInput = new(); playerInput.xyz = retrieved Input;
+            {
+                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+                //MoveDirection = m_localMoveVector,
+                JumpButtonGotPressed = JumpButtonIsPressed,
+                KneelButtonGotPressed = KneelButtonIsPressed,
+            };
             #endregion
 
             input.Set(playerInput);
