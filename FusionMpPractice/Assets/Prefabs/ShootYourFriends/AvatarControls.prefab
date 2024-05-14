@@ -2700,7 +2700,7 @@ MonoBehaviour:
   m_jumpForce: 3
   m_kneelTime: 0.1
   m_moveSpeedLerpTime: 0.5
-  m_smoothRotationTime: 15
+  m_smoothRotationTime: 17.5
   m_quaternionRotTime: 300
   m_aDRotYReduction: 0.85
   m_mouseRotYReduction: 0.5

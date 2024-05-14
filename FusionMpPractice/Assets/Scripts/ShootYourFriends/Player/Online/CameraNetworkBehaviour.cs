@@ -78,7 +78,7 @@ namespace PlayerManagement
 
         private void Update()
         {
-            FollowTarget();            
+            FollowTarget();
         }
 
         private void FixedUpdate()
@@ -265,6 +265,21 @@ namespace PlayerManagement
 
         //    m_cameraTransform.LookAt(_lookAtTarget);
         //}
+
+        internal void SwitchCursorVisibility()
+        {
+            m_cursorVisibility = !m_cursorVisibility;
+
+            switch (m_cursorVisibility)
+            {
+                case true:
+                    Cursor.visible = true;
+                    break;
+                case false:
+                    Cursor.visible = false;
+                    break;
+            }
+        }
         #endregion
     }
 }

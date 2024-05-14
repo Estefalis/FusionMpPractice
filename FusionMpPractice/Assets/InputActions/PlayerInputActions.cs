@@ -109,7 +109,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""CursorLockMode"",
+                    ""name"": ""CursorVisibility"",
                     ""type"": ""Button"",
                     ""id"": ""23dd2428-154e-49cf-8903-64acec1245af"",
                     ""expectedControlType"": ""Button"",
@@ -368,40 +368,40 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardAndMouse"",
-                    ""action"": ""CursorLockMode"",
+                    ""action"": ""CursorVisibility"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""c1b01101-db84-4006-a273-b551be17960b"",
-                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""path"": ""<Gamepad>/select"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""UniversalController"",
-                    ""action"": ""CursorLockMode"",
+                    ""action"": ""CursorVisibility"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""76ab7ec4-cc16-4f88-89fd-0f558f86b550"",
-                    ""path"": ""<DualShockGamepad>/leftStickPress"",
+                    ""id"": ""0a249c4a-11d8-48fc-989f-bca39165920c"",
+                    ""path"": ""<DualShockGamepad>/touchpadButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""UniversalController"",
-                    ""action"": ""CursorLockMode"",
+                    ""groups"": """",
+                    ""action"": ""CursorVisibility"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""2b00b6f4-74dc-484a-a39a-b236009fbcea"",
-                    ""path"": ""<XInputController>/leftStickPress"",
+                    ""id"": ""d20c32ea-452f-47d9-a8c4-3c07eb8dd659"",
+                    ""path"": ""<XInputController>/select"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""UniversalController"",
-                    ""action"": ""CursorLockMode"",
+                    ""groups"": """",
+                    ""action"": ""CursorVisibility"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1107,7 +1107,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_PlayerOnFoot_Acceleration = m_PlayerOnFoot.FindAction("Acceleration", throwIfNotFound: true);
         m_PlayerOnFoot_SwitchMoveMode = m_PlayerOnFoot.FindAction("SwitchMoveMode", throwIfNotFound: true);
         m_PlayerOnFoot_OpenMenu = m_PlayerOnFoot.FindAction("OpenMenu", throwIfNotFound: true);
-        m_PlayerOnFoot_CursorLockMode = m_PlayerOnFoot.FindAction("CursorLockMode", throwIfNotFound: true);
+        m_PlayerOnFoot_CursorVisibility = m_PlayerOnFoot.FindAction("CursorVisibility", throwIfNotFound: true);
         // DefaultUI
         m_DefaultUI = asset.FindActionMap("DefaultUI", throwIfNotFound: true);
         m_DefaultUI_Navigate = m_DefaultUI.FindAction("Navigate", throwIfNotFound: true);
@@ -1190,7 +1190,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerOnFoot_Acceleration;
     private readonly InputAction m_PlayerOnFoot_SwitchMoveMode;
     private readonly InputAction m_PlayerOnFoot_OpenMenu;
-    private readonly InputAction m_PlayerOnFoot_CursorLockMode;
+    private readonly InputAction m_PlayerOnFoot_CursorVisibility;
     public struct PlayerOnFootActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -1204,7 +1204,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Acceleration => m_Wrapper.m_PlayerOnFoot_Acceleration;
         public InputAction @SwitchMoveMode => m_Wrapper.m_PlayerOnFoot_SwitchMoveMode;
         public InputAction @OpenMenu => m_Wrapper.m_PlayerOnFoot_OpenMenu;
-        public InputAction @CursorLockMode => m_Wrapper.m_PlayerOnFoot_CursorLockMode;
+        public InputAction @CursorVisibility => m_Wrapper.m_PlayerOnFoot_CursorVisibility;
         public InputActionMap Get() { return m_Wrapper.m_PlayerOnFoot; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1241,9 +1241,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @OpenMenu.started += instance.OnOpenMenu;
             @OpenMenu.performed += instance.OnOpenMenu;
             @OpenMenu.canceled += instance.OnOpenMenu;
-            @CursorLockMode.started += instance.OnCursorLockMode;
-            @CursorLockMode.performed += instance.OnCursorLockMode;
-            @CursorLockMode.canceled += instance.OnCursorLockMode;
+            @CursorVisibility.started += instance.OnCursorVisibility;
+            @CursorVisibility.performed += instance.OnCursorVisibility;
+            @CursorVisibility.canceled += instance.OnCursorVisibility;
         }
 
         private void UnregisterCallbacks(IPlayerOnFootActions instance)
@@ -1275,9 +1275,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @OpenMenu.started -= instance.OnOpenMenu;
             @OpenMenu.performed -= instance.OnOpenMenu;
             @OpenMenu.canceled -= instance.OnOpenMenu;
-            @CursorLockMode.started -= instance.OnCursorLockMode;
-            @CursorLockMode.performed -= instance.OnCursorLockMode;
-            @CursorLockMode.canceled -= instance.OnCursorLockMode;
+            @CursorVisibility.started -= instance.OnCursorVisibility;
+            @CursorVisibility.performed -= instance.OnCursorVisibility;
+            @CursorVisibility.canceled -= instance.OnCursorVisibility;
         }
 
         public void RemoveCallbacks(IPlayerOnFootActions instance)
@@ -1442,7 +1442,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnAcceleration(InputAction.CallbackContext context);
         void OnSwitchMoveMode(InputAction.CallbackContext context);
         void OnOpenMenu(InputAction.CallbackContext context);
-        void OnCursorLockMode(InputAction.CallbackContext context);
+        void OnCursorVisibility(InputAction.CallbackContext context);
     }
     public interface IDefaultUIActions
     {

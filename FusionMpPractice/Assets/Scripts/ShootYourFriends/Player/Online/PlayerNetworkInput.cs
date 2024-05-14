@@ -54,7 +54,7 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.SwitchMoveMode.canceled -= OnRightMouseButtonUp;
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed -= AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled -= DecelerateMovespeed;
-                m_playerInputActions.PlayerOnFoot.CursorLockMode.performed -= SwitchCursorLockMode;
+                m_playerInputActions.PlayerOnFoot.CursorVisibility.performed -= SwitchCursorVisibility;
                 m_playerInputActions.PlayerOnFoot.CameraZoom.performed -= ZoomCamera;
                 m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed -= OpenMenu;
@@ -103,7 +103,7 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.SwitchMoveMode.canceled += OnRightMouseButtonUp;
                 m_playerInputActions.PlayerOnFoot.Acceleration.performed += AccelerateMovespeed;
                 m_playerInputActions.PlayerOnFoot.Acceleration.canceled += DecelerateMovespeed;
-                m_playerInputActions.PlayerOnFoot.CursorLockMode.performed += SwitchCursorLockMode;
+                m_playerInputActions.PlayerOnFoot.CursorVisibility.performed += SwitchCursorVisibility;
                 m_playerInputActions.PlayerOnFoot.CameraZoom.performed += ZoomCamera;
                 m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed += OpenMenu;
@@ -231,10 +231,10 @@ namespace PlayerManagement
             m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = false;
         }
         #endregion
-        #region CursorLockMode
-        private void SwitchCursorLockMode(InputAction.CallbackContext _callbackContext)
+        #region CursorVisibility
+        private void SwitchCursorVisibility(InputAction.CallbackContext _callbackContext)
         {
-
+            m_playerNetworkController.m_cameraNetworkBehaviour.SwitchCursorVisibility();
         }
         #endregion
 
