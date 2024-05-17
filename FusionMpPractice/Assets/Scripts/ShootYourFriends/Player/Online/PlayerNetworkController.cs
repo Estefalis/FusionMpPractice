@@ -42,12 +42,19 @@ namespace PlayerManagement
 
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out PlayerNetworkData networkedInputData))
-            {
-                PlayerNetworkedData = networkedInputData;
-            }
+            //if (GetInput<CombinedPlayerInputs>(out var input))
+            //{
+            //    var dir = input[0].MoveDirection;
+            //    if (dir != Vector3.zero)
+            //        Debug.Log($"ID 0: {input[0].MoveDirection}");
+            //}
 
-            m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
+            //if (GetInput(out PlayerNetworkData networkedInputData))
+            //{
+            //    PlayerNetworkedData = networkedInputData;
+            //}
+
+            //m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
         }
     }
 }

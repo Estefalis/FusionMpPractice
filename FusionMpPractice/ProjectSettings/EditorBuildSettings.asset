@@ -18,5 +18,5 @@ EditorBuildSettings:
     path: Assets/Scenes/CarBallGame/MainGame.unity
     guid: 384b74e1561511f4eb22b4a0c3684c36
   m_configObjects:
-    com.unity.input.settings: {fileID: 11400000, guid: 1cbe3948a1bbf1144944778ddeff31dd,
+    com.unity.input.settings: {fileID: 11400000, guid: a29cce9e8994285448240817b777c4e8,
       type: 2}

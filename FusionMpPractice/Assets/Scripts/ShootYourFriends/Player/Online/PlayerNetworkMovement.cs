@@ -185,6 +185,13 @@ namespace PlayerManagement
         {
             base.FixedUpdateNetwork();
 
+            //if (GetInput<CombinedPlayerInputs>(out var input))
+            //{
+            //    //var dir = input[0].MoveDirection;
+            //    //if (dir != Vector3.zero)
+            //    //    Debug.Log($"ID 0: {input[0].MoveDirection}");
+            //}
+
             m_rightVector = PlayerNetworkedData.MoveDirection.x;
             m_rotationVector = PlayerNetworkedData.MoveDirection.y;
             m_forwardVector = PlayerNetworkedData.MoveDirection.z;
@@ -636,13 +643,13 @@ namespace PlayerManagement
         #endregion
         #endregion
 
-        /// <summary>
-        /// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
-        /// </summary>
-        /// <param name="data"></param>
-        internal void SetInputData(PlayerNetworkData data)
-        {
-            PlayerNetworkedData = data;
-        }
+        ///// <summary>
+        ///// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
+        ///// </summary>
+        ///// <param name="data"></param>
+        //internal void SetInputData(PlayerNetworkData data)
+        //{
+        //    PlayerNetworkedData = data;
+        //}
     }
 }

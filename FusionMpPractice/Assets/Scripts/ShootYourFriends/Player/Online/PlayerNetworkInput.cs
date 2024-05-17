@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-//using UnityEngine.InputSystem.Users;        //For InputDeviceChange from the new InputSystem.
 
 namespace PlayerManagement
 {
@@ -29,6 +28,7 @@ namespace PlayerManagement
         private Vector3 m_localMoveVector;
         internal bool JumpButtonIsPressed;
         internal bool KneelButtonIsPressed;
+        private NetworkId m_networkId;
         #endregion
 
         private ERigidbodyMoveMethod m_ePreviousMoveMethod;
@@ -59,8 +59,6 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.CameraZoom.canceled -= StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed -= OpenMenu;
                 #endregion
-
-                //InputUser.onChange -= OnInputDeviceChange;
             }
         }
 
@@ -109,7 +107,7 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed += OpenMenu;
                 #endregion
 
-                //InputUser.onChange += OnInputDeviceChange; 
+                m_networkId = Object.Id;
             }
         }
 
@@ -296,7 +294,40 @@ namespace PlayerManagement
             #endregion
 
             #region Version 2
-            var playerInput = new PlayerNetworkData()   //or PlayerNetworkData playerInput = new(); playerInput.xyz = retrieved Input;
+            //var playerInput = new PlayerNetworkData()   //or PlayerNetworkData playerInput = new(); playerInput.xyz = retrieved Input;
+            //{
+            //    MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    //MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    KneelButtonGotPressed = KneelButtonIsPressed,
+            //};
+            #endregion
+
+            #region Combined Player Inputs
+            var playerInput = new CombinedPlayerInputs();
+
+            playerInput[0] = new PlayerNetworkData()
+            {
+                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+                //MoveDirection = m_localMoveVector,
+                JumpButtonGotPressed = JumpButtonIsPressed,
+                KneelButtonGotPressed = KneelButtonIsPressed,
+            };
+            playerInput[1] = new PlayerNetworkData()
+            {
+                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+                //MoveDirection = m_localMoveVector,
+                JumpButtonGotPressed = JumpButtonIsPressed,
+                KneelButtonGotPressed = KneelButtonIsPressed,
+            };
+            playerInput[2] = new PlayerNetworkData()
+            {
+                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+                //MoveDirection = m_localMoveVector,
+                JumpButtonGotPressed = JumpButtonIsPressed,
+                KneelButtonGotPressed = KneelButtonIsPressed,
+            };
+            playerInput[3] = new PlayerNetworkData()
             {
                 MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
                 //MoveDirection = m_localMoveVector,

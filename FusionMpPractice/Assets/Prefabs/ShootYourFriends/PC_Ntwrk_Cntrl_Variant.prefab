@@ -12,6 +12,21 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2140142383620873114, guid: f087d486672249d4e898e5b05876a32b,
+        type: 3}
+      propertyPath: Flags
+      value: 3073
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140142383620873114, guid: f087d486672249d4e898e5b05876a32b,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140142383620873114, guid: f087d486672249d4e898e5b05876a32b,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3996989401446623059, guid: f087d486672249d4e898e5b05876a32b,
         type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
@@ -82,5 +97,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1847909978459325741, guid: f087d486672249d4e898e5b05876a32b, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f087d486672249d4e898e5b05876a32b, type: 3}

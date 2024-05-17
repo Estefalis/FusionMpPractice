@@ -1,6 +1,6 @@
 using Fusion;
 
-public class CombinedPlayerInputs : INetworkInput
+public struct CombinedPlayerInputs : INetworkInput
 {
     public PlayerNetworkData PlayerA;
     public PlayerNetworkData PlayerB;
@@ -33,13 +33,13 @@ public class CombinedPlayerInputs : INetworkInput
                     PlayerA = value;
                     return;
                 case 1:
-                    PlayerA = value;
+                    PlayerB = value;
                     return;
                 case 2:
-                    PlayerA = value;
+                    PlayerC = value;
                     return;
                 case 3:
-                    PlayerA = value;
+                    PlayerD = value;
                     return;
                 default:
                     return;
