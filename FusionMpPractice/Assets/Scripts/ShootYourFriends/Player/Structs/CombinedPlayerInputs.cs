@@ -25,6 +25,7 @@ public struct CombinedPlayerInputs : INetworkInput
                     return default;
             }
         }
+
         set
         {
             switch (i)

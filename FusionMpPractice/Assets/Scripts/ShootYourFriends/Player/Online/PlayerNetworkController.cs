@@ -1,4 +1,5 @@
 using Fusion;
+using System.Linq;
 using UnityEngine;
 
 namespace PlayerManagement
@@ -26,6 +27,7 @@ namespace PlayerManagement
 
         #region Network
         [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote player receive the correct input data to move their avatars.
+        internal int m_playerIndex;
         #endregion
 
         public override void Spawned()
@@ -33,6 +35,7 @@ namespace PlayerManagement
             if (Object.HasInputAuthority)
             {
                 m_localInputParent.SetActive(true);
+                m_playerIndex = Runner.ActivePlayers.Count() - 1;
             }
             else
             {

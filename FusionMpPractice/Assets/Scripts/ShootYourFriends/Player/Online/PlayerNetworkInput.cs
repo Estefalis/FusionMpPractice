@@ -28,7 +28,6 @@ namespace PlayerManagement
         private Vector3 m_localMoveVector;
         internal bool JumpButtonIsPressed;
         internal bool KneelButtonIsPressed;
-        private NetworkId m_networkId;
         #endregion
 
         private ERigidbodyMoveMethod m_ePreviousMoveMethod;
@@ -106,8 +105,6 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.CameraZoom.canceled += StopCameraZoom;
                 m_playerInputActions.PlayerOnFoot.OpenMenu.performed += OpenMenu;
                 #endregion
-
-                m_networkId = Object.Id;
             }
         }
 

@@ -49,10 +49,9 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
             NetworkObject playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
 
             Runner.SetPlayerObject(_playerRef, playerObject);           //sets IsLocalPlayerObject.
+            //m_players.Add(_playerRef, playerObject);     //Version 2
             ////Add the used/randomed Position to the runtime SpawnPointList.
             m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
-            Debug.Log(m_spawnPointsList.Count - 1); //TODO: Connect this index with Player A/B/C/D index!!!
-            //m_players.Add(_playerRef, playerObject);     //Version 2
         }
     }
 

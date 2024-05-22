@@ -1,4 +1,5 @@
 using Fusion;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -184,19 +185,21 @@ namespace PlayerManagement
         public override void FixedUpdateNetwork()
         {
             base.FixedUpdateNetwork();
+            
+            if (GetInput<CombinedPlayerInputs>(out var networkInput))
+            {
+                m_rightVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.x;
+                m_rotationVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.y;
+                m_forwardVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.z;
+                m_jumpButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].JumpButtonGotPressed;
+                m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].KneelButtonGotPressed;
+            }
 
-            //if (GetInput<CombinedPlayerInputs>(out var input))
-            //{
-            //    //var dir = input[0].MoveDirection;
-            //    //if (dir != Vector3.zero)
-            //    //    Debug.Log($"ID 0: {input[0].MoveDirection}");
-            //}
-
-            m_rightVector = PlayerNetworkedData.MoveDirection.x;
-            m_rotationVector = PlayerNetworkedData.MoveDirection.y;
-            m_forwardVector = PlayerNetworkedData.MoveDirection.z;
-            m_jumpButtonGotPressed = PlayerNetworkedData.JumpButtonGotPressed;
-            m_kneelButtonGotPressed = PlayerNetworkedData.KneelButtonGotPressed;
+            //m_rightVector = PlayerNetworkedData.MoveDirection.x;
+            //m_rotationVector = PlayerNetworkedData.MoveDirection.y;
+            //m_forwardVector = PlayerNetworkedData.MoveDirection.z;
+            //m_jumpButtonGotPressed = PlayerNetworkedData.JumpButtonGotPressed;
+            //m_kneelButtonGotPressed = PlayerNetworkedData.KneelButtonGotPressed;
 
             Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
 
