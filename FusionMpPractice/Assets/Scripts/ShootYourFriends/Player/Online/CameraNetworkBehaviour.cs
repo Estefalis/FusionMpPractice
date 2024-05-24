@@ -268,18 +268,23 @@ namespace PlayerManagement
 
         internal void SwitchCursorVisibility()
         {
-            m_cursorVisibility = !m_cursorVisibility;
+            bool cursorVisible = Cursor.visible;
 
-            switch (m_cursorVisibility)
+            switch (cursorVisible)
             {
-                case true:
+                case false:
+                {
                     Cursor.visible = true;
                     break;
-                case false:
-                    Cursor.visible = false;
+                }
+                case true:
+                {
+                    //Cursor.visible = false;
+                    SetCursorRestrictions();
                     break;
+                }
             }
+            #endregion
         }
-        #endregion
     }
 }
