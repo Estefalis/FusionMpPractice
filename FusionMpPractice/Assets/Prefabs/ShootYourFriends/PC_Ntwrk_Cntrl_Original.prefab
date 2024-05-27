@@ -56,6 +56,8 @@ MonoBehaviour:
   m_cameraNetworkBehaviour: {fileID: 7850035750986150457}
   m_eAvatarMoveState: 0
   m_eRigidbodyMoveMethod: 4
+  m_hasInputAuthorityText: {fileID: 7765968254470550213}
+  m_networkObjectId: {fileID: 0}
   m_rePopPosition: {x: 0, y: 0, z: 0}
   m_fallLimit: -100
 --- !u!114 &3996989401446623059
@@ -328,6 +330,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8990469876164113035}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7765968254470550213 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1658118799308734542, guid: 1e2f78fc7763f6547a9b4df3b690b298,
+    type: 3}
+  m_PrefabInstance: {fileID: 8990469876164113035}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7785893249011657339 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1209669569924241648, guid: 1e2f78fc7763f6547a9b4df3b690b298,

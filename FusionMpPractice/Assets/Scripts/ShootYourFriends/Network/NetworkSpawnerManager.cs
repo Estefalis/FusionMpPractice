@@ -29,54 +29,50 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
 
     public void PlayerJoined(PlayerRef _playerRef)
     {
-        SpawnPlayer(_playerRef);
+        if (Runner.IsServer)
+            SpawnPlayer(_playerRef);
     }
 
     private void SpawnPlayer(PlayerRef _playerRef)
     {
-        if (Runner.IsServer)
+        int randomSpawnPosition = Random.Range(0, m_spawnPointsArray.Length);
+
+        foreach (Transform takenTransform in m_spawnPointsList) //SaveList for randomed PlayerSpawns.
         {
-            int randomSpawnPosition = Random.Range(0, m_spawnPointsArray.Length);
-
-            foreach (Transform takenTransform in m_spawnPointsList) //SaveList for randomed PlayerSpawns.
-            {
-                //'+= 1' on 'randomSpawnPosition', if previously randomed SpawnPoints are already in use, to prevent PlayerSpawns on the same Position.
-                if (m_spawnPointsArray[randomSpawnPosition].position == takenTransform.position)
-                    randomSpawnPosition += 1 % m_spawnPointsArray.Length;
-            }
-
-            //_playerRef sets (Has)InputAuthority over the spawned Object.
-            NetworkObject playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
-
-            Runner.SetPlayerObject(_playerRef, playerObject);           //sets IsLocalPlayerObject.
-            //m_players.Add(_playerRef, playerObject);     //Version 2
-            ////Add the used/randomed Position to the runtime SpawnPointList.
-            m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
+            //'+= 1' on 'randomSpawnPosition', if previously randomed SpawnPoints are already in use, to prevent PlayerSpawns on the same Position.
+            if (m_spawnPointsArray[randomSpawnPosition].position == takenTransform.position)
+                randomSpawnPosition += 1 % m_spawnPointsArray.Length;
         }
+
+        //_playerRef sets (Has)InputAuthority over the spawned Object.
+        NetworkObject playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
+
+        Runner.SetPlayerObject(_playerRef, playerObject);           //sets IsLocalPlayerObject.
+                                                                    //m_players.Add(_playerRef, playerObject);     //Version 2
+                                                                    ////Add the used/randomed Position to the runtime SpawnPointList.
+        m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
     }
 
     public void PlayerLeft(PlayerRef _playerRef)
     {
-        DespawnPlayer(_playerRef);
+        if (Runner.IsServer)
+            DespawnPlayer(_playerRef);
     }
 
     private void DespawnPlayer(PlayerRef _playerRef)
     {
-        if (Runner.IsServer)
+        if (Runner.TryGetPlayerObject(_playerRef, out var playerObject))
         {
-            if (Runner.TryGetPlayerObject(_playerRef, out var playerObject))
-            {
-                Runner.Despawn(playerObject);
-            }
-
-            Runner.SetPlayerObject(_playerRef, null);           //resets IsLocalPlayerObject.
-
-            ////Version 2
-            //if (m_players.TryGetValue(_playerRef, out var playerObject))
-            //{
-            //    Runner.Despawn(playerObject);
-            //    m_players.Remove(_playerRef);
-            //}
+            Runner.Despawn(playerObject);
         }
+
+        Runner.SetPlayerObject(_playerRef, null);           //resets IsLocalPlayerObject.
+
+        ////Version 2
+        //if (m_players.TryGetValue(_playerRef, out var playerObject))
+        //{
+        //    Runner.Despawn(playerObject);
+        //    m_players.Remove(_playerRef);
+        //}
     }
 }

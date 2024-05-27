@@ -69,16 +69,13 @@ public class NetworkSpawnerController : NetworkBehaviour, IPlayerJoined, IPlayer
 
     private void SpawnPlayerObject(PlayerRef player)
     {
-        if (Runner.IsServer)
-        {
-            var randomSpawnPos = new Vector3(Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange),
-                1.0f, Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange));
+        var randomSpawnPos = new Vector3(Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange),
+            1.0f, Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange));
 
-            var playerNetworkObject = Runner.Spawn(m_networkPlayerPrefab, new Vector3(0, 1, 0), Quaternion.identity, player);
-            m_spherePlayers.Add(player, playerNetworkObject);
-            var playerScript = playerNetworkObject.GetComponent<Player>();
-            playerScript.SetGameBall(m_ballVisual);
-        }
+        var playerNetworkObject = Runner.Spawn(m_networkPlayerPrefab, new Vector3(0, 1, 0), Quaternion.identity, player);
+        m_spherePlayers.Add(player, playerNetworkObject);
+        var playerScript = playerNetworkObject.GetComponent<Player>();
+        playerScript.SetGameBall(m_ballVisual);
     }
 
     public void PlayerLeft(PlayerRef player)
@@ -91,7 +88,7 @@ public class NetworkSpawnerController : NetworkBehaviour, IPlayerJoined, IPlayer
 
     private void DeSpawnPlayerObject(PlayerRef player)
     {
-        if(m_spherePlayers.TryGetValue(player, out var demoObject))
+        if (m_spherePlayers.TryGetValue(player, out var demoObject))
         {
             Runner.Despawn(demoObject);
             m_spherePlayers.Remove(player);

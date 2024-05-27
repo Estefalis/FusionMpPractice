@@ -184,7 +184,7 @@ namespace PlayerManagement
 
         public override void FixedUpdateNetwork()
         {
-            base.FixedUpdateNetwork();
+            //base.FixedUpdateNetwork();
             
             if (GetInput<CombinedPlayerInputs>(out var networkInput))
             {
