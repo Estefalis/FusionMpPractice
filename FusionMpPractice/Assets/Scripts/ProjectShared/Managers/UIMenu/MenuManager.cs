@@ -98,15 +98,6 @@ namespace MenuManagement
             }
         }
 
-        //public void LeaveSceneCoroutine(Transform _currentElement)
-        //{
-        //    GameObject createRoomIF = m_selectedElement[_currentElement];
-        //    if (createRoomIF.GetComponent<TMP_InputField>().text.Length >= m_minNameLength)
-        //    {
-        //        StartCoroutine(PlayAnimatorAndSetState(_currentElement.gameObject.GetComponent<Animator>(), popOutClipName/*, _currentElement, true*/));
-        //    }
-        //}
-
         internal IEnumerator PlayAnimatorAndSetState(Animator _animator, string _clipName, Transform _nextElement = null, bool _willLeaveScene = true)
         {
             Transform currentElement = m_activeElement.Peek();
@@ -123,10 +114,5 @@ namespace MenuManagement
                 SetSelectedElement(_nextElement);
             }
         }
-
-        //internal void AnimationCoroutine(GameObject _gameObject, Animator _animator, string _clipName, bool _stateChange)
-        //{
-        //    StartCoroutine(Utilities.PlayAnimatorAndSetState(_gameObject, _animator, _clipName, _stateChange));
-        //}
     }
 }

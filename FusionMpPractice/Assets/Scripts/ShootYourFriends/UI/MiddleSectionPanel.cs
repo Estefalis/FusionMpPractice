@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace MenuManagement
 {
     public class MiddleSectionPanel : MonoBehaviour

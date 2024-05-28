@@ -14,7 +14,7 @@ namespace MenuManagement
         [SerializeField] private Button m_createNicknameButton;
 
         private void Awake()
-        {            
+        {
             m_createNicknameButton.interactable = false;
         }
 

@@ -7,11 +7,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     internal string DevRoomCode { get => roomCode; }
-    [SerializeField] private string roomCode;    
+    [SerializeField] private string roomCode;
 
     [SerializeField] private NetworkRunner m_networkRunnerPrefab;
     private NetworkRunner m_networkRunner;
@@ -21,7 +22,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         try
         {
             roomCode = _sessionCode;
-            
+
             if (m_networkRunner == null)
             {
                 m_networkRunner = Instantiate(m_networkRunnerPrefab, transform);    //On Transform attached to the GameObject in Unity.
@@ -29,13 +30,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
                 m_networkRunner.ProvideInput = true;
             }
 
-            var tryingHost = mode == GameMode.Host;            
+            var tryingHost = mode == GameMode.Host;
             //Debug.Log(tryingHost ? $"Starting as host with {roomCode}." : $"Starting as client with {roomCode}.");
 
             var result = await m_networkRunner.StartGame(new StartGameArgs()
             {
                 GameMode = mode,
                 SessionName = _sessionCode,
+                PlayerCount = 4,    //2 x 2 Tag Team Max for a personal Game.
                 Scene = (int)EGameScene.MainGame,
                 SceneManager = m_networkRunner.GetComponent<NetworkSceneManagerDefault>()
             }).WithCancellation(_cancellationToken);
@@ -143,7 +145,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-
+//#if UNITY_EDITOR
+//        Debug.Log("OnShutdown called.");
+//#endif
+//        SceneManager.LoadScene((int)EGameScene.MainMenu);
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
