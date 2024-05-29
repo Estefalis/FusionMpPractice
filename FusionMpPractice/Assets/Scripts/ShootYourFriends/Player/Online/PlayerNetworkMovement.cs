@@ -1,5 +1,4 @@
 using Fusion;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -115,7 +114,7 @@ namespace PlayerManagement
         private Vector3 m_moveDirection;
         private float m_rightVector, m_forwardVector, m_rotationVector;
         private Quaternion m_quatDeltaRot;
-        [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }
+        //[Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }
         private static bool m_jumpButtonGotPressed = false, m_kneelButtonGotPressed = false;
         #endregion
 
@@ -185,21 +184,24 @@ namespace PlayerManagement
         public override void FixedUpdateNetwork()
         {
             //base.FixedUpdateNetwork();
-            
-            if (GetInput<CombinedPlayerInputs>(out var networkInput))
-            {
-                m_rightVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.x;
-                m_rotationVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.y;
-                m_forwardVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.z;
-                m_jumpButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].JumpButtonGotPressed;
-                m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].KneelButtonGotPressed;
-            }
 
-            //m_rightVector = PlayerNetworkedData.MoveDirection.x;
-            //m_rotationVector = PlayerNetworkedData.MoveDirection.y;
-            //m_forwardVector = PlayerNetworkedData.MoveDirection.z;
-            //m_jumpButtonGotPressed = PlayerNetworkedData.JumpButtonGotPressed;
-            //m_kneelButtonGotPressed = PlayerNetworkedData.KneelButtonGotPressed;
+            //if (GetInput<CombinedPlayerInputs>(out var networkInput))
+            //{
+            //    m_rightVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.x;
+            //    m_rotationVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.y;
+            //    m_forwardVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.z;
+            //    m_jumpButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].JumpButtonGotPressed;
+            //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].KneelButtonGotPressed;
+            //}
+
+            if (GetInput<PlayerNetworkData>(out var networkInput))
+            {
+                m_rightVector = networkInput.MoveDirection.x;
+                m_rotationVector = networkInput.MoveDirection.y;
+                m_forwardVector = networkInput.MoveDirection.z;
+                m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
+                m_kneelButtonGotPressed = networkInput.KneelButtonGotPressed;
+            }
 
             Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
 
@@ -622,13 +624,14 @@ namespace PlayerManagement
         #region Character Jump
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
-            m_coyoteTimeCounter = 0.0f; //Prevents the player from 'double jumping' on pressing the JumpButton multiple times.
+            if (Object.HasInputAuthority)
+                m_coyoteTimeCounter = 0.0f; //Prevents the player from 'double jumping' on pressing the JumpButton multiple times.
         }
         #endregion
         #region Ducking
         private void CharacterDuck(InputAction.CallbackContext _callbackContext)
         {
-            if (/*Runner.ProvideInput && */Object.HasInputAuthority)
+            if (Object.HasInputAuthority)
             {
                 m_crouchTimer = 0;
 
@@ -639,7 +642,7 @@ namespace PlayerManagement
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
         {
-            if (/*Runner.ProvideInput && */Object.HasInputAuthority)
+            if (Object.HasInputAuthority)
                 //Whenever the m_groundCheckTransform.position gets ReSetted, it has to be the same position as the moving Rigidbody!
                 m_groundCheckTransform.position = m_rigidbody.position;
         }

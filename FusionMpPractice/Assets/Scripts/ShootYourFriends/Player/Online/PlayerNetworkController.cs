@@ -26,7 +26,7 @@ namespace PlayerManagement
         #endregion
 
         #region Network
-        [Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote player receive the correct input data to move their avatars.
+        //[Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote player receive the correct input data to move their avatars.
         internal int m_playerIndex;
         #endregion
 
@@ -43,22 +43,22 @@ namespace PlayerManagement
             }
         }
 
-        public override void FixedUpdateNetwork()
-        {
-            //if (GetInput<CombinedPlayerInputs>(out var input))
-            //{
-            //    var dir = input[0].MoveDirection;
-            //    if (dir != Vector3.zero)
-            //        Debug.Log($"ID 0: {input[0].MoveDirection}");
-            //}
+        //public override void FixedUpdateNetwork()
+        //{
+        //    ////if (GetInput<CombinedPlayerInputs>(out var input))
+        //    ////{
+        //    ////    var dir = input[0].MoveDirection;
+        //    ////    if (dir != Vector3.zero)
+        //    ////        Debug.Log($"ID 0: {input[0].MoveDirection}");
+        //    ////}
 
-            //if (GetInput(out PlayerNetworkData networkedInputData))
-            //{
-            //    PlayerNetworkedData = networkedInputData;
-            //}
+        //    if (GetInput(out PlayerNetworkData networkedInputData))
+        //    {
+        //        PlayerNetworkedData = networkedInputData;
+        //    }
 
-            //m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
-        }
+        //    //m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
+        //}
     }
 }
 //var PlayerRefStruct = Runner.LocalPlayer.PlayerId;

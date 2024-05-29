@@ -34,13 +34,12 @@ namespace PlayerManagement
 
         private void OnDisable()
         {
-            if (transform.gameObject.activeInHierarchy)
+            if (transform.gameObject.activeInHierarchy && Object.HasInputAuthority)
             {
+                m_playerInputActions.PlayerOnFoot.Disable();
+
                 if (Runner != null)
-                {
-                    m_playerInputActions.PlayerOnFoot.Disable();
                     Runner.RemoveCallbacks(this);
-                }
 
                 #region InputAction-UnSubscriptions
                 m_playerInputActions.PlayerOnFoot.Movement.performed -= MoveCharacter;
@@ -63,14 +62,10 @@ namespace PlayerManagement
 
         private void Start()
         {
-            if (transform.gameObject.activeInHierarchy)
+            if (Object.HasInputAuthority)
             {
-                if (Runner != null)
-                {
-                    m_playerInputActions = InputManager.m_InputManagerActions;
-                    m_playerInputActions.PlayerOnFoot.Enable();
-                    Runner.AddCallbacks(this);
-                }
+                m_playerInputActions = InputManager.m_InputManagerActions;
+                m_playerInputActions.PlayerOnFoot.Enable();
 
                 #region List isComposite/isPartOfComposite from Actions in Console
                 //for (int i = 0; i < m_playerInputActions.PlayerOnFoot.Movement.bindings.Count; i++)
@@ -110,7 +105,6 @@ namespace PlayerManagement
 
         private void Update()
         {
-            //RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
             CameraRotation();
         }
 
@@ -172,92 +166,113 @@ namespace PlayerManagement
         #region Normal Acceleration
         private void MoveCharacter(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = true;
+            if (Object.HasInputAuthority)
+                m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = true;
         }
 
         private void StopMovement(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = false;
+            if (Object.HasInputAuthority)
+                m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = false;
         }
         #endregion
         #region Character Jump
         private void CharacterJump(InputAction.CallbackContext _callbackContext)
         {
-            JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
+            if (Object.HasInputAuthority)
+                JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
-            JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
+            if (Object.HasInputAuthority)
+                JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
         #endregion
         #region Ducking
         private void CharacterDuck(InputAction.CallbackContext _callbackContext)
         {
-            KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
+            if (Object.HasInputAuthority)
+                KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
         {
-            KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
+            if (Object.HasInputAuthority)
+                KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
         #endregion
         #region Rotation
         private void OnRightMouseButtonDown(InputAction.CallbackContext _callbackContext)
         {
-            m_ePreviousMoveMethod = m_playerNetworkController.m_eRigidbodyMoveMethod;
-            m_playerNetworkController.m_eRigidbodyMoveMethod = ERigidbodyMoveMethod.Locked;
+            if (Object.HasInputAuthority)
+            {
+                m_ePreviousMoveMethod = m_playerNetworkController.m_eRigidbodyMoveMethod;
+                m_playerNetworkController.m_eRigidbodyMoveMethod = ERigidbodyMoveMethod.Locked;
+            }
         }
 
         private void OnRightMouseButtonUp(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_eRigidbodyMoveMethod = m_ePreviousMoveMethod;
+            if (Object.HasInputAuthority)
+                m_playerNetworkController.m_eRigidbodyMoveMethod = m_ePreviousMoveMethod;
         }
         #endregion
         #region Increasing Acceleration
         //Set fast moveSpeed by pressing shift and controller relatives.
         private void AccelerateMovespeed(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = _callbackContext.ReadValueAsButton();
+            if (Object.HasInputAuthority)
+                m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void DecelerateMovespeed(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = false;
+            if (Object.HasInputAuthority)
+                m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = false;
         }
         #endregion
         #region CursorVisibility
         private void SwitchCursorVisibility(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_cameraNetworkBehaviour.SwitchCursorVisibility();
+            if (Object.HasInputAuthority)
+                m_playerNetworkController.m_cameraNetworkBehaviour.SwitchCursorVisibility();
         }
-        #endregion
-
-        #region InputDeviceChange
-        //private void OnInputDeviceChange(InputUser _inputUser, InputUserChange _inputUserChange, InputDevice _inputDevice)
-        //{
-        //    //TODO: Possible Notifications on changing the input device.
-        //}
         #endregion
         #region Camera Zoom
         private void ZoomCamera(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomSpeed;
+            if (Object.HasInputAuthority)
+            {
+                m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomSpeed;
+            }
         }
 
         private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
         {
-            m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
+            if (Object.HasInputAuthority)
+                m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
         }
         #endregion
 
         #region Menu
         private void OpenMenu(InputAction.CallbackContext _callbackContext)
         {
+            if (Object.HasInputAuthority)
+            {
 
+            }
         }
         #endregion
         #endregion
+
+        public override void Spawned()
+        {
+            if (Runner != null && Object.HasInputAuthority)
+            {
+                Runner.AddCallbacks(this);
+            }
+        }
 
         public void BeforeUpdate()
         {
@@ -268,69 +283,68 @@ namespace PlayerManagement
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
             #region Version 1
-            //PlayerNetworkData playerInput = new();
-            //var InputActions = m_playerInputActions.PlayerOnFoot;
+            //PlayerNetworkData playerInput = new PlayerNetworkData();
+            ////var InputActions = m_playerInputActions.PlayerOnFoot;
 
-            #region OnInput Tests
             //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
+            //playerInput.MoveDirection = m_localMoveVector;
+            //playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
+            //playerInput.KneelButtonGotPressed = KneelButtonIsPressed;
 
+            #region OnInput InputButtons.Set-Tests
             //playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
             //playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
             //playerInput.InputButtons.Set(EInputButtons.Left, m_rightInputLocal < 0);
             //playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
+#if UNITY_EDITOR
             //Debug.Log($"Forward: {m_forwardInputLocal > 0} - Backward: {m_forwardInputLocal < 0} - Left: {m_rightInputLocal < 0} - Right: {m_rightInputLocal > 0} - ");
-
-            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed()); //m_playerInputActions.PlayerOnFoot;
+#endif
+            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed());
             //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Duck.IsPressed());
             #endregion
-
-            //playerInput.MoveDirection = m_localMoveVector;
-
-            //playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
-            //playerInput.KneelButtonGotPressed = KneelButtonIsPressed;
             #endregion
 
             #region Version 2
-            //var playerInput = new PlayerNetworkData()   //or PlayerNetworkData playerInput = new(); playerInput.xyz = retrieved Input;
+            var playerInput = new PlayerNetworkData()   //or PlayerNetworkData playerInput = new();
+            {
+                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+                //MoveDirection = m_localMoveVector,
+                JumpButtonGotPressed = JumpButtonIsPressed,
+                KneelButtonGotPressed = KneelButtonIsPressed,
+            };
+            #endregion
+
+            #region Combined Player Inputs
+            //var playerInput = new CombinedPlayerInputs();
+
+            //playerInput[0] = new PlayerNetworkData()
             //{
             //    MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
             //    //MoveDirection = m_localMoveVector,
             //    JumpButtonGotPressed = JumpButtonIsPressed,
             //    KneelButtonGotPressed = KneelButtonIsPressed,
             //};
-            #endregion
-
-            #region Combined Player Inputs
-            var playerInput = new CombinedPlayerInputs();
-
-            playerInput[0] = new PlayerNetworkData()
-            {
-                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-                //MoveDirection = m_localMoveVector,
-                JumpButtonGotPressed = JumpButtonIsPressed,
-                KneelButtonGotPressed = KneelButtonIsPressed,
-            };
-            playerInput[1] = new PlayerNetworkData()
-            {
-                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-                //MoveDirection = m_localMoveVector,
-                JumpButtonGotPressed = JumpButtonIsPressed,
-                KneelButtonGotPressed = KneelButtonIsPressed,
-            };
-            playerInput[2] = new PlayerNetworkData()
-            {
-                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-                //MoveDirection = m_localMoveVector,
-                JumpButtonGotPressed = JumpButtonIsPressed,
-                KneelButtonGotPressed = KneelButtonIsPressed,
-            };
-            playerInput[3] = new PlayerNetworkData()
-            {
-                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-                //MoveDirection = m_localMoveVector,
-                JumpButtonGotPressed = JumpButtonIsPressed,
-                KneelButtonGotPressed = KneelButtonIsPressed,
-            };
+            //playerInput[1] = new PlayerNetworkData()
+            //{
+            //    MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    //MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    KneelButtonGotPressed = KneelButtonIsPressed,
+            //};
+            //playerInput[2] = new PlayerNetworkData()
+            //{
+            //    MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    //MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    KneelButtonGotPressed = KneelButtonIsPressed,
+            //};
+            //playerInput[3] = new PlayerNetworkData()
+            //{
+            //    MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    //MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    KneelButtonGotPressed = KneelButtonIsPressed,
+            //};
             #endregion
 
             input.Set(playerInput);
