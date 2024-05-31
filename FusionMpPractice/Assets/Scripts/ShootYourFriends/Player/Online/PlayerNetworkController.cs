@@ -1,10 +1,9 @@
 using Fusion;
-using System.Linq;
 using UnityEngine;
 
 namespace PlayerManagement
 {
-    public class PlayerNetworkController : NetworkBehaviour
+    public class PlayerNetworkController : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     {
         [SerializeField] private GameObject m_localInputParent;
 
@@ -26,16 +25,28 @@ namespace PlayerManagement
         #endregion
 
         #region Network
-        //[Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote player receive the correct input data to move their avatars.
-        internal int m_playerIndex;
+        //[Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote _playerRef receive the correct input data to move their avatars.
+        internal PlayerRef m_playerRef;
+        internal int m_playerId;
         #endregion
+
+        public void PlayerJoined(PlayerRef _playerRef)
+        {
+            m_playerRef = _playerRef;
+            m_playerId = m_playerRef.PlayerId;
+        }
+
+        public void PlayerLeft(PlayerRef _playerRef)
+        {
+            m_playerRef = -1;
+            m_playerId = -1;
+        }
 
         public override void Spawned()
         {
             if (Object.HasInputAuthority)
             {
                 m_localInputParent.SetActive(true);
-                m_playerIndex = Runner.ActivePlayers.Count() - 1;
             }
             else
             {

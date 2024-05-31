@@ -146,7 +146,7 @@ namespace PlayerManagement
             m_hasInputAuthorityText.text = $"{Object.HasInputAuthority}";
             m_networkObjectId.text = $"{Object.Id}";
 
-            if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy /*&& Object.HasInputAuthority*/)
+            if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
             {
                 m_playerInputActions = InputManager.m_InputManagerActions;
                 m_playerInputActions.PlayerOnFoot.Enable();
@@ -187,11 +187,11 @@ namespace PlayerManagement
 
             //if (GetInput<CombinedPlayerInputs>(out var networkInput))
             //{
-            //    m_rightVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.x;
-            //    m_rotationVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.y;
-            //    m_forwardVector = networkInput[m_playerNetworkController.m_playerIndex].MoveDirection.z;
-            //    m_jumpButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].JumpButtonGotPressed;
-            //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_playerIndex].KneelButtonGotPressed;
+            //    m_rightVector = networkInput[m_playerNetworkController.m_playerId].MoveDirection.x;
+            //    m_rotationVector = networkInput[m_playerNetworkController.m_playerId].MoveDirection.y;
+            //    m_forwardVector = networkInput[m_playerNetworkController.m_playerId].MoveDirection.z;
+            //    m_jumpButtonGotPressed = networkInput[m_playerNetworkController.m_playerId].JumpButtonGotPressed;
+            //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_playerId].KneelButtonGotPressed;
             //}
 
             if (GetInput<PlayerNetworkData>(out var networkInput))
@@ -343,7 +343,7 @@ namespace PlayerManagement
             m_moveDirection = m_rightVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
             m_moveDirection += m_forwardVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
             m_moveDirection.y = 0.0f;
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Time.fixedDeltaTime * m_moveDirection.normalized);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             if (m_moveDirection != Vector3.zero)
             {
@@ -384,7 +384,7 @@ namespace PlayerManagement
         {
             if (m_permitCrouchLerp)
             {
-                m_crouchTimer += Time.fixedDeltaTime;
+                m_crouchTimer += Runner.DeltaTime;
                 float countingUp = m_crouchTimer / m_kneelTime;
                 m_crouchTimer *= m_crouchTimer;
 
@@ -400,7 +400,7 @@ namespace PlayerManagement
                             {
                                 //Lerp getting up.
                                 m_capsuleCollider.height = Mathf.Lerp(m_capsuleCollider.height, m_colliderWalkHeight, countingUp);
-                                m_crouchTimer += Time.fixedDeltaTime;
+                                m_crouchTimer += Runner.DeltaTime;
                             }
                             else
                             {
@@ -417,7 +417,7 @@ namespace PlayerManagement
                         {
                             //Lerp kneeling down.
                             m_capsuleCollider.height = Mathf.Lerp(m_capsuleCollider.height, m_colliderCrouchHeight, countingUp);
-                            m_crouchTimer += Time.fixedDeltaTime;
+                            m_crouchTimer += Runner.DeltaTime;
                         }
                         else
                             m_capsuleCollider.height = m_colliderCrouchHeight;
@@ -624,27 +624,22 @@ namespace PlayerManagement
         #region Character Jump
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_coyoteTimeCounter = 0.0f; //Prevents the player from 'double jumping' on pressing the JumpButton multiple times.
+            m_coyoteTimeCounter = 0.0f; //Prevents the player from 'double jumping' on pressing the JumpButton multiple times.
         }
         #endregion
         #region Ducking
         private void CharacterDuck(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-            {
-                m_crouchTimer = 0;
+            m_crouchTimer = 0;
 
-                m_groundCheckHeightAdjustment = (m_colliderWalkHeight - m_colliderCrouchHeight) / 2;
-                m_groundCheckTransform.position = new Vector3(m_rigidbody.position.x, m_rigidbody.position.y + m_groundCheckHeightAdjustment, m_rigidbody.position.z);
-            }
+            m_groundCheckHeightAdjustment = (m_colliderWalkHeight - m_colliderCrouchHeight) / 2;
+            m_groundCheckTransform.position = new Vector3(m_rigidbody.position.x, m_rigidbody.position.y + m_groundCheckHeightAdjustment, m_rigidbody.position.z);
         }
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                //Whenever the m_groundCheckTransform.position gets ReSetted, it has to be the same position as the moving Rigidbody!
-                m_groundCheckTransform.position = m_rigidbody.position;
+            //Whenever the m_groundCheckTransform.position gets ReSetted, it has to be the same position as the moving Rigidbody!
+            m_groundCheckTransform.position = m_rigidbody.position;
         }
         #endregion
         #endregion

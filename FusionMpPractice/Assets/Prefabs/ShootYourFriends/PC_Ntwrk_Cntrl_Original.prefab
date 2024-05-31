@@ -171,7 +171,8 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5230890172250122737, guid: 94677d379cd3fd641a7679cd705993ac, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 94677d379cd3fd641a7679cd705993ac, type: 3}
 --- !u!20 &3101296337815397137 stripped
 Camera:
@@ -222,6 +223,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3996989401446623061}
     m_Modifications:
+    - target: {fileID: 295129689879103814, guid: 1e2f78fc7763f6547a9b4df3b690b298,
+        type: 3}
+      propertyPath: m_playerNetworkController
+      value: 
+      objectReference: {fileID: 8326428093305934301}
+    - target: {fileID: 295129689879103817, guid: 1e2f78fc7763f6547a9b4df3b690b298,
+        type: 3}
+      propertyPath: m_playerNetworkController
+      value: 
+      objectReference: {fileID: 8326428093305934301}
     - target: {fileID: 1209669569924241648, guid: 1e2f78fc7763f6547a9b4df3b690b298,
         type: 3}
       propertyPath: m_playerNetworkController

@@ -166,102 +166,82 @@ namespace PlayerManagement
         #region Normal Acceleration
         private void MoveCharacter(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = true;
+            m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = true;
         }
 
         private void StopMovement(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = false;
+            m_playerNetworkController.m_playerNetworkMovement.m_moveButtonIsPressed = false;
         }
         #endregion
         #region Character Jump
         private void CharacterJump(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
+            JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void OnJumpButtonRelease(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
+            JumpButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
         #endregion
         #region Ducking
         private void CharacterDuck(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
+            KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void StopDucking(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
+            KneelButtonIsPressed = _callbackContext.ReadValueAsButton();
         }
         #endregion
         #region Rotation
         private void OnRightMouseButtonDown(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-            {
-                m_ePreviousMoveMethod = m_playerNetworkController.m_eRigidbodyMoveMethod;
-                m_playerNetworkController.m_eRigidbodyMoveMethod = ERigidbodyMoveMethod.Locked;
-            }
+            m_ePreviousMoveMethod = m_playerNetworkController.m_eRigidbodyMoveMethod;
+            m_playerNetworkController.m_eRigidbodyMoveMethod = ERigidbodyMoveMethod.Locked;
         }
 
         private void OnRightMouseButtonUp(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_playerNetworkController.m_eRigidbodyMoveMethod = m_ePreviousMoveMethod;
+            m_playerNetworkController.m_eRigidbodyMoveMethod = m_ePreviousMoveMethod;
         }
         #endregion
         #region Increasing Acceleration
         //Set fast moveSpeed by pressing shift and controller relatives.
         private void AccelerateMovespeed(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = _callbackContext.ReadValueAsButton();
+            m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = _callbackContext.ReadValueAsButton();
         }
 
         private void DecelerateMovespeed(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = false;
+            m_playerNetworkController.m_playerNetworkMovement.m_shiftIsPressed = false;
         }
         #endregion
         #region CursorVisibility
         private void SwitchCursorVisibility(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_playerNetworkController.m_cameraNetworkBehaviour.SwitchCursorVisibility();
+            m_playerNetworkController.m_cameraNetworkBehaviour.SwitchCursorVisibility();
         }
         #endregion
         #region Camera Zoom
         private void ZoomCamera(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-            {
-                m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomSpeed;
-            }
+            m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = _callbackContext.ReadValue<Vector2>().y * m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomSpeed;
         }
 
         private void StopCameraZoom(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-                m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
+            m_playerNetworkController.m_cameraNetworkBehaviour.m_zoomScrollValue = 0.0f;
         }
         #endregion
 
         #region Menu
         private void OpenMenu(InputAction.CallbackContext _callbackContext)
         {
-            if (Object.HasInputAuthority)
-            {
 
-            }
         }
         #endregion
         #endregion
