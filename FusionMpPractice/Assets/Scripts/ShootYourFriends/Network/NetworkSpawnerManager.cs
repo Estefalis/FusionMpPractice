@@ -10,7 +10,7 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
     [SerializeField] private Transform[] m_spawnPointsArray;
     private List<Transform> m_spawnPointsList;
 
-    //private Dictionary<PlayerRef, NetworkObject> m_players = new();   //Version 2
+    //private Dictionary<OwnPlayerRef, NetworkObject> m_players = new();   //Version 2
 
     private NetworkManager m_networkManager;
 

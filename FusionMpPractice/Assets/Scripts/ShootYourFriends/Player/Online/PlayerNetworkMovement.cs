@@ -2,13 +2,11 @@ using Fusion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-//using UnityEngine.SceneManagement;
 
 namespace PlayerManagement
 {
     public class PlayerNetworkMovement : NetworkBehaviour
     {
-        [SerializeField] private TextMeshProUGUI m_hasInputAuthorityText;
         [SerializeField] private TextMeshProUGUI m_networkObjectId;
         [SerializeField] private TextMeshProUGUI m_rigidbodyPos;
 
@@ -124,7 +122,6 @@ namespace PlayerManagement
             m_rigidbodyTransform = m_rigidbody.transform;
             m_startPosition = transform.position;
             m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Walking;
-            //SceneManager.sceneLoaded += OnSceneFinishedLoading;
         }
 
         private void OnDisable()
@@ -137,13 +134,10 @@ namespace PlayerManagement
                 m_playerInputActions.PlayerOnFoot.Duck.performed -= CharacterDuck;
                 m_playerInputActions.PlayerOnFoot.Duck.canceled -= StopDucking;
             }
-
-            //SceneManager.sceneLoaded -= OnSceneFinishedLoading;
         }
 
         private void Start()
         {
-            m_hasInputAuthorityText.text = $"{Object.HasInputAuthority}";
             m_networkObjectId.text = $"{Object.Id}";
 
             if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
@@ -183,15 +177,13 @@ namespace PlayerManagement
 
         public override void FixedUpdateNetwork()
         {
-            //base.FixedUpdateNetwork();
-
             //if (GetInput<CombinedPlayerInputs>(out var networkInput))
             //{
-            //    m_rightVector = networkInput[m_playerNetworkController.m_playerId].MoveDirection.x;
-            //    m_rotationVector = networkInput[m_playerNetworkController.m_playerId].MoveDirection.y;
-            //    m_forwardVector = networkInput[m_playerNetworkController.m_playerId].MoveDirection.z;
-            //    m_jumpButtonGotPressed = networkInput[m_playerNetworkController.m_playerId].JumpButtonGotPressed;
-            //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_playerId].KneelButtonGotPressed;
+            //    m_rightVector = networkInput[m_playerNetworkController.m_myPlayerId].MoveDirection.x;
+            //    m_rotationVector = networkInput[m_playerNetworkController.m_myPlayerId].MoveDirection.y;
+            //    m_forwardVector = networkInput[m_playerNetworkController.m_myPlayerId].MoveDirection.z;
+            //    m_jumpButtonGotPressed = networkInput[m_playerNetworkController.m_myPlayerId].JumpButtonGotPressed;
+            //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_myPlayerId].DuckButtonGotPressed;
             //}
 
             if (GetInput<PlayerNetworkData>(out var networkInput))
@@ -200,61 +192,61 @@ namespace PlayerManagement
                 m_rotationVector = networkInput.MoveDirection.y;
                 m_forwardVector = networkInput.MoveDirection.z;
                 m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
-                m_kneelButtonGotPressed = networkInput.KneelButtonGotPressed;
-            }
+                m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
 
-            Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
+                Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
 
-            if (!m_playerNetworkController.m_isDead)
-            {
-                switch (m_playerNetworkController.m_eRigidbodyMoveMethod)
+                if (!m_playerNetworkController.m_isDead)
                 {
-                    //Runner.DeltaTime instead of Time.fixedDeltaTime in Movement_Methods.
-                    case ERigidbodyMoveMethod.Basic:
+                    switch (m_playerNetworkController.m_eRigidbodyMoveMethod)
                     {
-                        MoveRigidbodyBasic();
-                        break;
-                    }
-                    case ERigidbodyMoveMethod.KbRotateY:
-                    {
-                        MoveRigidbodyKbY();
-                        break;
-                    }
-                    case ERigidbodyMoveMethod.MouseRotateY:
-                    {
-                        MoveRigidBodyMouseY();
-                        break;
-                    }
-                    case ERigidbodyMoveMethod.Locked:
-                    {
-                        MoveRigidbodyLocked();
-                        break;
-                    }
-                    case ERigidbodyMoveMethod.Relative:
-                    {
-                        MoveRigidbodyRelative();
-                        break;
-                    }
-                }
-
-                Jumping();
-
-                switch (m_playerIsGrounded) //Calculate FallDamage.
-                {
-                    case false:
-                    {
-                        FallDamageCalculationStart();
-                        break;
-                    }
-                    case true:
-                    {
-                        FallDamageCalculationEnd();
-
-                        if (!m_jumpButtonGotPressed && !m_canJumpAgain)
+                        //Runner.DeltaTime instead of Time.fixedDeltaTime in Movement_Methods.
+                        case ERigidbodyMoveMethod.Basic:
                         {
-                            m_canJumpAgain = true;
+                            MoveRigidbodyBasic();
+                            break;
                         }
-                        break;
+                        case ERigidbodyMoveMethod.KbRotateY:
+                        {
+                            MoveRigidbodyKbY();
+                            break;
+                        }
+                        case ERigidbodyMoveMethod.MouseRotateY:
+                        {
+                            MoveRigidBodyMouseY();
+                            break;
+                        }
+                        case ERigidbodyMoveMethod.Locked:
+                        {
+                            MoveRigidbodyLocked();
+                            break;
+                        }
+                        case ERigidbodyMoveMethod.Relative:
+                        {
+                            MoveRigidbodyRelative();
+                            break;
+                        }
+                    }
+
+                    Jumping();
+
+                    switch (m_playerIsGrounded) //Calculate FallDamage.
+                    {
+                        case false:
+                        {
+                            FallDamageCalculationStart();
+                            break;
+                        }
+                        case true:
+                        {
+                            FallDamageCalculationEnd();
+
+                            if (!m_jumpButtonGotPressed && !m_canJumpAgain)
+                            {
+                                m_canJumpAgain = true;
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -269,22 +261,6 @@ namespace PlayerManagement
             Gizmos.DrawWireSphere(m_lineOrigin + m_sphereCastDirection * m_hitCheckDistance, m_sphereRadius);
         }
 #endif
-        //private void OnSceneFinishedLoading(Scene _scene, LoadSceneMode _mode)
-        //{
-        //    switch (_scene.buildIndex)
-        //    {
-        //        case 1:
-        //        {
-        //            m_playerInputActions = InputManager.m_InputManagerActions;
-        //            m_playerInputActions.PlayerOnFoot.Enable();
-        //            m_playerInputActions.PlayerOnFoot.Jump.canceled += OnJumpButtonRelease;
-        //            m_playerInputActions.PlayerOnFoot.Duck.performed += CharacterDuck;
-        //            m_playerInputActions.PlayerOnFoot.Duck.canceled += StopDucking;
-        //            break;
-        //        }
-        //    }
-        //}
-
         private void Jumping()
         {
             if (m_coyoteTimeCounter >= 0 && m_jumpButtonGotPressed && m_canJumpAgain && m_playerIsGrounded)

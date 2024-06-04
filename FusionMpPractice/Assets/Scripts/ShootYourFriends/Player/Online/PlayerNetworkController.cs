@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PlayerManagement
 {
-    public class PlayerNetworkController : NetworkBehaviour, IPlayerJoined, IPlayerLeft
+    public class PlayerNetworkController : NetworkBehaviour
     {
         [SerializeField] private GameObject m_localInputParent;
 
@@ -26,26 +26,14 @@ namespace PlayerManagement
 
         #region Network
         //[Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote _playerRef receive the correct input data to move their avatars.
-        internal PlayerRef m_playerRef;
-        internal int m_playerId;
+        internal NetworkId m_networkId;
         #endregion
-
-        public void PlayerJoined(PlayerRef _playerRef)
-        {
-            m_playerRef = _playerRef;
-            m_playerId = m_playerRef.PlayerId;
-        }
-
-        public void PlayerLeft(PlayerRef _playerRef)
-        {
-            m_playerRef = -1;
-            m_playerId = -1;
-        }
 
         public override void Spawned()
         {
             if (Object.HasInputAuthority)
             {
+                m_networkId = Object.Id;
                 m_localInputParent.SetActive(true);
             }
             else
