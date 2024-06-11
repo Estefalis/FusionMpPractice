@@ -177,6 +177,8 @@ namespace PlayerManagement
 
         public override void FixedUpdateNetwork()
         {
+            base.FixedUpdateNetwork();
+
             //if (GetInput<CombinedPlayerInputs>(out var networkInput))
             //{
             //    m_rightVector = networkInput[m_playerNetworkController.m_myPlayerId].MoveDirection.x;
