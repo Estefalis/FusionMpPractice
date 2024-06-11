@@ -186,7 +186,7 @@ namespace PlayerManagement
             //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_myPlayerId].DuckButtonGotPressed;
             //}
 
-            if (GetInput<PlayerNetworkData>(out var networkInput))
+            if (GetInput(out PlayerNetworkData networkInput))
             {
                 m_rightVector = networkInput.MoveDirection.x;
                 m_rotationVector = networkInput.MoveDirection.y;
