@@ -1,7 +1,7 @@
-using Fusion;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Fusion;
 
 public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft   //Just a different name for NetworkSpawnerController in Guide.
 {
@@ -12,12 +12,12 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
 
     //private Dictionary<OwnPlayerRef, NetworkObject> m_players = new();   //Version 2
 
-    private NetworkManager m_networkManager;
+    private NetworkRunnerManager m_networkManager;
 
     private void Awake()
     {
         m_spawnPointsList = new List<Transform>();
-        m_networkManager = FindObjectOfType<NetworkManager>();
+        m_networkManager = FindObjectOfType<NetworkRunnerManager>();
 
         if (m_roomCodeText != null)
         {
@@ -47,10 +47,9 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
         //_playerRef sets (Has)InputAuthority over the spawned Object.
         NetworkObject playerObject = Runner.Spawn(m_playerNetworkPrefab, m_spawnPointsArray[randomSpawnPosition].position, Quaternion.identity, _playerRef);
 
-        Runner.SetPlayerObject(_playerRef, playerObject);           //sets IsLocalPlayerObject.
-                                                                    //m_players.Add(_playerRef, playerObject);     //Version 2
-                                                                    ////Add the used/randomed Position to the runtime SpawnPointList.
-        m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]);
+        Runner.SetPlayerObject(_playerRef, playerObject);   //sets IsLocalPlayerObject. Version2: m_players.Add(_playerRef, playerObject);
+
+        m_spawnPointsList.Add(m_spawnPointsArray[randomSpawnPosition]); //Add the used/randomed Position to the runtime SpawnPointList.
     }
 
     public void PlayerLeft(PlayerRef _playerRef)
@@ -61,18 +60,21 @@ public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLef
 
     private void DespawnPlayer(PlayerRef _playerRef)
     {
+        #region Version 1
         if (Runner.TryGetPlayerObject(_playerRef, out var playerObject))
         {
             Runner.Despawn(playerObject);
         }
 
         Runner.SetPlayerObject(_playerRef, null);           //resets IsLocalPlayerObject.
+        #endregion
 
-        ////Version 2
+        #region Version 2
         //if (m_players.TryGetValue(_playerRef, out var playerObject))
         //{
         //    Runner.Despawn(playerObject);
         //    m_players.Remove(_playerRef);
         //}
+        #endregion
     }
 }

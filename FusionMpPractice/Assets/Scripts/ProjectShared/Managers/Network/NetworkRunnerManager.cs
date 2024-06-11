@@ -1,15 +1,14 @@
-using Extensions;
-using Fusion;
-using Fusion.Sockets;
-//using Fusion.Photon.Realtime;   //For Regions.
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Extensions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using Fusion;
+using Fusion.Sockets;
+//using Fusion.Photon.Realtime;   //For Regions.
 
-public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     internal string DevRoomCode { get => roomCode; }
     [SerializeField] private string roomCode;

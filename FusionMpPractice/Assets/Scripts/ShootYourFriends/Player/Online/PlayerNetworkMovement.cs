@@ -177,7 +177,7 @@ namespace PlayerManagement
 
         public override void FixedUpdateNetwork()
         {
-            base.FixedUpdateNetwork();
+            //base.FixedUpdateNetwork();
 
             //if (GetInput<CombinedPlayerInputs>(out var networkInput))
             //{
@@ -190,11 +190,14 @@ namespace PlayerManagement
 
             if (GetInput(out PlayerNetworkData networkInput))
             {
+                networkInput.MoveDirection.Normalize();
                 m_rightVector = networkInput.MoveDirection.x;
                 m_rotationVector = networkInput.MoveDirection.y;
                 m_forwardVector = networkInput.MoveDirection.z;
                 m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
                 m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
+
+                //var previousPosition = m_rigidbodyTransform.position;
 
                 Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
 

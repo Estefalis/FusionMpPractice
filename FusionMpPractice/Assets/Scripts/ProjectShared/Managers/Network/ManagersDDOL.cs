@@ -8,8 +8,8 @@ public class ManagersDDOL : MonoBehaviour
     //private static Managers m_instance;
     public static ManagersDDOL Instance { get; private set; }
 
-    //public NetworkManager m_NetworkManager;
-    [field: SerializeField] public NetworkManager NetworkManager { get; private set; }
+    //public NetworkRunnerManager m_NetworkManager;
+    [field: SerializeField] public NetworkRunnerManager NetworkManager { get; private set; }
     //[SerializeField] public MenuManager MenuManager { get; private set; }
 
     private void Awake()
