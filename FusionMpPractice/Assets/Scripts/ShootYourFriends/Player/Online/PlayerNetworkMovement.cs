@@ -190,7 +190,6 @@ namespace PlayerManagement
 
             if (GetInput(out PlayerNetworkData networkInput))
             {
-                networkInput.MoveDirection.Normalize();
                 m_rightVector = networkInput.MoveDirection.x;
                 m_rotationVector = networkInput.MoveDirection.y;
                 m_forwardVector = networkInput.MoveDirection.z;
@@ -328,10 +327,13 @@ namespace PlayerManagement
 
             if (m_moveDirection != Vector3.zero)
             {
-                float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;
-                float smoothRotation =
-                    Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
-                m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
+                m_targetRotation = Quaternion.LookRotation(m_moveDirection, Vector3.up);
+                m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);
+                m_rigidbody.MoveRotation(m_targetRotation);
+                //float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;
+                //float smoothRotation =
+                //    Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
+                //m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
             }
         }
         #endregion

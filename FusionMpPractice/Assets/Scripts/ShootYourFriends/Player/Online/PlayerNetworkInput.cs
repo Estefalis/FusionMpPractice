@@ -263,13 +263,13 @@ namespace PlayerManagement
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
             #region Version 1
-            //PlayerNetworkData playerInput = new PlayerNetworkData();
-            ////var InputActions = m_playerInputActions.PlayerOnFoot;
+            PlayerNetworkData playerInput = new PlayerNetworkData();
+            //var InputActions = m_playerInputActions.PlayerOnFoot;
 
-            //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
+            playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
             //playerInput.MoveDirection = m_localMoveVector;
-            //playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
-            //playerInput.DuckButtonGotPressed = DuckButtonIsPressed;
+            playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
+            playerInput.DuckButtonGotPressed = DuckButtonIsPressed;
 
             #region OnInput InputButtons.Set-Tests
             //playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
@@ -285,14 +285,14 @@ namespace PlayerManagement
             #endregion
 
             #region Version 2
-            var playerInput = new PlayerNetworkData()   //or PlayerNetworkData playerInput = new();
-            {
-                NetworkId = m_playerNetworkController.m_networkId,
-                MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-                //MoveDirection = m_localMoveVector,
-                JumpButtonGotPressed = JumpButtonIsPressed,
-                DuckButtonGotPressed = DuckButtonIsPressed,
-            };
+            //var playerInput = new PlayerNetworkData()   //or PlayerNetworkData playerInput = new();
+            //{
+            //    NetworkId = m_playerNetworkController.m_networkId,
+            //    MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    //MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    DuckButtonGotPressed = DuckButtonIsPressed,
+            //};
             #endregion
 
             #region Combined Player Inputs
