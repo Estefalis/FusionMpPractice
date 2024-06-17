@@ -42,15 +42,6 @@ namespace PlayerManagement
             }
         }
 
-        //public override void FixedUpdateNetwork()
-        //{
-        //    ////if (GetInput<CombinedPlayerInputs>(out var input))
-        //    ////{
-        //    ////    var dir = input[0].MoveDirection;
-        //    ////    if (dir != Vector3.zero)
-        //    ////        Debug.Log($"ID 0: {input[0].MoveDirection}");
-        //    ////}
-
         //    if (GetInput(out PlayerNetworkData networkedInputData))
         //    {
         //        PlayerNetworkedData = networkedInputData;
@@ -60,6 +51,3 @@ namespace PlayerManagement
         //}
     }
 }
-//var PlayerRefStruct = Runner.LocalPlayer.PlayerId;
-//var PlayerRefId = PlayerRefStruct.PlayerId;
-//var isPlayerIndexValid = PlayerRefStruct.IsValid; //Runner.LocalPlayer.IsValid.

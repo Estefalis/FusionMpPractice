@@ -1295,7 +1295,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5041189732828423345}
-  - component: {fileID: 5041189732828423344}
+  - component: {fileID: 6970717953181797205}
   - component: {fileID: 5041189732828423351}
   - component: {fileID: 5041189732828423350}
   m_Layer: 3
@@ -1321,7 +1321,7 @@ Transform:
   m_Father: {fileID: 2284942448277819409}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &5041189732828423344
+--- !u!136 &6970717953181797205
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1767,7 +1767,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5538768361658617693
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2552,17 +2552,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  m_networkObjectId: {fileID: 1274695620220227513}
-  m_rigidbodyPos: {fileID: 6372909837746574780}
   m_playerNetworkController: {fileID: 0}
-  m_capsuleCollider: {fileID: 5041189732828423344}
+  m_capsuleCollider: {fileID: 6970717953181797205}
   m_walkSpeed: 5
   m_runSpeed: 7.5
   m_crouchSpeed: 2.5
   m_jumpForce: 3
   m_kneelTime: 0.1
   m_moveSpeedLerpTime: 0.5
-  m_smoothRotationTime: 17.5
   m_quaternionRotTime: 300
   m_aDRotYReduction: 0.85
   m_mouseRotYReduction: 0.5

@@ -6,12 +6,14 @@ using Extensions;
 using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
+using Fusion.Photon.Realtime;
 //using Fusion.Photon.Realtime;   //For Regions.
 
 public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    internal string DevRoomCode { get => roomCode; }
-    [SerializeField] private string roomCode;
+    internal string DevRoomCode { get => m_roomCode; }
+    [SerializeField] private string m_roomCode;
+    [SerializeField] private string m_setRegion = "eu";
 
     [SerializeField] private NetworkRunner m_networkRunnerPrefab;
     private NetworkRunner m_networkRunner;
@@ -20,7 +22,7 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         try
         {
-            roomCode = _sessionCode;
+            m_roomCode = _sessionCode;
 
             if (m_networkRunner == null)
             {
@@ -29,8 +31,13 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
                 m_networkRunner.ProvideInput = true;
             }
 
+            #region Set Server Region manually
+            //var appSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
+            //appSettings.FixedRegion = m_setRegion;
+            #endregion
+
             var tryingHost = mode == GameMode.Host;
-            //Debug.Log(tryingHost ? $"Starting as host with {roomCode}." : $"Starting as client with {roomCode}.");
+            //Debug.Log(tryingHost ? $"Starting as host with {m_roomCode}." : $"Starting as client with {m_roomCode}.");
 
             var result = await m_networkRunner.StartGame(new StartGameArgs()
             {

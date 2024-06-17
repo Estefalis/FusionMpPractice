@@ -1,5 +1,5 @@
 using Fusion;
-using TMPro;
+//using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,8 +7,8 @@ namespace PlayerManagement
 {
     public class PlayerNetworkMovement : NetworkBehaviour
     {
-        [SerializeField] private TextMeshProUGUI m_networkObjectId;
-        [SerializeField] private TextMeshProUGUI m_rigidbodyPos;
+        //[SerializeField] private TextMeshProUGUI m_networkObjectId;
+        //[SerializeField] private TextMeshProUGUI m_rigidbodyPos;
 
         private PlayerInputActions m_playerInputActions;
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
@@ -33,7 +33,7 @@ namespace PlayerManagement
 
         #region Rotation
         [Header("Rotation")]
-        [SerializeField] private float m_smoothRotationTime = 15.0f;
+        //[SerializeField] private float m_smoothRotationTime = 15.0f;
         [SerializeField] private float m_quaternionRotTime = 300.0f;
         [SerializeField, Range(0.5f, 1.0f)] private float m_aDRotYReduction = 0.85f;
         [SerializeField, Range(0.001f, 0.5f)] private float m_mouseRotYReduction = 0.1f;
@@ -120,8 +120,9 @@ namespace PlayerManagement
         {
             m_rigidbody = GetComponentInChildren<Rigidbody>();
             m_rigidbodyTransform = m_rigidbody.transform;
-            m_startPosition = transform.position;
+            m_startPosition = m_rigidbodyTransform.position;
             m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Walking;
+            m_playerNetworkController.m_eRigidbodyMoveMethod = ERigidbodyMoveMethod.Relative;
         }
 
         private void OnDisable()
@@ -138,7 +139,7 @@ namespace PlayerManagement
 
         private void Start()
         {
-            m_networkObjectId.text = $"{Object.Id}";
+            //m_networkObjectId.text = $"{Object.Id}";
 
             if (m_playerNetworkController.m_playerNetworkInput.gameObject.activeInHierarchy)
             {
@@ -157,7 +158,7 @@ namespace PlayerManagement
 
         private void Update()
         {
-            m_rigidbodyPos.text = $"{m_rigidbodyTransform.position}";
+            //m_rigidbodyPos.text = $"{m_rigidbodyTransform.position}";
 
             if (!m_playerNetworkController.m_isDead)
             {
@@ -166,7 +167,7 @@ namespace PlayerManagement
                 //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
 
                 CoyoteTimerReSet();
-                MoveAcceleration();
+                //MoveAcceleration();
             }
 
             if (m_rigidbodyTransform.position.y < m_playerNetworkController.m_fallLimit)
@@ -197,6 +198,7 @@ namespace PlayerManagement
                 m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
 
                 //var previousPosition = m_rigidbodyTransform.position;
+                MoveAcceleration();
 
                 Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
 
@@ -513,25 +515,25 @@ namespace PlayerManagement
             {
                 case EAvatarMoveState.Walking:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
                 case EAvatarMoveState.Running:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
                 case EAvatarMoveState.Crouching:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
                 case EAvatarMoveState.Idle:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
                     m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
