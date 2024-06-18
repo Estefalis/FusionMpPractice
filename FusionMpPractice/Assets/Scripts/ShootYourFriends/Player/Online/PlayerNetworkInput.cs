@@ -256,7 +256,8 @@ namespace PlayerManagement
 
         public void BeforeUpdate()
         {
-            RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
+            if (Object.HasInputAuthority)
+                RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
         }
 
         #region INetworkRunnerCallbacks
