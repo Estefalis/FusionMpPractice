@@ -266,6 +266,7 @@ namespace PlayerManagement
             PlayerNetworkData playerInput = new PlayerNetworkData();
             //var InputActions = m_playerInputActions.PlayerOnFoot;
 
+            playerInput.NetworkId = m_playerNetworkController.m_networkId;
             playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
             //playerInput.MoveDirection = m_localMoveVector;
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;

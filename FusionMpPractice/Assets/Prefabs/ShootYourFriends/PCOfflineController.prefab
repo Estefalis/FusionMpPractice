@@ -1710,8 +1710,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3917965877667392551}
-  - component: {fileID: 3917965877667392550}
   - component: {fileID: 3917965877667392545}
+  - component: {fileID: 3917965877667392550}
   m_Layer: 3
   m_Name: Rb_Mesh_Coll
   m_TagString: Untagged
@@ -1735,20 +1735,6 @@ Transform:
   m_Father: {fileID: 7791000184517646471}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &3917965877667392550
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3917965877667392547}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!54 &3917965877667392545
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1765,6 +1751,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 1
+--- !u!136 &3917965877667392550
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3917965877667392547}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &3917965877936963702
 GameObject:
   m_ObjectHideFlags: 0

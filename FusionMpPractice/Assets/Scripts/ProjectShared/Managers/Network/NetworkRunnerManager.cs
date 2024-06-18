@@ -32,8 +32,8 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             #region Set Server Region manually
-            //var appSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
-            //appSettings.FixedRegion = m_setRegion;
+            var appSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
+            appSettings.FixedRegion = m_setRegion;
             #endregion
 
             var tryingHost = mode == GameMode.Host;
@@ -41,6 +41,7 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
             var result = await m_networkRunner.StartGame(new StartGameArgs()
             {
+                CustomPhotonAppSettings = appSettings,
                 GameMode = mode,
                 SessionName = _sessionCode,
                 PlayerCount = 4,    //2 x 2 Tag Team Max for a personal Game.
