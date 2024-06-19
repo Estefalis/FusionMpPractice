@@ -124,6 +124,7 @@ namespace PlayerManagement
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;
                     m_rotationInputLocal = 0.0f;
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;
+                    m_localMoveVector = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
                     break;
                 }
                 case ERigidbodyMoveMethod.KbRotateY:
@@ -131,6 +132,7 @@ namespace PlayerManagement
                     m_rightInputLocal = 0.0f;
                     m_rotationInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;           //A & D
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
+                    m_localMoveVector = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
                     break;
                 }
                 case ERigidbodyMoveMethod.MouseRotateY:
@@ -138,6 +140,7 @@ namespace PlayerManagement
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;              //A & D
                     m_rotationInputLocal = m_playerInputActions.PlayerOnFoot.Rotation.ReadValue<Vector2>().x;           //MouseX Rot Y
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
+                    m_localMoveVector = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
                     break;
                 }
                 case ERigidbodyMoveMethod.Locked:
@@ -145,6 +148,7 @@ namespace PlayerManagement
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;              //A & D
                     m_rotationInputLocal = 0.0f;
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
+                    m_localMoveVector = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
                     break;
                 }
                 case ERigidbodyMoveMethod.Relative:
@@ -152,13 +156,13 @@ namespace PlayerManagement
                     m_rightInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().x;              //A & D
                     m_rotationInputLocal = 0.0f;
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
+                    m_localMoveVector = m_rightInputLocal * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
+                    m_localMoveVector += m_forwardInputLocal * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
                     break;
                 }
                 default:
                     break;
             }
-
-            //m_localMoveVector = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
         }
         #endregion
 
@@ -256,7 +260,7 @@ namespace PlayerManagement
 
         public void BeforeUpdate()
         {
-            if (Object.HasInputAuthority)
+            if (Object.HasInputAuthority && m_playerNetworkController.m_networkId == Object.Id)
                 RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
         }
 
@@ -269,8 +273,7 @@ namespace PlayerManagement
 
             playerInput.NetworkId = m_playerNetworkController.m_networkId;
             //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
-            playerInput.MoveDirection = new Vector2(m_rightInputLocal, m_forwardInputLocal);
-            playerInput.RotationInput = m_rotationInputLocal;
+            playerInput.MoveDirection = m_localMoveVector;
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
             playerInput.DuckButtonGotPressed = DuckButtonIsPressed;
 
@@ -292,8 +295,7 @@ namespace PlayerManagement
             //{
             //    NetworkId = m_playerNetworkController.m_networkId,
             //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //    MoveDirection = new Vector2(m_rightInputLocal, m_forwardInputLocal),
-            //    RotationInput = m_rotationInputLocal,
+            //    MoveDirection = m_localMoveVector,
             //    JumpButtonGotPressed = JumpButtonIsPressed,
             //    DuckButtonGotPressed = DuckButtonIsPressed,
             //};
@@ -305,32 +307,28 @@ namespace PlayerManagement
             //playerInput[0] = new PlayerNetworkInputData()
             //{
             //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //    MoveDirection = new Vector2(m_rightInputLocal, m_forwardInputLocal),
-            //    RotationInput = m_rotationInputLocal,
+            //    MoveDirection = m_localMoveVector,
             //    JumpButtonGotPressed = JumpButtonIsPressed,
             //    DuckButtonGotPressed = DuckButtonIsPressed,
             //};
             //playerInput[1] = new PlayerNetworkInputData()
             //{
             //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //    MoveDirection = new Vector2(m_rightInputLocal, m_forwardInputLocal),
-            //    RotationInput = m_rotationInputLocal,
+            //    MoveDirection = m_localMoveVector,
             //    JumpButtonGotPressed = JumpButtonIsPressed,
             //    DuckButtonGotPressed = DuckButtonIsPressed,
             //};
             //playerInput[2] = new PlayerNetworkInputData()
             //{
             //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //    MoveDirection = new Vector2(m_rightInputLocal, m_forwardInputLocal),
-            //    RotationInput = m_rotationInputLocal,
+            //    MoveDirection = m_localMoveVector,
             //    JumpButtonGotPressed = JumpButtonIsPressed,
             //    DuckButtonGotPressed = DuckButtonIsPressed,
             //};
             //playerInput[3] = new PlayerNetworkInputData()
             //{
             //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //    MoveDirection = new Vector2(m_rightInputLocal, m_forwardInputLocal),
-            //    RotationInput = m_rotationInputLocal,
+            //    MoveDirection = m_localMoveVector,
             //    JumpButtonGotPressed = JumpButtonIsPressed,
             //    DuckButtonGotPressed = DuckButtonIsPressed,
             //};

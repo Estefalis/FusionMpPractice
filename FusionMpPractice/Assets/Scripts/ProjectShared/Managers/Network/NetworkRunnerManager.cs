@@ -7,7 +7,6 @@ using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
 using Fusion.Photon.Realtime;
-//using Fusion.Photon.Realtime;   //For Regions.
 
 public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {

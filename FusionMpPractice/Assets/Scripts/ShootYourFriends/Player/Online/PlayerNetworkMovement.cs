@@ -33,7 +33,7 @@ namespace PlayerManagement
 
         #region Rotation
         [Header("Rotation")]
-        //[SerializeField] private float m_smoothRotationTime = 15.0f;
+        [SerializeField] private float m_smoothRotationTime = 15.0f;
         [SerializeField] private float m_quaternionRotTime = 300.0f;
         [SerializeField, Range(0.5f, 1.0f)] private float m_aDRotYReduction = 0.85f;
         [SerializeField, Range(0.001f, 0.5f)] private float m_mouseRotYReduction = 0.1f;
@@ -178,8 +178,6 @@ namespace PlayerManagement
 
         public override void FixedUpdateNetwork()
         {
-            //base.FixedUpdateNetwork();
-
             //if (GetInput<CombinedPlayerInputs>(out var networkInput))
             //{
             //    m_rightVector = networkInput[m_playerNetworkController.m_myPlayerId].MoveDirection.x;
@@ -192,8 +190,8 @@ namespace PlayerManagement
             if (GetInput(out PlayerNetworkInputData networkInput))
             {
                 m_rightVector = networkInput.MoveDirection.x;
-                m_rotationVector = networkInput.RotationInput;
-                m_forwardVector = networkInput.MoveDirection.y;
+                m_rotationVector = networkInput.MoveDirection.y;
+                m_forwardVector = networkInput.MoveDirection.z;
                 m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
                 m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
 
@@ -322,20 +320,25 @@ namespace PlayerManagement
 
         private void MoveRigidbodyRelative()
         {
-            m_moveDirection = m_rightVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
-            m_moveDirection += m_forwardVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
+            m_moveDirection = new Vector3(m_rightVector, 0.0f, m_forwardVector);
+            //m_moveDirection = m_rightVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
+            //m_moveDirection += m_forwardVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
             m_moveDirection.y = 0.0f;
             m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             if (m_moveDirection != Vector3.zero)
             {
-                m_targetRotation = Quaternion.LookRotation(m_moveDirection, Vector3.up);
-                m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);
-                m_rigidbody.MoveRotation(m_targetRotation);
-                //float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;  //m_moveDirection.x/y on Vector2
-                //float smoothRotation =
-                //    Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
-                //m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
+                #region Quaternion & rb.MoveRotation
+                //m_targetRotation = Quaternion.LookRotation(m_moveDirection, Vector3.up);
+                //m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);
+                //m_rigidbody.MoveRotation(m_targetRotation);
+                #endregion
+                #region Mathf.Rad2Deg rotation
+                float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;  //m_moveDirection.x/y on Vector2
+                float smoothRotation =
+                    Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
+                m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
+                #endregion
             }
         }
         #endregion
