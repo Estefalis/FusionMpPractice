@@ -2,12 +2,12 @@ using Fusion;
 
 public struct CombinedPlayerInputs : INetworkInput
 {
-    public PlayerNetworkData PlayerA;
-    public PlayerNetworkData PlayerB;
-    public PlayerNetworkData PlayerC;
-    public PlayerNetworkData PlayerD;
+    public PlayerNetworkInputData PlayerA;
+    public PlayerNetworkInputData PlayerB;
+    public PlayerNetworkInputData PlayerC;
+    public PlayerNetworkInputData PlayerD;
 
-    public PlayerNetworkData this[int i]
+    public PlayerNetworkInputData this[int i]
     {
         get
         {

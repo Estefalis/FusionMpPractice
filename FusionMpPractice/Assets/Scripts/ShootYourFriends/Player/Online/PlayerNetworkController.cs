@@ -25,7 +25,7 @@ namespace PlayerManagement
         #endregion
 
         #region Network
-        //[Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }   //Remote _playerRef receive the correct input data to move their avatars.
+        //[Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }   //Remote _playerRef receive the correct input data to move their avatars.
         internal NetworkId m_networkId;
         #endregion
 
@@ -42,7 +42,7 @@ namespace PlayerManagement
             }
         }
 
-        //    if (GetInput(out PlayerNetworkData networkedInputData))
+        //    if (GetInput(out PlayerNetworkInputData networkedInputData))
         //    {
         //        PlayerNetworkedData = networkedInputData;
         //    }

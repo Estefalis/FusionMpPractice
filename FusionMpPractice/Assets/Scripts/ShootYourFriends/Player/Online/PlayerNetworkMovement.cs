@@ -112,7 +112,7 @@ namespace PlayerManagement
         private Vector3 m_moveDirection;
         private float m_rightVector, m_forwardVector, m_rotationVector;
         private Quaternion m_quatDeltaRot;
-        //[Networked] private PlayerNetworkData PlayerNetworkedData { get; set; }
+        //[Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }
         private static bool m_jumpButtonGotPressed = false, m_kneelButtonGotPressed = false;
         #endregion
 
@@ -189,11 +189,11 @@ namespace PlayerManagement
             //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_myPlayerId].DuckButtonGotPressed;
             //}
 
-            if (GetInput(out PlayerNetworkData networkInput))
+            if (GetInput(out PlayerNetworkInputData networkInput))
             {
                 m_rightVector = networkInput.MoveDirection.x;
-                m_rotationVector = networkInput.MoveDirection.y;
-                m_forwardVector = networkInput.MoveDirection.z;
+                m_rotationVector = networkInput.RotationInput;
+                m_forwardVector = networkInput.MoveDirection.y;
                 m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
                 m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
 
@@ -332,7 +332,7 @@ namespace PlayerManagement
                 m_targetRotation = Quaternion.LookRotation(m_moveDirection, Vector3.up);
                 m_targetRotation = Quaternion.RotateTowards(m_rigidbodyTransform.rotation, m_targetRotation, m_quaternionRotTime * Runner.DeltaTime);
                 m_rigidbody.MoveRotation(m_targetRotation);
-                //float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;
+                //float angle = Mathf.Atan2(m_moveDirection.x, m_moveDirection.z) * Mathf.Rad2Deg;  //m_moveDirection.x/y on Vector2
                 //float smoothRotation =
                 //    Mathf.SmoothDampAngle(m_rigidbodyTransform.eulerAngles.y, angle, ref m_mathfSmoothValue, 1 / m_smoothRotationTime);
                 //m_rigidbodyTransform.rotation = Quaternion.Euler(0.0f, smoothRotation, 0.0f);
@@ -633,7 +633,7 @@ namespace PlayerManagement
         ///// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
         ///// </summary>
         ///// <param name="data"></param>
-        //internal void SetInputData(PlayerNetworkData data)
+        //internal void SetInputData(PlayerNetworkInputData data)
         //{
         //    PlayerNetworkedData = data;
         //}

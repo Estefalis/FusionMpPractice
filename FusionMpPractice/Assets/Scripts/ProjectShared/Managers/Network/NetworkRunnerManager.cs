@@ -24,12 +24,9 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             m_roomCode = _sessionCode;
 
-            if (m_networkRunner == null)
-            {
-                m_networkRunner = Instantiate(m_networkRunnerPrefab, transform);    //On Transform attached to the GameObject in Unity.
-                m_networkRunner.AddCallbacks(this);                                 //'AddCallbacks' & 'ProvideInput' enable access to Callbacks.
-                m_networkRunner.ProvideInput = true;
-            }
+            m_networkRunner = Instantiate(m_networkRunnerPrefab, transform);    //On Transform attached to the GameObject in Unity.
+            m_networkRunner.AddCallbacks(this);     //'AddCallbacks' & 'ProvideInput' enable access to Callbacks.
+            m_networkRunner.ProvideInput = true;
 
             #region Set Server Region manually
             var appSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
@@ -152,10 +149,10 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-//#if UNITY_EDITOR
-//        Debug.Log("OnShutdown called.");
-//#endif
-//        SceneManager.LoadScene((int)EGameScene.MainMenu);
+        //#if UNITY_EDITOR
+        //        Debug.Log("OnShutdown called.");
+        //#endif
+        //        SceneManager.LoadScene((int)EGameScene.MainMenu);
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)

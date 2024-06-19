@@ -45,6 +45,9 @@ public class NetworkCharacterControllerPrototype : NetworkTransform {
   public override void Spawned() {
     base.Spawned();
     CacheController();
+
+    // Caveat: this is needed to initialize the Controller's state and avoid unwanted spikes in its perceived velocity
+    Controller.Move(transform.position);
   }
 
   private void CacheController() {
@@ -68,7 +71,7 @@ public class NetworkCharacterControllerPrototype : NetworkTransform {
 
   /// <summary>
   /// Basic implementation of a jump impulse (immediately integrates a vertical component to Velocity).
-  /// <param name="ignoreGrounded">Jumping even if not in a grounded state.</param>
+  /// <param name="ignoreGrounded">Jump even if not in a grounded state.</param>
   /// <param name="overrideImpulse">Optional field to override the jump impulse. If null, <see cref="jumpImpulse"/> is used.</param>
   /// </summary>
   public virtual void Jump(bool ignoreGrounded = false, float? overrideImpulse = null) {
