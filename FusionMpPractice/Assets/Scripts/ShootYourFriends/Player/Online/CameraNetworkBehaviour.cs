@@ -70,9 +70,9 @@ namespace PlayerManagement
             if (m_camera == null)
                 m_camera = GetComponentInChildren<Camera>();
 
-            m_cameraTransform = m_camera.transform;
-            m_cameraLocalZDistance = m_cameraTransform.position.z - m_cameraPivot.position.z;
+            m_cameraTransform = m_camera.transform;            
             m_resetDistance = m_cameraTransform.localPosition.z;
+            SetCameraLocalZDistance();
             m_runtimeMaxZoomDistance = m_maxZoomDistance;
             SetCursorRestrictions();
         }
@@ -83,10 +83,6 @@ namespace PlayerManagement
             FollowTarget();
         }
 
-        //private void FixedUpdate()
-        //{
-        //}
-
         public override void FixedUpdateNetwork()
         {
             if (GetInput(out PlayerNetworkInputData networkInput) && networkInput.MouseVector != null)
@@ -94,12 +90,11 @@ namespace PlayerManagement
                 m_playerInputRotationVector.x = -networkInput.MouseVector.x;
                 m_playerInputRotationVector.y = networkInput.MouseVector.y;
             }
-
-            ProcessPlayerCameraInputs();
         }
 
         private void LateUpdate()
         {
+            ProcessPlayerCameraInputs();
             CameraRotation();
             CameraZoom();
         }
@@ -108,6 +103,11 @@ namespace PlayerManagement
         {
             Cursor.lockState = m_cursorLockMode;
             Cursor.visible = m_cursorVisibility;
+        }
+
+        private void SetCameraLocalZDistance()
+        {
+            m_cameraLocalZDistance = m_cameraTransform.position.z - m_cameraPivot.position.z;
         }
 
         private void FollowTarget()
@@ -140,10 +140,10 @@ namespace PlayerManagement
                         switch (m_invertXRotation)
                         {
                             case false:
-                                m_cameraMoveDirection.x -= m_playerInputRotationVector.y * m_xAxisRotationSpeed * Time.fixedDeltaTime;
+                                m_cameraMoveDirection.x -= m_playerInputRotationVector.y * m_xAxisRotationSpeed * Time.deltaTime;
                                 break;
                             case true:
-                                m_cameraMoveDirection.x += m_playerInputRotationVector.y * m_xAxisRotationSpeed * Time.fixedDeltaTime;
+                                m_cameraMoveDirection.x += m_playerInputRotationVector.y * m_xAxisRotationSpeed * Time.deltaTime;
                                 break;
                         }
 
@@ -153,12 +153,12 @@ namespace PlayerManagement
                             {
                                 case false:
                                 {
-                                    m_cameraMoveDirection.y -= m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
+                                    m_cameraMoveDirection.y -= m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.deltaTime;
                                     break;
                                 }
                                 case true:
                                 {
-                                    m_cameraMoveDirection.y += m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.fixedDeltaTime;
+                                    m_cameraMoveDirection.y += m_playerInputRotationVector.x * m_yAxisRotationSpeed * Time.deltaTime;
                                     break;
                                 }
                             }
