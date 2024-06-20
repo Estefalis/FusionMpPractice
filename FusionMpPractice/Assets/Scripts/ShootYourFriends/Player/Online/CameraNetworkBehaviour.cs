@@ -1,8 +1,9 @@
 using UnityEngine;
+using Fusion;
 
 namespace PlayerManagement
 {
-    public class CameraNetworkBehaviour : MonoBehaviour
+    public class CameraNetworkBehaviour : NetworkBehaviour
     {
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
 
@@ -78,13 +79,23 @@ namespace PlayerManagement
 
         private void Update()
         {
+            CameraCollision();
             FollowTarget();
         }
 
-        private void FixedUpdate()
+        //private void FixedUpdate()
+        //{
+        //}
+
+        public override void FixedUpdateNetwork()
         {
+            if (GetInput(out PlayerNetworkInputData networkInput) && networkInput.MouseVector != null)
+            {
+                m_playerInputRotationVector.x = -networkInput.MouseVector.x;
+                m_playerInputRotationVector.y = networkInput.MouseVector.y;
+            }
+
             ProcessPlayerCameraInputs();
-            CameraCollision();
         }
 
         private void LateUpdate()

@@ -26,6 +26,8 @@ namespace PlayerManagement
         //[Networked] private NetworkButtons m_previousButtonState { get; set; }
         private float m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal;   //Building new MoveVector(s) in combination.
         private Vector3 m_localMoveVector;
+        private float m_mouseX, m_mouseY;
+        private Vector2 m_mouseMoveVector;
         internal bool JumpButtonIsPressed;
         internal bool DuckButtonIsPressed;
         #endregion
@@ -103,17 +105,17 @@ namespace PlayerManagement
             }
         }
 
-        private void Update()
-        {
-            CameraRotation();
-        }
+        //private void Update()
+        //{
+        //    //CameraRotation();
+        //}
 
         #region Custom Methods
-        private void CameraRotation()
-        {
-            m_playerNetworkController.m_cameraNetworkBehaviour.m_playerInputRotationVector =
-                new Vector3(-m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().y, 0.0f);
-        }
+        //private void CameraRotation()
+        //{
+        //    m_playerNetworkController.m_cameraNetworkBehaviour.m_playerInputRotationVector =
+        //        new Vector3(-m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().y, 0.0f);
+        //}
 
         private void RetrieveUserInput()
         {
@@ -158,6 +160,7 @@ namespace PlayerManagement
                     m_forwardInputLocal = m_playerInputActions.PlayerOnFoot.Movement.ReadValue<Vector2>().y;            //W & S
                     m_localMoveVector = m_rightInputLocal * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
                     m_localMoveVector += m_forwardInputLocal * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
+                    m_mouseMoveVector = new Vector2(m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().y);
                     break;
                 }
                 default:
@@ -272,6 +275,8 @@ namespace PlayerManagement
             //var InputActions = m_playerInputActions.PlayerOnFoot;
 
             playerInput.NetworkId = m_playerNetworkController.m_networkId;
+            if (m_mouseMoveVector != null)
+                playerInput.MouseVector = m_mouseMoveVector;
             //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
             playerInput.MoveDirection = m_localMoveVector;
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;

@@ -160,6 +160,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 26374642313623608}
   - {fileID: 1097830014125517697}
+  - {fileID: 2242850098891348956}
   SimulationBehaviours: []
 --- !u!1 &6402673030330305264
 GameObject:
@@ -324,6 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af9cbccb59681e6448756c6181b52e65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   m_playerNetworkController: {fileID: 0}
   m_camera: {fileID: 6402673030330305268}
   m_cameraPivot: {fileID: 0}

@@ -83,6 +83,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 8326428093305934301}
   - {fileID: 9001744785606541924}
+  - {fileID: 7850035750986150457}
   SimulationBehaviours: []
 --- !u!1001 &7950018145781885848
 PrefabInstance:
