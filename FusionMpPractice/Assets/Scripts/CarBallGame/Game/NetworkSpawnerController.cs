@@ -6,7 +6,8 @@ public class NetworkSpawnerController : NetworkBehaviour, IPlayerJoined, IPlayer
 {
     [SerializeField] private NetworkPrefabRef m_networkGameBallPrefab;
     [SerializeField] private NetworkPrefabRef m_networkPlayerPrefab;
-    [SerializeField, Range(0.0f, 10.0f)] private float m_randomSpawnPositionRange = 5.0f;
+    [SerializeField, Range(0.0f, 10.0f)] 
+    private float m_randomSpawnPositionRange = 5.0f;
 
     private List<NetworkObject> m_spawnedNetworkObjects = new();
     private Dictionary<PlayerRef, NetworkObject> m_spherePlayers = new();
@@ -29,37 +30,39 @@ public class NetworkSpawnerController : NetworkBehaviour, IPlayerJoined, IPlayer
         m_ballVisual = m_gameBallNetworkObject.transform.GetChild(0).transform;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.B))
-            SpawnBall();
+    #region Initial DeSpawn Tests
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.B))
+    //        SpawnRandomBallManually();
 
-        if (Input.GetKeyDown(KeyCode.X))
-            DeSpawnBall();
-    }
+    //    if (Input.GetKeyDown(KeyCode.X))
+    //        DeSpawnRandomedBall();
+    //}
 
-    private void SpawnBall()
-    {
-        if (Runner.IsServer)
-        {
-            var randomSpawnPos = new Vector3(Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange),
-                0.5f, Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange));
+    //private void SpawnRandomBallManually()
+    //{
+    //    if (Runner.IsServer)
+    //    {
+    //        var randomSpawnPos = new Vector3(Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange),
+    //            0.5f, Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange));
 
-            var ballNetworkObject = Runner.Spawn(m_networkGameBallPrefab, randomSpawnPos, Quaternion.identity);
-            m_spawnedNetworkObjects.Add(ballNetworkObject);
-        }
-    }
+    //        var ballNetworkObject = Runner.Spawn(m_networkGameBallPrefab, randomSpawnPos, Quaternion.identity);
+    //        m_spawnedNetworkObjects.Add(ballNetworkObject);
+    //    }
+    //}
 
-    private void DeSpawnBall()
-    {
-        if (Runner.IsServer)
-        {
-            foreach (var ball in m_spawnedNetworkObjects)
-            {
-                Runner.Despawn(ball);
-            }
-        }
-    }
+    //private void DeSpawnRandomedBall()
+    //{
+    //    if (Runner.IsServer)
+    //    {
+    //        foreach (var ball in m_spawnedNetworkObjects)
+    //        {
+    //            Runner.Despawn(ball);
+    //        }
+    //    }
+    //}
+    #endregion
 
     public void PlayerJoined(PlayerRef player)
     {
@@ -72,7 +75,7 @@ public class NetworkSpawnerController : NetworkBehaviour, IPlayerJoined, IPlayer
         var randomSpawnPos = new Vector3(Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange),
             1.0f, Random.Range(-m_randomSpawnPositionRange, m_randomSpawnPositionRange));
 
-        var playerNetworkObject = Runner.Spawn(m_networkPlayerPrefab, new Vector3(0, 1, 0), Quaternion.identity, player);
+        var playerNetworkObject = Runner.Spawn(m_networkPlayerPrefab, randomSpawnPos, Quaternion.identity, player);
         m_spherePlayers.Add(player, playerNetworkObject);
         var playerScript = playerNetworkObject.GetComponent<Player>();
         playerScript.SetGameBall(m_ballVisual);

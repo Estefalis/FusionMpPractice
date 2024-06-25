@@ -8,7 +8,7 @@ namespace PlayerManagement
         [SerializeField] private GameObject m_localInputParent;
 
         [SerializeField] internal PlayerNetworkInput m_playerNetworkInput;
-        [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;
+        [SerializeField] internal PlayerNetworkMovement m_playerNetworkMovement;    //Equal to SimpleCarController.
         [SerializeField] internal PlayerNetworkInteractions m_playerNetworkInteractions;
         [SerializeField] internal PlayerNetworkHealth m_playerNetworkHealth;
         [SerializeField] internal CameraNetworkBehaviour m_cameraNetworkBehaviour;
@@ -25,7 +25,7 @@ namespace PlayerManagement
         #endregion
 
         #region Network
-        //[Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }   //Remote _playerRef receive the correct input data to move their avatars.
+        [Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }   //Remote _playerRef receive the correct input data to move their avatars.
         internal NetworkId m_networkId;
         #endregion
 
@@ -42,12 +42,14 @@ namespace PlayerManagement
             }
         }
 
-        //    if (GetInput(out PlayerNetworkInputData networkedInputData))
-        //    {
-        //        PlayerNetworkedData = networkedInputData;
-        //    }
+        public override void FixedUpdateNetwork()
+        {
+            if (GetInput(out PlayerNetworkInputData networkedInputData))
+            {
+                PlayerNetworkedData = networkedInputData;
+            }
 
-        //    //m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
-        //}
+            m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
+        }
     }
 }

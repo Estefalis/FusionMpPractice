@@ -33,6 +33,21 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] private TMP_InputField m_createRoomIF;
     #endregion
 
+    private void OnDisable()
+    {
+        if (m_waitingStartGameTextCoroutine != null)
+        {
+            StopCoroutine(m_waitingStartGameTextCoroutine);
+        }
+
+        m_waitingInfoText.text = string.Empty;
+
+        if (m_cancelButtons[1] != null)
+        {
+            m_cancelButtons[1].gameObject.SetActive(false);
+        }
+    }
+
     #region Public async ButtonClicks
     public async void CreateRoomAsHost()        //In Transform with the CreateRoom-Button.
     {
@@ -45,7 +60,6 @@ public class ConnectionManager : MonoBehaviour
         m_cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = m_cancellationTokenSource.Token;
 
-        //$"{PhotonNetwork.CloudRegion.ToUpper()}" to set roomname/region.
         await ManagersDDOL.Instance.NetworkManager.StartGame(GameMode.Host, SessionCodeGenerator.GenerateSessionCode(), cancellationToken);
     }
 
@@ -61,18 +75,6 @@ public class ConnectionManager : MonoBehaviour
         var cancellationToken = m_cancellationTokenSource.Token;
 
         await ManagersDDOL.Instance.NetworkManager.StartGame(GameMode.Client, m_createRoomIF.text, cancellationToken);
-
-        if (m_waitingStartGameTextCoroutine != null)
-        {
-            StopCoroutine(m_waitingStartGameTextCoroutine);
-        }
-
-        m_waitingInfoText.text = string.Empty;
-
-        if (m_cancelButtons[1] != null)
-        {
-            m_cancelButtons[1].gameObject.SetActive(false);
-        }
     }
 
     public async void CreateRoomAsOr()
@@ -86,7 +88,6 @@ public class ConnectionManager : MonoBehaviour
         m_cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = m_cancellationTokenSource.Token;
 
-        //$"{PhotonNetwork.CloudRegion.ToUpper()}" to set roomname/region.
         await ManagersDDOL.Instance.NetworkManager.StartGame(GameMode.AutoHostOrClient, SessionCodeGenerator.GenerateSessionCode(), cancellationToken);
     }
     #endregion
@@ -94,9 +95,9 @@ public class ConnectionManager : MonoBehaviour
     #region CancelCancellationTokenSource
     public void OnCancelButtonClicked()
     {
-        foreach(var button in m_cancelButtons)
+        foreach (var button in m_cancelButtons)
         {
-            if(button.gameObject.activeInHierarchy)
+            if (button.gameObject.activeInHierarchy)
             {
                 button.gameObject.SetActive(false);
             }

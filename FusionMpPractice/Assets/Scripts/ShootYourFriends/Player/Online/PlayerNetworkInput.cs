@@ -66,7 +66,7 @@ namespace PlayerManagement
         {
             if (Object.HasInputAuthority)
             {
-                m_playerInputActions = InputManager.m_InputManagerActions;
+                //m_playerInputActions = InputManager.m_InputManagerActions;
                 m_playerInputActions.PlayerOnFoot.Enable();
 
                 #region List isComposite/isPartOfComposite from Actions in Console
@@ -105,18 +105,19 @@ namespace PlayerManagement
             }
         }
 
+        #region Changed to send over OnInput
         //private void Update()
         //{
         //    //CameraRotation();
         //}
-
-        #region Custom Methods
         //private void CameraRotation()
         //{
         //    m_playerNetworkController.m_cameraNetworkBehaviour.m_playerInputRotationVector =
         //        new Vector3(-m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().x, m_playerInputActions.PlayerOnFoot.CameraMovement.ReadValue<Vector2>().y, 0.0f);
         //}
+        #endregion
 
+        #region Custom Methods
         private void RetrieveUserInput()
         {
             switch (m_playerNetworkController.m_eRigidbodyMoveMethod)
@@ -270,6 +271,7 @@ namespace PlayerManagement
         #region INetworkRunnerCallbacks
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
+            m_playerInputActions = InputManager.m_InputManagerActions;
             #region Version 1
             PlayerNetworkInputData playerInput = new PlayerNetworkInputData();
             //var InputActions = m_playerInputActions.PlayerOnFoot;

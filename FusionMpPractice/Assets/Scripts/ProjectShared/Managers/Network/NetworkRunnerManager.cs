@@ -23,9 +23,12 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             m_roomCode = _sessionCode;
 
-            m_networkRunner = Instantiate(m_networkRunnerPrefab, transform);    //On Transform attached to the GameObject in Unity.
-            m_networkRunner.AddCallbacks(this);     //'AddCallbacks' & 'ProvideInput' enable access to Callbacks.
-            m_networkRunner.ProvideInput = true;
+            if (m_networkRunner == null)
+            {
+                m_networkRunner = Instantiate(m_networkRunnerPrefab, transform);    //On Transform attached to the GameObject in Unity.
+                m_networkRunner.AddCallbacks(this);     //'AddCallbacks' & 'ProvideInput' enable access to Callbacks.
+                m_networkRunner.ProvideInput = true; 
+            }
 
             #region Set Server Region manually
             var appSettings = PhotonAppSettings.Instance.AppSettings.GetCopy();
@@ -75,6 +78,21 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log($"{player} joined.");
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log($"{player} left.");
+    }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+
+    }
+
     #region Currently unused INetworkRunnerCallbacks
     public void OnConnectedToServer(NetworkRunner runner)
     {
@@ -106,22 +124,7 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input)
-    {
-
-    }
-
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-    {
-
-    }
-
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-    {
-
-    }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
 
     }

@@ -841,7 +841,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e62788784b785524eaa39dc635d78c75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomCode: Test
+  m_roomCode: 
+  m_setRegion: eu
   m_networkRunnerPrefab: {fileID: 559204058813224372, guid: fc797f4ca169a174ba2da38e41338b8b,
     type: 3}
 --- !u!4 &1825399353

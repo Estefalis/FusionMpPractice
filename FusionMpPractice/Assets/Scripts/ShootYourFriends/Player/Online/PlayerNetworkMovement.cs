@@ -112,7 +112,7 @@ namespace PlayerManagement
         private Vector3 m_moveDirection;
         private float m_rightVector, m_forwardVector, m_rotationVector;
         private Quaternion m_quatDeltaRot;
-        //[Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }
+        [Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }
         private static bool m_jumpButtonGotPressed = false, m_kneelButtonGotPressed = false;
         #endregion
 
@@ -187,13 +187,19 @@ namespace PlayerManagement
             //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_myPlayerId].DuckButtonGotPressed;
             //}
 
-            if (GetInput(out PlayerNetworkInputData networkInput))
-            {
-                m_rightVector = networkInput.MoveDirection.x;
-                m_rotationVector = networkInput.MoveDirection.y;
-                m_forwardVector = networkInput.MoveDirection.z;
-                m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
-                m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
+            //if (GetInput(out PlayerNetworkInputData networkInput))
+            //{
+                m_rightVector = PlayerNetworkedData.MoveDirection.x;
+                m_rotationVector = PlayerNetworkedData.MoveDirection.y;
+                m_forwardVector = PlayerNetworkedData.MoveDirection.z;
+                m_jumpButtonGotPressed = PlayerNetworkedData.JumpButtonGotPressed;
+                m_kneelButtonGotPressed = PlayerNetworkedData.DuckButtonGotPressed;
+
+                //m_rightVector = networkInput.MoveDirection.x;
+                //m_rotationVector = networkInput.MoveDirection.y;
+                //m_forwardVector = networkInput.MoveDirection.z;
+                //m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
+                //m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
 
                 //var previousPosition = m_rigidbodyTransform.position;
                 MoveAcceleration();
@@ -253,7 +259,7 @@ namespace PlayerManagement
                         }
                     }
                 }
-            }
+            //}
         }
 
         #region Custom Methods
@@ -632,13 +638,13 @@ namespace PlayerManagement
         #endregion
         #endregion
 
-        ///// <summary>
-        ///// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
-        ///// </summary>
-        ///// <param name="data"></param>
-        //internal void SetInputData(PlayerNetworkInputData data)
-        //{
-        //    PlayerNetworkedData = data;
-        //}
+        /// <summary>
+        /// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
+        /// </summary>
+        /// <param name="data"></param>
+        internal void SetInputData(PlayerNetworkInputData data)
+        {
+            PlayerNetworkedData = data;
+        }
     }
 }

@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 639205930321203742}
   - component: {fileID: 639205930321203737}
   - component: {fileID: 639205930321203743}
-  - component: {fileID: 639205930321203740}
   - component: {fileID: 639205930321203741}
+  - component: {fileID: 639205930321203740}
   m_Layer: 0
   m_Name: NetworkBallParent
   m_TagString: Untagged
@@ -65,30 +65,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &639205930321203740
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 639205930321203736}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
-  AoiPositionSource: {fileID: 0}
-  Flags: 2305
-  NetworkGuid:
-    RawGuidValue: 427bd3e5433de874a902e9d0c17df63f
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 639205930321203741}
-  SimulationBehaviours: []
 --- !u!114 &639205930321203741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,6 +93,30 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
+--- !u!114 &639205930321203740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 639205930321203736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: 427bd3e5433de874a902e9d0c17df63f
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 639205930321203741}
+  SimulationBehaviours: []
 --- !u!1 &639205930345017380
 GameObject:
   m_ObjectHideFlags: 0
