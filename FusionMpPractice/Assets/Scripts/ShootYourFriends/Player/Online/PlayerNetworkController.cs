@@ -26,14 +26,14 @@ namespace PlayerManagement
 
         #region Network
         [Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }   //Remote _playerRef receive the correct input data to move their avatars.
-        internal NetworkId m_networkId;
+        //internal NetworkId m_networkId;
         #endregion
 
         public override void Spawned()
         {
             if (Object.HasInputAuthority)
             {
-                m_networkId = Object.Id;
+                //m_networkId = Object.Id;
                 m_localInputParent.SetActive(true);
             }
             else
@@ -42,14 +42,14 @@ namespace PlayerManagement
             }
         }
 
-        public override void FixedUpdateNetwork()
-        {
-            if (GetInput(out PlayerNetworkInputData networkedInputData))
-            {
-                PlayerNetworkedData = networkedInputData;
-            }
+        //public override void FixedUpdateNetwork()
+        //{
+        //    if (GetInput(out PlayerNetworkInputData networkedInputData))
+        //    {
+        //        PlayerNetworkedData = networkedInputData;
+        //    }
 
-            m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
-        }
+        //    m_playerNetworkMovement.SetInputData(PlayerNetworkedData);
+        //}
     }
 }

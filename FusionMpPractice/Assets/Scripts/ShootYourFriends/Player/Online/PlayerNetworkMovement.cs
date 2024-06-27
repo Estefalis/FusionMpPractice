@@ -22,12 +22,11 @@ namespace PlayerManagement
         [SerializeField] internal float m_walkSpeed = 5.0f;
         [SerializeField] internal float m_runSpeed = 10.0f;
         [SerializeField] internal float m_crouchSpeed = 2.5f;
-        internal float m_stopMovementValue = 0.0f;
         [SerializeField] internal float m_jumpForce = 3.0f;
         [SerializeField] internal float m_kneelTime = 0.1f;
         [SerializeField] internal float m_moveSpeedLerpTime = 0.5f;
-        internal bool m_canJumpAgain;
-        internal bool m_switchMoveMethod = false;
+        private readonly float m_stopMovementValue = 0.0f;
+        private bool m_canJumpAgain;
         private Transform m_rigidbodyTransform;
         #endregion
 
@@ -48,7 +47,7 @@ namespace PlayerManagement
         [SerializeField] internal float m_durationToZeroSpeed = 6.0f;
         [SerializeField] internal float m_brakeToZeroSpeed = 1.0f;
         internal float m_acceleRatePerSec, m_deceleRatePerSec, m_brakeRatePerSec;
-        internal float m_individualMaxSpeed, m_setRunTimeMaxSpeed;
+        private float m_setRunTimeMaxSpeed, m_postPhotonMaxSpeed;
         internal EAvatarMoveState m_lastMoveMode;
         #endregion
 
@@ -112,12 +111,14 @@ namespace PlayerManagement
         private Vector3 m_moveDirection;
         private float m_rightVector, m_forwardVector, m_rotationVector;
         private Quaternion m_quatDeltaRot;
-        [Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }
-        private static bool m_jumpButtonGotPressed = false, m_kneelButtonGotPressed = false;
+        //[Networked] private PlayerNetworkInputData PlayerNetworkedData { get; set; }
+        private static bool m_jumpButtonGotPressed, m_kneelButtonGotPressed;
         #endregion
 
         private void Awake()
         {
+            m_jumpButtonGotPressed = false;
+            m_kneelButtonGotPressed = false;
             m_rigidbody = GetComponentInChildren<Rigidbody>();
             m_rigidbodyTransform = m_rigidbody.transform;
             m_startPosition = m_rigidbodyTransform.position;
@@ -167,7 +168,7 @@ namespace PlayerManagement
                 //m_playerNetworkController.m_playerIsGrounded = Physics.Raycast(m_playerNetworkController.m_groundCheckTransform.position, Vector3.down, m_playerNetworkController.m_groundCheckDistance, m_playerNetworkController.m_groundCheckLayerMask);
 
                 CoyoteTimerReSet();
-                //MoveAcceleration();
+                MoveAcceleration();
             }
 
             if (m_rigidbodyTransform.position.y < m_playerNetworkController.m_fallLimit)
@@ -187,27 +188,27 @@ namespace PlayerManagement
             //    m_kneelButtonGotPressed = networkInput[m_playerNetworkController.m_myPlayerId].DuckButtonGotPressed;
             //}
 
-            //if (GetInput(out PlayerNetworkInputData networkInput))
-            //{
-                m_rightVector = PlayerNetworkedData.MoveDirection.x;
-                m_rotationVector = PlayerNetworkedData.MoveDirection.y;
-                m_forwardVector = PlayerNetworkedData.MoveDirection.z;
-                m_jumpButtonGotPressed = PlayerNetworkedData.JumpButtonGotPressed;
-                m_kneelButtonGotPressed = PlayerNetworkedData.DuckButtonGotPressed;
-
-                //m_rightVector = networkInput.MoveDirection.x;
-                //m_rotationVector = networkInput.MoveDirection.y;
-                //m_forwardVector = networkInput.MoveDirection.z;
-                //m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
-                //m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
+            if (GetInput(out PlayerNetworkInputData networkInput))
+            {
+                m_postPhotonMaxSpeed = networkInput.VariableMoveSpeed;
+                m_rightVector = networkInput.MoveDirection.x;
+                m_rotationVector = networkInput.MoveDirection.y;
+                m_forwardVector = networkInput.MoveDirection.z;
+                m_jumpButtonGotPressed = networkInput.JumpButtonGotPressed;
+                m_kneelButtonGotPressed = networkInput.DuckButtonGotPressed;
 
                 //var previousPosition = m_rigidbodyTransform.position;
-                MoveAcceleration();
 
-                Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
+                //m_rightVector = PlayerNetworkedData.MoveDirection.x;
+                //m_rotationVector = PlayerNetworkedData.MoveDirection.y;
+                //m_forwardVector = PlayerNetworkedData.MoveDirection.z;
+                //m_jumpButtonGotPressed = PlayerNetworkedData.JumpButtonGotPressed;
+                //m_kneelButtonGotPressed = PlayerNetworkedData.DuckButtonGotPressed;
 
                 if (!m_playerNetworkController.m_isDead)
-                {
+                {                    
+                    Crouching();    //Move from Update because of the need of 'm_kneelButtonGotPressed' being static.
+
                     switch (m_playerNetworkController.m_eRigidbodyMoveMethod)
                     {
                         //Runner.DeltaTime instead of Time.fixedDeltaTime in Movement_Methods.
@@ -249,17 +250,16 @@ namespace PlayerManagement
                         }
                         case true:
                         {
-                            FallDamageCalculationEnd();
-
                             if (!m_jumpButtonGotPressed && !m_canJumpAgain)
                             {
                                 m_canJumpAgain = true;
+                                FallDamageCalculationEnd();
                             }
                             break;
                         }
                     }
                 }
-            //}
+            }
         }
 
         #region Custom Methods
@@ -276,7 +276,7 @@ namespace PlayerManagement
             if (m_coyoteTimeCounter >= 0 && m_jumpButtonGotPressed && m_canJumpAgain && m_playerIsGrounded)
             {
                 m_canJumpAgain = false; //local Jump Variable to just apply Addforce ONCE.
-                m_rigidbody.AddForce(m_rigidbody.transform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
+                m_rigidbody.AddForce(m_rigidbodyTransform.up * Mathf.Sqrt(m_jumpForce * -m_inversedGravityMultiplier * m_gravityValue), ForceMode.Impulse);
             }
         }
 
@@ -284,7 +284,7 @@ namespace PlayerManagement
         private void MoveRigidbodyBasic()
         {
             m_moveDirection = new Vector3(m_rightVector, 0.0f, m_forwardVector);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_postPhotonMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             if (m_moveDirection != Vector3.zero)
             {
@@ -298,7 +298,7 @@ namespace PlayerManagement
         {
             m_moveDirection = new Vector3(0.0f, 0.0f, m_forwardVector);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_postPhotonMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             m_quatDeltaRot =
                 Quaternion.Euler(0.0f, m_rotationVector * Runner.DeltaTime * (m_quaternionRotTime * m_aDRotYReduction), 0.0f);
@@ -309,7 +309,7 @@ namespace PlayerManagement
         {
             m_moveDirection = new Vector3(m_rightVector, 0.0f, m_forwardVector);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_postPhotonMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             m_quatDeltaRot =
                 Quaternion.Euler(0.0f, m_rotationVector * Runner.DeltaTime * (m_quaternionRotTime * m_mouseRotYReduction), 0.0f);
@@ -321,7 +321,7 @@ namespace PlayerManagement
             m_moveDirection = new Vector3(m_rightVector, 0.0f, m_forwardVector);
             m_moveDirection = m_rigidbodyTransform.TransformDirection(m_moveDirection);
             //TODO: Lerping CameraY-Rotation to RigidbodyY-Rotation while being locked?
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_postPhotonMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
         }
 
         private void MoveRigidbodyRelative()
@@ -330,7 +330,7 @@ namespace PlayerManagement
             //m_moveDirection = m_rightVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.right;
             //m_moveDirection += m_forwardVector * m_playerNetworkController.m_cameraNetworkBehaviour.m_camera.transform.forward;
             m_moveDirection.y = 0.0f;
-            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_individualMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
+            m_rigidbody.MovePosition(m_rigidbodyTransform.position + m_postPhotonMaxSpeed * Runner.DeltaTime * m_moveDirection.normalized);
 
             if (m_moveDirection != Vector3.zero)
             {
@@ -349,30 +349,6 @@ namespace PlayerManagement
         }
         #endregion
         #region Crouching
-        private void SphereCastCheckAbove()
-        {
-            m_lineOrigin = m_groundCheckTransform.position;
-            m_sphereCastDirection = m_groundCheckTransform.up;
-
-            m_obstacleIsAbove =
-                Physics.SphereCast(m_lineOrigin, m_sphereRadius, m_sphereCastDirection, out RaycastHit hitObject, m_maxDistanceAbove, m_crouchObstacles, QueryTriggerInteraction.UseGlobal);
-
-            switch (m_obstacleIsAbove)
-            {
-                case false:
-                {
-                    m_currentHitObject = null;
-                    m_hitCheckDistance = m_maxDistanceAbove;
-                    break;
-                }
-                case true:
-                {
-                    m_currentHitObject = hitObject.transform.gameObject;
-                    m_hitCheckDistance = hitObject.distance;
-                    break;
-                }
-            }
-        }
 
         private void Crouching()
         {
@@ -420,10 +396,36 @@ namespace PlayerManagement
                 }
             }
         }
+
+        private void SphereCastCheckAbove()
+        {
+            m_lineOrigin = m_groundCheckTransform.position;
+            m_sphereCastDirection = m_groundCheckTransform.up;
+
+            m_obstacleIsAbove =
+                Physics.SphereCast(m_lineOrigin, m_sphereRadius, m_sphereCastDirection, out RaycastHit hitObject, m_maxDistanceAbove, m_crouchObstacles, QueryTriggerInteraction.UseGlobal);
+
+            switch (m_obstacleIsAbove)
+            {
+                case false:
+                {
+                    m_currentHitObject = null;
+                    m_hitCheckDistance = m_maxDistanceAbove;
+                    break;
+                }
+                case true:
+                {
+                    m_currentHitObject = hitObject.transform.gameObject;
+                    m_hitCheckDistance = hitObject.distance;
+                    break;
+                }
+            }
+        }
         #endregion
         #region Acceleration
         private void MoveAcceleration()
         {
+            float prePhotonMaxSpeed = m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed;
             switch (m_moveButtonIsPressed)
             {
                 #region While Movement Buttons are not pressed (WASD, Left Stick).
@@ -435,7 +437,7 @@ namespace PlayerManagement
                         {
                             m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Idle;
                             m_setRunTimeMaxSpeed = m_stopMovementValue;
-                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                            m_deceleRatePerSec = -m_setRunTimeMaxSpeed / m_durationToZeroSpeed;
                             AccelerationRate(m_deceleRatePerSec);
                             break;
                         }
@@ -443,7 +445,7 @@ namespace PlayerManagement
                         {
                             m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Crouching;
                             m_setRunTimeMaxSpeed = m_crouchSpeed;
-                            m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                            m_deceleRatePerSec = -m_setRunTimeMaxSpeed / m_durationToZeroSpeed;
                             AccelerationRate(m_deceleRatePerSec);
                             break;
                         }
@@ -465,14 +467,14 @@ namespace PlayerManagement
                                     //In case the character shall speed up from walking.
                                     m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Walking;
                                     m_setRunTimeMaxSpeed = m_walkSpeed;
-                                    if (m_individualMaxSpeed < m_setRunTimeMaxSpeed)    //current vs. set speed.
+                                    if (prePhotonMaxSpeed < m_setRunTimeMaxSpeed)    //current vs. set speed.
                                     {
-                                        m_acceleRatePerSec = m_walkSpeed / m_durationToZeroSpeed;
+                                        m_acceleRatePerSec = m_setRunTimeMaxSpeed / m_durationToZeroSpeed;
                                         AccelerationRate(m_acceleRatePerSec);
                                     }
                                     else
                                     {
-                                        m_deceleRatePerSec = -m_walkSpeed / m_durationToZeroSpeed;
+                                        m_deceleRatePerSec = -m_setRunTimeMaxSpeed / m_durationToZeroSpeed;
                                         AccelerationRate(m_deceleRatePerSec);
                                     }
                                     break;
@@ -481,7 +483,7 @@ namespace PlayerManagement
                                 {
                                     m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Crouching;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
-                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                    m_deceleRatePerSec = -m_setRunTimeMaxSpeed / m_durationToZeroSpeed;
                                     AccelerationRate(m_deceleRatePerSec);
                                     break;
                                 }
@@ -496,7 +498,7 @@ namespace PlayerManagement
                                 {
                                     m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Running;
                                     m_setRunTimeMaxSpeed = m_runSpeed;
-                                    m_acceleRatePerSec = m_runSpeed / m_durationToMaxSpeed;
+                                    m_acceleRatePerSec = m_setRunTimeMaxSpeed / m_durationToMaxSpeed;
                                     AccelerationRate(m_acceleRatePerSec);
                                     break;
                                 }
@@ -504,7 +506,7 @@ namespace PlayerManagement
                                 {
                                     m_playerNetworkController.m_eAvatarMoveState = EAvatarMoveState.Crouching;
                                     m_setRunTimeMaxSpeed = m_crouchSpeed;
-                                    m_deceleRatePerSec = -m_crouchSpeed / m_durationToZeroSpeed;
+                                    m_deceleRatePerSec = -m_setRunTimeMaxSpeed / m_durationToZeroSpeed;
                                     AccelerationRate(m_deceleRatePerSec);
                                     break;
                                 }
@@ -524,26 +526,26 @@ namespace PlayerManagement
             {
                 case EAvatarMoveState.Walking:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
-                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
                 case EAvatarMoveState.Running:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
-                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
                 case EAvatarMoveState.Crouching:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
-                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
                 case EAvatarMoveState.Idle:
                 {
-                    m_individualMaxSpeed += _sentDeAccelerationRate * Runner.DeltaTime;
-                    m_individualMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed += _sentDeAccelerationRate * Time.deltaTime;
+                    m_playerNetworkController.m_playerNetworkInput.m_prePhotonMaxSpeed = Mathf.Clamp(m_setRunTimeMaxSpeed, m_stopMovementValue, m_setRunTimeMaxSpeed);
                     break;
                 }
             }
@@ -576,8 +578,8 @@ namespace PlayerManagement
         {
             if (!m_isGroundContactLost)
             {
-                m_lostGroundContactVector.y = transform.position.y - (m_groundCheckDistance * 0.5f);    //Radius instead of Diameter.
                 m_isGroundContactLost = true;
+                m_lostGroundContactVector.y = m_groundCheckTransform.position.y - (m_groundCheckDistance * 0.5f);    //Radius instead of Diameter.
                 m_allowApplyingDamageOnce = true;
             }
         }
@@ -586,7 +588,7 @@ namespace PlayerManagement
         {
             if (m_isGroundContactLost && m_allowApplyingDamageOnce)
             {
-                m_regainedGroundContactVector.y = transform.position.y - (m_groundCheckDistance * 0.5f);    //Radius instead of Diameter.
+                m_regainedGroundContactVector.y = m_groundCheckTransform.position.y - (m_groundCheckDistance * 0.5f);    //Radius instead of Diameter.
                 m_isGroundContactLost = false;
                 CalculateFallDamage();
             }
@@ -638,13 +640,13 @@ namespace PlayerManagement
         #endregion
         #endregion
 
-        /// <summary>
-        /// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
-        /// </summary>
-        /// <param name="data"></param>
-        internal void SetInputData(PlayerNetworkInputData data)
-        {
-            PlayerNetworkedData = data;
-        }
+        ///// <summary>
+        ///// Received PlayerInput-Data via 'PlayerNetworkedData' and Photon.
+        ///// </summary>
+        ///// <param name="data"></param>
+        //internal void SetInputData(PlayerNetworkInputData data)
+        //{
+        //    PlayerNetworkedData = data;
+        //}
     }
 }

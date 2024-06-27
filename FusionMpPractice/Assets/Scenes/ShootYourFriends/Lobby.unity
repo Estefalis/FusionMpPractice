@@ -852,6 +852,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1040622668}
   - component: {fileID: 1040622669}
+  - component: {fileID: 1040622670}
   m_Layer: 0
   m_Name: NetworkRunnerManager
   m_TagString: Untagged
@@ -886,9 +887,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e62788784b785524eaa39dc635d78c75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomCode: Test
+  m_roomCode: 
+  m_setRegion: eu
   m_networkRunnerPrefab: {fileID: 559204058813224372, guid: fc797f4ca169a174ba2da38e41338b8b,
     type: 3}
+--- !u!114 &1040622670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040622667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: 6228479fe5be4ab7bc331051be6f3048
+  NestedObjects: []
+  NetworkedBehaviours: []
+  SimulationBehaviours: []
 --- !u!1 &1088202064
 GameObject:
   m_ObjectHideFlags: 0

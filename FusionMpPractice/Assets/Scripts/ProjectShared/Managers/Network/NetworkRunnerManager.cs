@@ -7,6 +7,7 @@ using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
 using Fusion.Photon.Realtime;
+using PlayerManagement;
 
 public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -16,6 +17,7 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField] private NetworkRunner m_networkRunnerPrefab;
     private NetworkRunner m_networkRunner;
+    private PlayerNetworkInput m_playerNetworkInput;
 
     public async Task StartGame(GameMode mode, string _sessionCode, CancellationToken _cancellationToken)
     {
@@ -27,7 +29,7 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
             {
                 m_networkRunner = Instantiate(m_networkRunnerPrefab, transform);    //On Transform attached to the GameObject in Unity.
                 m_networkRunner.AddCallbacks(this);     //'AddCallbacks' & 'ProvideInput' enable access to Callbacks.
-                m_networkRunner.ProvideInput = true; 
+                m_networkRunner.ProvideInput = true;
             }
 
             #region Set Server Region manually
@@ -80,17 +82,25 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log($"{player} joined.");
+        //Debug.Log($"{player} joined.");
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log($"{player} left.");
+        //Debug.Log($"{player} left.");
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
+        if (m_playerNetworkInput == null)
+        {
+            m_playerNetworkInput = FindObjectOfType<PlayerNetworkInput>();
+        }
 
+        if (m_playerNetworkInput != null)
+        {
+            input.Set(m_playerNetworkInput.GetPlayerInputData());
+        }
     }
 
     #region Currently unused INetworkRunnerCallbacks

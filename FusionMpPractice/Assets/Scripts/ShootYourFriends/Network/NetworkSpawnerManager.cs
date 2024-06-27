@@ -1,7 +1,7 @@
+using Fusion;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using Fusion;
 
 public class NetworkSpawnerManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft   //Just a different name for NetworkSpawnerController in Guide.
 {

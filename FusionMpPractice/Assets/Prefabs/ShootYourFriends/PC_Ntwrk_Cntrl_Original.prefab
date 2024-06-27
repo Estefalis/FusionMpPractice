@@ -236,6 +236,11 @@ PrefabInstance:
       objectReference: {fileID: 8326428093305934301}
     - target: {fileID: 1209669569924241648, guid: 1e2f78fc7763f6547a9b4df3b690b298,
         type: 3}
+      propertyPath: m_capsuleCollider
+      value: 
+      objectReference: {fileID: 2051503651990174174}
+    - target: {fileID: 1209669569924241648, guid: 1e2f78fc7763f6547a9b4df3b690b298,
+        type: 3}
       propertyPath: m_playerNetworkController
       value: 
       objectReference: {fileID: 8326428093305934301}
@@ -326,6 +331,12 @@ PrefabInstance:
       objectReference: {fileID: 3101296337815397137}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1e2f78fc7763f6547a9b4df3b690b298, type: 3}
+--- !u!136 &2051503651990174174 stripped
+CapsuleCollider:
+  m_CorrespondingSourceObject: {fileID: 6970717953181797205, guid: 1e2f78fc7763f6547a9b4df3b690b298,
+    type: 3}
+  m_PrefabInstance: {fileID: 8990469876164113035}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2140142383620873114 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7023293871650400529, guid: 1e2f78fc7763f6547a9b4df3b690b298,
