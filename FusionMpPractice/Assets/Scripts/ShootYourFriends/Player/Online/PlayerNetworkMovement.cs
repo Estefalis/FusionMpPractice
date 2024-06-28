@@ -152,8 +152,7 @@ namespace PlayerManagement
 
                 m_setRunTimeMaxSpeed = 0.0f;
                 m_maxDistanceAbove = m_colliderWalkHeight;
-                m_canJumpAgain = true;  //Enable local Jump Variable to enable Jump on first Button press. 
-                m_playerNetworkController.m_rePopPosition = m_rigidbodyTransform.position;
+                m_canJumpAgain = true;  //Enable local Jump Variable to enable Jump on first Button press.
             }
         }
 

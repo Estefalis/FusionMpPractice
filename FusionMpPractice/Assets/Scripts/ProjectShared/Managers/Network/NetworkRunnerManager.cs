@@ -82,25 +82,31 @@ public class NetworkRunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        //Debug.Log($"{player} joined.");
+#if UNITY_EDITOR
+        Debug.Log($"{player} joined.");
+#endif
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        //Debug.Log($"{player} left.");
+#if UNITY_EDITOR
+        Debug.Log($"{player} left.");
+#endif
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        if (m_playerNetworkInput == null)
-        {
-            m_playerNetworkInput = FindObjectOfType<PlayerNetworkInput>();
-        }
+        #region Attempt to remove OnInput from PlayerNetworkInput.cs
+        //if (m_playerNetworkInput == null)
+        //{
+        //    m_playerNetworkInput = FindObjectOfType<PlayerNetworkInput>();
+        //}
 
-        if (m_playerNetworkInput != null)
-        {
-            input.Set(m_playerNetworkInput.GetPlayerInputData());
-        }
+        //if (m_playerNetworkInput != null)
+        //{
+        //    input.Set(m_playerNetworkInput.GetPlayerInputData());
+        //}
+        #endregion
     }
 
     #region Currently unused INetworkRunnerCallbacks

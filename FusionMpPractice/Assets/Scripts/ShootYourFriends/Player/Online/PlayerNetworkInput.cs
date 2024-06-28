@@ -17,7 +17,7 @@ namespace PlayerManagement
         Duck = 5,
     }
 
-    public class PlayerNetworkInput : NetworkBehaviour/*, INetworkRunnerCallbacks*/ /*, IBeforeUpdate*/
+    public class PlayerNetworkInput : NetworkBehaviour, INetworkRunnerCallbacks /*, IBeforeUpdate*/
     {
         private PlayerInputActions m_playerInputActions;
         [SerializeField] private PlayerNetworkController m_playerNetworkController;
@@ -41,8 +41,8 @@ namespace PlayerManagement
             {
                 m_playerInputActions.PlayerOnFoot.Disable();
 
-                //if (Runner != null)
-                //    Runner.RemoveCallbacks(this);
+                if (Runner != null)
+                    Runner.RemoveCallbacks(this);
 
                 #region InputAction-UnSubscriptions
                 m_playerInputActions.PlayerOnFoot.Movement.performed -= MoveCharacter;
@@ -67,7 +67,7 @@ namespace PlayerManagement
         {
             if (Object.HasInputAuthority)
             {
-                //m_playerInputActions = InputManager.m_InputManagerActions;
+                m_playerInputActions = InputManager.m_InputManagerActions;
                 m_playerInputActions.PlayerOnFoot.Enable();
 
                 #region List isComposite/isPartOfComposite from Actions in Console
@@ -260,28 +260,49 @@ namespace PlayerManagement
         #endregion
         #endregion
 
-        //public override void Spawned()
-        //{
-        //    if (Runner != null && Object.HasInputAuthority)
-        //    {
-        //        Runner.AddCallbacks(this);
-        //    }
-        //}
+        public override void Spawned()
+        {
+            if (Runner != null && Object.HasInputAuthority)
+            {
+                Runner.AddCallbacks(this);
+            }
+        }
 
         //public void BeforeUpdate()
         //{
-        //    if (Object.HasInputAuthority && m_playerNetworkController.m_networkId == Object.Id)
+        //    if (Object.HasInputAuthority /*&& m_playerNetworkController.m_networkId == Object.Id*/)
+        //    {
         //        RetrieveUserInput();  //Modular Setup of Vectors for individual Movement.
+        //    }
         //}
 
-        public PlayerNetworkInputData GetPlayerInputData()
+        //public PlayerNetworkInputData GetPlayerInputData()
+        //{
+        //    m_playerInputActions = InputManager.m_InputManagerActions;
+        //    PlayerNetworkInputData playerInput = new PlayerNetworkInputData();
+        //    //var InputActions = m_playerInputActions.PlayerOnFoot;
+
+        //    //playerInput.NetworkId = m_playerNetworkController.m_networkId;
+        //    ////if (m_mouseMoveVector != null)
+        //    playerInput.VariableMoveSpeed = m_prePhotonMaxSpeed;
+        //    playerInput.MouseVector = m_mouseMoveVector;
+        //    //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
+        //    playerInput.MoveDirection = m_localMoveVector;
+        //    playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
+        //    playerInput.DuckButtonGotPressed = DuckButtonIsPressed;
+
+        //    return playerInput;
+        //}
+
+        #region INetworkRunnerCallbacks
+        public void OnInput(NetworkRunner runner, NetworkInput input)
         {
-            m_playerInputActions = InputManager.m_InputManagerActions;
+            //m_playerInputActions = InputManager.m_InputManagerActions;
+            #region Version 1
             PlayerNetworkInputData playerInput = new PlayerNetworkInputData();
             //var InputActions = m_playerInputActions.PlayerOnFoot;
 
             //playerInput.NetworkId = m_playerNetworkController.m_networkId;
-            ////if (m_mouseMoveVector != null)
             playerInput.VariableMoveSpeed = m_prePhotonMaxSpeed;
             playerInput.MouseVector = m_mouseMoveVector;
             //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
@@ -289,162 +310,143 @@ namespace PlayerManagement
             playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
             playerInput.DuckButtonGotPressed = DuckButtonIsPressed;
 
-            return playerInput;
-        }
+            #region OnInput InputButtons.Set-Tests
+            //playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
+            //playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
+            //playerInput.InputButtons.Set(EInputButtons.Left, m_rightInputLocal < 0);
+            //playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
+#if UNITY_EDITOR
+            //Debug.Log($"Forward: {m_forwardInputLocal > 0} - Backward: {m_forwardInputLocal < 0} - Left: {m_rightInputLocal < 0} - Right: {m_rightInputLocal > 0} - ");
+#endif
+            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed());
+            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Duck.IsPressed());
+            #endregion
+            #endregion
 
-        #region INetworkRunnerCallbacks
-        public void OnInput(NetworkRunner runner, NetworkInput input)
-        {
-            //            //m_playerInputActions = InputManager.m_InputManagerActions;
-            //            #region Version 1
-            //            PlayerNetworkInputData playerInput = new PlayerNetworkInputData();
-            //            //var InputActions = m_playerInputActions.PlayerOnFoot;
+            #region Version 2
+            //var playerInput = new PlayerNetworkInputData()   //or PlayerNetworkInputData playerInput = new();
+            //{
+            //    NetworkId = m_playerNetworkController.m_networkId,
+            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    DuckButtonGotPressed = DuckButtonIsPressed,
+            //};
+            #endregion
 
-            //            playerInput.NetworkId = m_playerNetworkController.m_networkId;
-            //            if (m_mouseMoveVector != null)
-            //                playerInput.MouseVector = m_mouseMoveVector;
-            //            //playerInput.MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal);
-            //            playerInput.MoveDirection = m_localMoveVector;
-            //            playerInput.JumpButtonGotPressed = JumpButtonIsPressed;
-            //            playerInput.DuckButtonGotPressed = DuckButtonIsPressed;
+            #region Combined Player Inputs
+            //var playerInput = new CombinedPlayerInputs();
 
-            //            #region OnInput InputButtons.Set-Tests
-            //            //playerInput.InputButtons.Set(EInputButtons.Forward, m_forwardInputLocal > 0);
-            //            //playerInput.InputButtons.Set(EInputButtons.Backward, m_forwardInputLocal < 0);
-            //            //playerInput.InputButtons.Set(EInputButtons.Left, m_rightInputLocal < 0);
-            //            //playerInput.InputButtons.Set(EInputButtons.Right, m_rightInputLocal > 0);
-            //#if UNITY_EDITOR
-            //            //Debug.Log($"Forward: {m_forwardInputLocal > 0} - Backward: {m_forwardInputLocal < 0} - Left: {m_rightInputLocal < 0} - Right: {m_rightInputLocal > 0} - ");
-            //#endif
-            //            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Jump.IsPressed());
-            //            //playerInput.InputButtons.Set(EInputButtons.Jump, InputActions.PlayerOnFoot.Duck.IsPressed());
-            //            #endregion
-            //            #endregion
+            //playerInput[0] = new PlayerNetworkInputData()
+            //{
+            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    DuckButtonGotPressed = DuckButtonIsPressed,
+            //};
+            //playerInput[1] = new PlayerNetworkInputData()
+            //{
+            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    DuckButtonGotPressed = DuckButtonIsPressed,
+            //};
+            //playerInput[2] = new PlayerNetworkInputData()
+            //{
+            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    DuckButtonGotPressed = DuckButtonIsPressed,
+            //};
+            //playerInput[3] = new PlayerNetworkInputData()
+            //{
+            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
+            //    MoveDirection = m_localMoveVector,
+            //    JumpButtonGotPressed = JumpButtonIsPressed,
+            //    DuckButtonGotPressed = DuckButtonIsPressed,
+            //};
+            #endregion
 
-            //            #region Version 2
-            //            //var playerInput = new PlayerNetworkInputData()   //or PlayerNetworkInputData playerInput = new();
-            //            //{
-            //            //    NetworkId = m_playerNetworkController.m_networkId,
-            //            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //            //    MoveDirection = m_localMoveVector,
-            //            //    JumpButtonGotPressed = JumpButtonIsPressed,
-            //            //    DuckButtonGotPressed = DuckButtonIsPressed,
-            //            //};
-            //            #endregion
-
-            //            #region Combined Player Inputs
-            //            //var playerInput = new CombinedPlayerInputs();
-
-            //            //playerInput[0] = new PlayerNetworkInputData()
-            //            //{
-            //            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //            //    MoveDirection = m_localMoveVector,
-            //            //    JumpButtonGotPressed = JumpButtonIsPressed,
-            //            //    DuckButtonGotPressed = DuckButtonIsPressed,
-            //            //};
-            //            //playerInput[1] = new PlayerNetworkInputData()
-            //            //{
-            //            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //            //    MoveDirection = m_localMoveVector,
-            //            //    JumpButtonGotPressed = JumpButtonIsPressed,
-            //            //    DuckButtonGotPressed = DuckButtonIsPressed,
-            //            //};
-            //            //playerInput[2] = new PlayerNetworkInputData()
-            //            //{
-            //            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //            //    MoveDirection = m_localMoveVector,
-            //            //    JumpButtonGotPressed = JumpButtonIsPressed,
-            //            //    DuckButtonGotPressed = DuckButtonIsPressed,
-            //            //};
-            //            //playerInput[3] = new PlayerNetworkInputData()
-            //            //{
-            //            //    //MoveDirection = new Vector3(m_rightInputLocal, m_rotationInputLocal, m_forwardInputLocal),
-            //            //    MoveDirection = m_localMoveVector,
-            //            //    JumpButtonGotPressed = JumpButtonIsPressed,
-            //            //    DuckButtonGotPressed = DuckButtonIsPressed,
-            //            //};
-            //            #endregion
-
-            //            input.Set(playerInput);
+            input.Set(playerInput);
 
             //playerInput = default;
         }
 
         #region Currently unused INetworkRunnerCallbacks
-        //public void OnConnectedToServer(NetworkRunner runner)
-        //{
+        public void OnConnectedToServer(NetworkRunner runner)
+        {
 
-        //}
+        }
 
-        //public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
-        //{
+        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+        {
 
-        //}
+        }
 
-        //public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
-        //{
+        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
+        {
 
-        //}
+        }
 
-        //public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
-        //{
+        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
+        {
 
-        //}
+        }
 
-        //public void OnDisconnectedFromServer(NetworkRunner runner)
-        //{
+        public void OnDisconnectedFromServer(NetworkRunner runner)
+        {
 
-        //}
+        }
 
-        //public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-        //{
+        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+        {
 
-        //}
+        }
 
-        //public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-        //{
+        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
+        {
 
-        //}
+        }
 
-        //public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        //{
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
 
-        //}
+        }
 
-        //public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-        //{
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
 
-        //}
+        }
 
-        //public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
-        //{
+        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
+        {
 
-        //}
+        }
 
-        //public void OnSceneLoadDone(NetworkRunner runner)
-        //{
+        public void OnSceneLoadDone(NetworkRunner runner)
+        {
 
-        //}
+        }
 
-        //public void OnSceneLoadStart(NetworkRunner runner)
-        //{
+        public void OnSceneLoadStart(NetworkRunner runner)
+        {
 
-        //}
+        }
 
-        //public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-        //{
+        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        {
 
-        //}
+        }
 
-        //public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-        //{
+        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+        {
 
-        //}
+        }
 
-        //public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
-        //{
+        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
+        {
 
-        //}
+        }
         #endregion
         #endregion
     }

@@ -34,6 +34,7 @@ namespace PlayerManagement
             if (Object.HasInputAuthority)
             {
                 //m_networkId = Object.Id;
+                m_rePopPosition = transform.position;
                 m_localInputParent.SetActive(true);
             }
             else
